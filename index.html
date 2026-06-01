@@ -6,6 +6,8 @@
 <meta name="theme-color" content="#1a3580"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="VU Find"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='36' fill='%231a3580'/><rect x='20' y='20' width='152' height='152' rx='24' fill='%23cc1414'/><text x='96' y='130' font-family='Arial' font-weight='900' font-size='90' fill='white' text-anchor='middle'>VU</text></svg>"/>
 <title>VU Find — Smart Lost &amp; Found</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -507,7 +509,8 @@ textarea.finput{resize:vertical;min-height:76px}
 
 /* MOBILE OVERRIDES */
 .menu-toggle{display:none;align-items:center;justify-content:center;width:36px;height:36px;border:1.5px solid var(--border);border-radius:8px;background:#f8fafc;cursor:pointer;font-size:18px;flex-shrink:0;margin-right:6px;}
-.menu-toggle:hover{background:#eef2ff}
+.topbar-logout-btn{display:none;align-items:center;gap:5px;padding:6px 12px;border-radius:100px;border:1.5px solid #fecaca;background:#fef2f2;color:var(--vu-red);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background .2s;}
+.topbar-logout-btn:hover{background:#fee2e2}
 .mobile-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:190;display:none}
 .mobile-overlay.show{display:block}
 
@@ -516,7 +519,8 @@ textarea.finput{resize:vertical;min-height:76px}
   .sidebar{width:260px;transform:translateX(-100%);transition:transform .3s cubic-bezier(.22,1,.36,1);z-index:200;box-shadow:4px 0 24px rgba(0,0,0,0.12);top:58px;}
   .sidebar.open{transform:translateX(0)}
   .main-content{margin-left:0;height:calc(100vh - 58px - var(--nav-h));}
-  .menu-toggle{display:flex!important}
+  .menu-toggle{display:none!important}
+  .topbar-left .vu-logo-box{display:none}
   .topbar-page-title{display:none}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
   .qa-grid{grid-template-columns:1fr 1fr}
@@ -535,6 +539,8 @@ textarea.finput{resize:vertical;min-height:76px}
   .toast{max-width:100%}
   .carousel-wrap{height:130px}
   .carousel-item{width:110px}
+  .topbar-user{gap:7px;padding:5px 10px}
+  .topbar-logout-btn{display:inline-flex!important}
 }
 @media(min-width:769px) and (max-width:1024px){
   :root{--sidebar-w:190px}
@@ -739,10 +745,12 @@ textarea.finput{resize:vertical;min-height:76px}
     </div>
     <div class="topbar-right">
       <div class="topbar-page-title" id="topbarTitle">Home</div>
-      <div class="topbar-user" onclick="doLogout()" title="Click to logout">
-        <div class="ava" id="hAva">?</div>
-        <span class="uname" id="hName">User</span>
-        <span style="font-size:11px;color:var(--text-muted)">▾</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="topbar-user" title="Logged in user">
+          <div class="ava" id="hAva">?</div>
+          <span class="uname" id="hName">User</span>
+        </div>
+        <button class="topbar-logout-btn" onclick="doLogout()" title="Logout">🚪 Logout</button>
       </div>
     </div>
   </div>
@@ -1202,8 +1210,17 @@ window.doRegister = async function(){
   }
 };
 
+function clearAuthForms(){
+  ['lEmail','lPass'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['rFirst','rLast','rPhone','rEmail','rPass','rConf'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  setBtn('loginBtn',false,'Sign In →');
+  setBtn('regBtn',false,'Create Account →');
+  authTab('login');
+}
+
 function bootApp(u){
   me = u;
+  clearAuthForms();
   document.getElementById('authScreen').classList.remove('active');
   document.getElementById('appScreen').classList.add('active');
   const ini = (u.first[0]+(u.last[0]||'')).toUpperCase();
@@ -1224,6 +1241,7 @@ window.doLogout = function(){
   allItems=[]; allUsers=[]; allReviews=[];
   document.getElementById('appScreen').classList.remove('active');
   document.getElementById('authScreen').classList.add('active');
+  clearAuthForms();
   nav('home');
 };
 
@@ -1851,6 +1869,90 @@ window.installPWA = function(){
     deferredPWA.userChoice.then(()=>{deferredPWA=null;document.getElementById('installBar').classList.remove('show');});
   }
 };
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    const swCode = `
+const CACHE = 'vufind-v1';
+const ASSETS = [
+  '/',
+  '/index.html',
+  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
+];
+
+self.addEventListener('install', e=>{
+  e.waitUntil(
+    caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())
+  );
+});
+
+self.addEventListener('activate', e=>{
+  e.waitUntil(
+    caches.keys().then(keys=>Promise.all(
+      keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))
+    )).then(()=>self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', e=>{
+  // Network first for Firebase/API calls
+  if(e.request.url.includes('firebase') || e.request.url.includes('googleapis.com/identitytoolkit')){
+    e.respondWith(fetch(e.request));
+    return;
+  }
+  // Cache first for everything else
+  e.respondWith(
+    caches.match(e.request).then(cached=>{
+      if(cached) return cached;
+      return fetch(e.request).then(res=>{
+        if(res && res.status===200 && res.type==='basic'){
+          const clone = res.clone();
+          caches.open(CACHE).then(c=>c.put(e.request, clone));
+        }
+        return res;
+      }).catch(()=>caches.match('/index.html'));
+    })
+  );
+});`;
+    const blob = new Blob([swCode],{type:'application/javascript'});
+    const swUrl = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swUrl,{scope:'/'}).catch(()=>{});
+  });
+}
+
+/* Inline PWA manifest */
+(function(){
+  const manifest = {
+    name: "VU Find — Smart Lost & Found",
+    short_name: "VU Find",
+    description: "Smart Campus Lost & Found System for Victoria University",
+    start_url: "/index.html",
+    display: "standalone",
+    orientation: "portrait",
+    background_color: "#ffffff",
+    theme_color: "#1a3580",
+    icons: [
+      {
+        src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='36' fill='%231a3580'/><rect x='20' y='20' width='152' height='152' rx='24' fill='%23cc1414'/><text x='96' y='130' font-family='Arial' font-weight='900' font-size='90' fill='white' text-anchor='middle'>VU</text></svg>",
+        sizes: "192x192",
+        type: "image/svg+xml",
+        purpose: "any maskable"
+      },
+      {
+        src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='96' fill='%231a3580'/><rect x='52' y='52' width='408' height='408' rx='64' fill='%23cc1414'/><text x='256' y='350' font-family='Arial' font-weight='900' font-size='240' fill='white' text-anchor='middle'>VU</text></svg>",
+        sizes: "512x512",
+        type: "image/svg+xml",
+        purpose: "any maskable"
+      }
+    ],
+    categories: ["education", "utilities"],
+    lang: "en"
+  };
+  const blob = new Blob([JSON.stringify(manifest)],{type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const link = document.createElement('link');
+  link.rel='manifest'; link.href=url;
+  document.head.appendChild(link);
+})();
 window.addEventListener('online',  ()=>document.getElementById('offlineBar').classList.remove('on'));
 window.addEventListener('offline', ()=>document.getElementById('offlineBar').classList.add('on'));
 if(!navigator.onLine) document.getElementById('offlineBar').classList.add('on');
