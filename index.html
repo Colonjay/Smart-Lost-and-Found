@@ -27,17 +27,15 @@
     onSnapshot, query, orderBy, serverTimestamp, getDocs as fsGetDocs
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  // ── PASTE YOUR FIREBASE CONFIG HERE ──────────────────────────────────────
-  // Go to: Firebase Console → Project Settings → Your apps → SDK setup
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyB_hIRIfUfI0uivKKkRk8xno9TQwt0T4jM",
+    authDomain: "lost-and-found-app-9d5d4.firebaseapp.com",
+    projectId: "lost-and-found-app-9d5d4",
+    storageBucket: "lost-and-found-app-9d5d4.firebasestorage.app",
+    messagingSenderId: "334727118690",
+    appId: "1:334727118690:web:6430baaf5ac60522cfb63b",
+    measurementId: "G-B26ZNCVY33"
   };
-  // ─────────────────────────────────────────────────────────────────────────
 
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
