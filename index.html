@@ -161,6 +161,12 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:var(--content-bg
 .finput::placeholder{color:#b0bec5}
 .finput option{background:#fff;color:var(--text-dark)}
 textarea.finput{resize:vertical;min-height:76px}
+
+/* PASSWORD TOGGLE */
+.pw-wrap{position:relative;display:flex;align-items:center}
+.pw-wrap .finput{flex:1;padding-right:42px}
+.pw-toggle{position:absolute;right:0;top:0;bottom:0;width:40px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:var(--text-muted);transition:color .18s;border-radius:0 9px 9px 0;padding:0;}
+.pw-toggle:hover{color:var(--vu-blue3)}
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border-radius:9px;border:none;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .22s;}
 .btn:disabled{opacity:.6;cursor:not-allowed;transform:none!important}
 .btn-red{background:linear-gradient(135deg,var(--vu-red),var(--vu-red2));color:#fff;box-shadow:0 4px 16px rgba(204,20,20,0.3)}
@@ -209,7 +215,8 @@ textarea.finput{resize:vertical;min-height:76px}
 .navbtn{display:flex;align-items:center;gap:12px;padding:10px 18px;cursor:pointer;border:none;background:transparent;color:var(--text-mid);font-family:'Inter',sans-serif;font-size:13.5px;font-weight:500;transition:all .18s;text-align:left;width:100%;position:relative;}
 .navbtn:hover{background:#f1f5f9;color:var(--vu-blue)}
 .navbtn.on{background:var(--active-bg);color:var(--vu-blue);font-weight:600;border-left:3px solid var(--vu-red);}
-.ni{font-size:18px;width:22px;text-align:center;flex-shrink:0}
+.ni{width:22px;text-align:center;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.ni svg{display:block}
 .nav-label{flex:1}
 .sidebar-footer{margin-top:auto;padding:12px 18px;border-top:1.5px solid var(--border);}
 .logout-btn{display:flex;align-items:center;gap:10px;padding:10px 0;color:var(--text-muted);cursor:pointer;font-size:13px;font-weight:500;background:none;border:none;width:100%;transition:color .18s;}
@@ -482,7 +489,7 @@ textarea.finput{resize:vertical;min-height:76px}
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:#fff;border-top:1.5px solid var(--border);z-index:150;align-items:stretch;box-shadow:0 -4px 20px rgba(26,53,128,0.10);}
 .bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:transparent;cursor:pointer;font-family:'Inter',sans-serif;padding:6px 2px;color:var(--text-muted);transition:color .2s;position:relative;}
 .bnav-btn.on{color:var(--vu-blue)}
-.bnav-btn .bnav-ico{font-size:20px;line-height:1}
+.bnav-btn .bnav-ico{font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center}
 .bnav-btn .bnav-lbl{font-size:9px;font-weight:600;letter-spacing:.2px;text-transform:uppercase}
 .bnav-btn.on::after{content:'';position:absolute;top:0;left:20%;right:20%;height:2.5px;background:var(--vu-red);border-radius:0 0 3px 3px;}
 .bnav-report{flex:1.1}
@@ -687,7 +694,12 @@ textarea.finput{resize:vertical;min-height:76px}
         </div>
         <div class="fgroup">
           <div class="flabel">Password</div>
-          <input type="password" class="finput" id="lPass" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()"/>
+          <div class="pw-wrap">
+            <input type="password" class="finput" id="lPass" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()"/>
+            <button type="button" class="pw-toggle" onclick="togglePw('lPass',this)" tabindex="-1" aria-label="Show password">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
         </div>
         <button class="btn btn-blue mt8" id="loginBtn" onclick="doLogin()">Sign In →</button>
         <div class="hint-line">Admin: <strong style="color:var(--vu-red)">admin@vu.ac.ug</strong> / admin123</div>
@@ -714,11 +726,21 @@ textarea.finput{resize:vertical;min-height:76px}
         </div>
         <div class="fgroup">
           <div class="flabel">Create Password</div>
-          <input type="password" class="finput" id="rPass" placeholder="Min. 6 characters"/>
+          <div class="pw-wrap">
+            <input type="password" class="finput" id="rPass" placeholder="Min. 6 characters"/>
+            <button type="button" class="pw-toggle" onclick="togglePw('rPass',this)" tabindex="-1" aria-label="Show password">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
         </div>
         <div class="fgroup">
           <div class="flabel">Confirm Password</div>
-          <input type="password" class="finput" id="rConf" placeholder="Re-enter password"/>
+          <div class="pw-wrap">
+            <input type="password" class="finput" id="rConf" placeholder="Re-enter password"/>
+            <button type="button" class="pw-toggle" onclick="togglePw('rConf',this)" tabindex="-1" aria-label="Show password">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
         </div>
         <button class="btn btn-blue mt8" id="regBtn" onclick="doRegister()">Create Account →</button>
         <div class="hint-line">Already have an account? <span style="color:var(--vu-blue3);cursor:pointer;font-weight:600" onclick="authTab('login')">Sign In</span></div>
@@ -758,12 +780,12 @@ textarea.finput{resize:vertical;min-height:76px}
   <!-- SIDEBAR -->
   <nav class="sidebar" id="sidebar">
     <div class="nav-section-label">Main Menu</div>
-    <button class="navbtn on" id="n-home" onclick="nav('home')"><span class="ni">🏠</span><span class="nav-label">Home</span></button>
-    <button class="navbtn" id="n-browse" onclick="nav('browse')"><span class="ni">🔍</span><span class="nav-label">Browse Items</span></button>
-    <button class="navbtn" id="n-reviews" onclick="nav('reviews')"><span class="ni">⭐</span><span class="nav-label">Reviews</span></button>
+    <button class="navbtn on" id="n-home" onclick="nav('home')"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg></span><span class="nav-label">Home</span></button>
+    <button class="navbtn" id="n-browse" onclick="nav('browse')"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><span class="nav-label">Browse Items</span></button>
+    <button class="navbtn" id="n-reviews" onclick="nav('reviews')"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span><span class="nav-label">Reviews</span></button>
     <div class="nav-dropdown" id="reportDropdown">
       <button class="navbtn" id="n-report" onclick="toggleReportDropdown(event)">
-        <span class="ni">📋</span>
+        <span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
         <span class="nav-label">Report Item</span>
         <span class="nav-dropdown-arrow">▾</span>
       </button>
@@ -773,9 +795,9 @@ textarea.finput{resize:vertical;min-height:76px}
       </div>
     </div>
     <div class="nav-section-label" style="margin-top:6px">Administration</div>
-    <button class="navbtn" id="n-admin" onclick="nav('admin')"><span class="ni">⚙️</span><span class="nav-label">Admin Panel</span></button>
+    <button class="navbtn" id="n-admin" onclick="nav('admin')"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span class="nav-label">Admin Panel</span></button>
     <div class="sidebar-footer">
-      <button class="logout-btn" onclick="doLogout()"><span style="font-size:16px">🚪</span><span>Logout</span></button>
+      <button class="logout-btn" onclick="doLogout()"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>Logout</span></button>
     </div>
   </nav>
 
@@ -1058,19 +1080,19 @@ textarea.finput{resize:vertical;min-height:76px}
   <!-- MOBILE BOTTOM NAV -->
   <nav class="bottom-nav" id="bottomNav">
     <button class="bnav-btn on" id="bn-home" onclick="nav('home')">
-      <span class="bnav-ico">🏠</span><span class="bnav-lbl">Home</span>
+      <span class="bnav-ico"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg></span><span class="bnav-lbl">Home</span>
     </button>
     <button class="bnav-btn" id="bn-browse" onclick="nav('browse')">
-      <span class="bnav-ico">🔍</span><span class="bnav-lbl">Browse</span>
+      <span class="bnav-ico"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><span class="bnav-lbl">Browse</span>
     </button>
     <button class="bnav-btn bnav-report" id="bn-report" onclick="openReportSheet()">
-      <div class="bnav-report-ico">📋</div><span class="bnav-lbl" style="margin-top:2px">Report</span>
+      <div class="bnav-report-ico"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><span class="bnav-lbl" style="margin-top:2px">Report</span>
     </button>
     <button class="bnav-btn" id="bn-reviews" onclick="nav('reviews')">
-      <span class="bnav-ico">⭐</span><span class="bnav-lbl">Reviews</span>
+      <span class="bnav-ico"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span><span class="bnav-lbl">Reviews</span>
     </button>
     <button class="bnav-btn" id="bn-admin" onclick="nav('admin')">
-      <span class="bnav-ico">⚙️</span><span class="bnav-lbl">Admin</span>
+      <span class="bnav-ico"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span class="bnav-lbl">Admin</span>
     </button>
   </nav>
 
@@ -1844,6 +1866,18 @@ document.getElementById('cBtn').onclick = function(){
 
 /* UTILS */
 function v(id){ const el=document.getElementById(id); return el?(el.value||'').trim():''; }
+
+/* PASSWORD VISIBILITY TOGGLE */
+function togglePw(inputId, btn){
+  const inp = document.getElementById(inputId);
+  if(!inp) return;
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  btn.innerHTML = show
+    ? `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+    : `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+}
 function setText(id,val){ const el=document.getElementById(id); if(el) el.textContent=val; }
 function esc(s){ if(!s)return''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function setBtn(id,loading,text){ const el=document.getElementById(id); if(!el) return; el.disabled=loading; el.textContent=text; }
