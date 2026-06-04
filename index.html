@@ -303,11 +303,7 @@ textarea.finput{resize:vertical;min-height:76px}
 .upload-text strong{color:var(--vu-blue3)}
 .img-resize-wrap{position:relative;margin-top:10px;display:none}
 .img-resize-wrap.show{display:block}
-.img-resize-preview{width:100%;border-radius:8px;max-height:220px;object-fit:contain;background:#f8fafc;display:block;}
-.resize-controls{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
-.resize-label{font-size:11px;color:var(--text-muted);font-weight:600;white-space:nowrap}
-.resize-slider{flex:1;min-width:80px;accent-color:var(--vu-blue3)}
-.resize-val{font-size:11px;color:var(--vu-blue);font-weight:700;width:36px;text-align:right}
+.img-resize-preview{max-width:100%;border-radius:8px;display:block;}
 
 /* ADMIN */
 .admin-hero{background:linear-gradient(135deg,var(--vu-blue) 0%,var(--vu-blue3) 100%);border-radius:14px;padding:22px;margin-bottom:18px;color:#fff;box-shadow:var(--shadow2);}
@@ -997,11 +993,8 @@ textarea.finput{resize:vertical;min-height:76px}
           </div>
           <div class="img-resize-wrap" id="imgResizeWrap">
             <img class="img-resize-preview" id="fPreview" alt="Preview"/>
-            <div class="resize-controls">
-              <span class="resize-label">Resize:</span>
-              <input type="range" class="resize-slider" id="resizeSlider" min="10" max="100" value="100" oninput="onResize(this.value)"/>
-              <span class="resize-val" id="resizeVal">100%</span>
-              <button class="btn btn-ghost btn-sm" onclick="clearPhoto()" style="margin-left:4px">✕ Remove</button>
+            <div style="margin-top:6px">
+              <button class="btn btn-ghost btn-sm" onclick="clearPhoto()">✕ Remove</button>
             </div>
           </div>
         </div>
@@ -1808,27 +1801,11 @@ document.addEventListener('click', e=>{
 });
 
 /* IMAGE UPLOAD */
-window.onResize = function(pct){
-  document.getElementById('resizeVal').textContent = pct+'%';
-  if(!originalImgData) return;
-  const scale = pct/100;
-  const img = new Image();
-  img.onload = function(){
-    const canvas = document.createElement('canvas');
-    canvas.width  = Math.round(img.naturalWidth*scale);
-    canvas.height = Math.round(img.naturalHeight*scale);
-    canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
-    pendingImgData = canvas.toDataURL('image/jpeg',0.88);
-    document.getElementById('fPreview').src = pendingImgData;
-  };
-  img.src = originalImgData;
-};
+
 window.clearPhoto = function(){
   pendingImgData=null; originalImgData=null;
   const fp = document.getElementById('fPhoto'); if(fp) fp.value='';
   document.getElementById('imgResizeWrap').classList.remove('show');
-  document.getElementById('resizeSlider').value=100;
-  document.getElementById('resizeVal').textContent='100%';
 };
 window.onPhoto = function(input){
   function processFile(file){
@@ -1838,8 +1815,6 @@ window.onPhoto = function(input){
       pendingImgData  = e.target.result;
       document.getElementById('fPreview').src = e.target.result;
       document.getElementById('imgResizeWrap').classList.add('show');
-      document.getElementById('resizeSlider').value=100;
-      document.getElementById('resizeVal').textContent='100%';
     };
     r.readAsDataURL(file);
   }
