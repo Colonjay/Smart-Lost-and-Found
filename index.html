@@ -301,9 +301,13 @@ textarea.finput{resize:vertical;min-height:76px}
 .upload-ico{font-size:26px;margin-bottom:6px}
 .upload-text{font-size:12px;color:var(--text-muted)}
 .upload-text strong{color:var(--vu-blue3)}
-.img-resize-wrap{position:relative;margin-top:10px;display:none}
-.img-resize-wrap.show{display:block}
-.img-resize-preview{max-width:100%;border-radius:8px;display:block;}
+.img-preview-wrap{position:relative;margin-top:14px;display:none;align-items:center;gap:14px}
+.img-preview-wrap.show{display:flex}
+.img-preview-thumb{width:96px;height:96px;border-radius:16px;object-fit:cover;flex-shrink:0;border:2px solid var(--border);box-shadow:0 2px 10px rgba(26,53,128,0.10);background:#f1f5f9;}
+.img-preview-info{display:flex;flex-direction:column;gap:6px}
+.img-preview-label{font-size:12px;font-weight:600;color:var(--success)}
+.img-preview-sub{font-size:11px;color:var(--text-muted)}
+@media(max-width:400px){.img-preview-thumb{width:80px;height:80px;border-radius:14px}}
 
 /* ADMIN */
 .admin-hero{background:linear-gradient(135deg,var(--vu-blue) 0%,var(--vu-blue3) 100%);border-radius:14px;padding:22px;margin-bottom:18px;color:#fff;box-shadow:var(--shadow2);}
@@ -991,10 +995,12 @@ textarea.finput{resize:vertical;min-height:76px}
             <div class="upload-ico">📷</div>
             <div class="upload-text"><strong>Click to upload or take photo</strong> — PNG, JPG up to 5MB</div>
           </div>
-          <div class="img-resize-wrap" id="imgResizeWrap">
-            <img class="img-resize-preview" id="fPreview" alt="Preview"/>
-            <div style="margin-top:6px">
-              <button class="btn btn-ghost btn-sm" onclick="clearPhoto()">✕ Remove</button>
+          <div class="img-preview-wrap" id="imgResizeWrap">
+            <img class="img-preview-thumb" id="fPreview" alt="Preview"/>
+            <div class="img-preview-info">
+              <div class="img-preview-label">✅ Photo ready</div>
+              <div class="img-preview-sub" id="fPreviewMeta">Image attached</div>
+              <button class="btn btn-ghost btn-sm" style="width:auto;margin-top:2px" onclick="clearPhoto()">✕ Remove</button>
             </div>
           </div>
         </div>
@@ -1109,7 +1115,6 @@ let curATab        = 'pending';
 let reportType     = 'lost';
 let deferredPWA    = null;
 let pendingImgData = null;
-let originalImgData= null;
 let confirmCb      = null;
 let curReviewStar  = 0;
 let curPromptStar  = 0;
@@ -1803,23 +1808,39 @@ document.addEventListener('click', e=>{
 /* IMAGE UPLOAD */
 
 window.clearPhoto = function(){
-  pendingImgData=null; originalImgData=null;
+  pendingImgData=null;
   const fp = document.getElementById('fPhoto'); if(fp) fp.value='';
   document.getElementById('imgResizeWrap').classList.remove('show');
 };
 window.onPhoto = function(input){
-  function processFile(file){
-    const r = new FileReader();
-    r.onload = e=>{
-      originalImgData = e.target.result;
-      pendingImgData  = e.target.result;
-      document.getElementById('fPreview').src = e.target.result;
+  if(!input.files||!input.files[0]) return;
+  const file = input.files[0];
+  const SIZE = 600; // output square px — good quality, reasonable file size
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const img = new Image();
+    img.onload = ()=>{
+      // Centre-crop to square then scale to SIZE×SIZE
+      const canvas  = document.createElement('canvas');
+      canvas.width  = SIZE;
+      canvas.height = SIZE;
+      const ctx = canvas.getContext('2d');
+      const src = Math.min(img.width, img.height); // side of the square crop
+      const sx  = (img.width  - src) / 2;
+      const sy  = (img.height - src) / 2;
+      ctx.drawImage(img, sx, sy, src, src, 0, 0, SIZE, SIZE);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+      pendingImgData = dataUrl;
+      document.getElementById('fPreview').src = dataUrl;
+      // Show friendly meta
+      const kb = Math.round(dataUrl.length * 0.75 / 1024);
+      const meta = document.getElementById('fPreviewMeta');
+      if(meta) meta.textContent = `${SIZE}×${SIZE}px · ~${kb} KB`;
       document.getElementById('imgResizeWrap').classList.add('show');
     };
-    r.readAsDataURL(file);
-  }
-  if(!input.files||!input.files[0]) return;
-  processFile(input.files[0]);
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 };
 
 /* CONFIRM DIALOG */
