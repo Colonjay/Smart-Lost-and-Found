@@ -2,14 +2,15 @@
 importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js');
 
-// Initialize Firebase inside the worker using your project details
+// Configured Project Background Engine Setup
 firebase.initializeApp({
-  apiKey: "AIzaSyAsX-ExampleKey-12345",
+  apiKey: "AIzaSyB_hIRIfUfI0uivKKkRk8xno9TQwt0T4jM",
   authDomain: "lost-and-found-app-9d5d4.firebaseapp.com",
   projectId: "lost-and-found-app-9d5d4",
-  storageBucket: "lost-and-found-app-9d5d4.appspot.com",
-  messagingSenderId: "543210987654",
-  appId: "1:543210987654:web:abcd1234efgh5678"
+  storageBucket: "lost-and-found-app-9d5d4.firebasestorage.app",
+  messagingSenderId: "334727118690",
+  appId: "1:334727118690:web:6430baaf5ac60522cfb63b",
+  measurementId: "G-B26ZNCVY33"
 });
 
 const messaging = firebase.messaging();
@@ -21,7 +22,7 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification.title || 'VU Find Update';
   const notificationOptions = {
     body: payload.notification.body || 'There is an update regarding a campus item.',
-    icon: '/favicon.ico' // Update this path to your app icon if you have one
+    icon: '/favicon.ico'
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
