@@ -109,14 +109,15 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
 
   <script>
-    // Initialize Firebase Structure (Only used for Messaging Notification registration)
+    // Configured Project Web SDK Engine
     const firebaseConfig = {
-      apiKey: "AIzaSyAsX-ExampleKey-12345",
+      apiKey: "AIzaSyB_hIRIfUfI0uivKKkRk8xno9TQwt0T4jM",
       authDomain: "lost-and-found-app-9d5d4.firebaseapp.com",
       projectId: "lost-and-found-app-9d5d4",
-      storageBucket: "lost-and-found-app-9d5d4.appspot.com",
-      messagingSenderId: "543210987654",
-      appId: "1:543210987654:web:abcd1234efgh5678"
+      storageBucket: "lost-and-found-app-9d5d4.firebasestorage.app",
+      messagingSenderId: "334727118690",
+      appId: "1:334727118690:web:6430baaf5ac60522cfb63b",
+      measurementId: "G-B26ZNCVY33"
     };
     
     firebase.initializeApp(firebaseConfig);
@@ -126,7 +127,7 @@
       messaging = firebase.messaging();
     }
 
-    // Local runtime state for mock interface navigation (No real-time database locks required)
+    // Local runtime variables
     let itemsData = [
       { id: "1", name: "Brown Leather Wallet", loc: "Block A Cafeteria", date: "2026-06-20", type: "lost", status: "active" },
       { id: "2", name: "HP Laptop Charger", loc: "Main Library Room 4", date: "2026-06-22", type: "found", status: "active" },
@@ -137,10 +138,8 @@
 </head>
 <body>
 
-<!-- TOAST WRAPPER -->
 <div id="toasts"></div>
 
-<!-- SPLASH ENGINE -->
 <div class="splash-screen" id="splash">
   <div style="text-align: center;">
     <h1 style="color: var(--secondary); font-size: 36px; margin-bottom: 10px;">VU FIND</h1>
@@ -148,11 +147,9 @@
   </div>
 </div>
 
-<!-- CENTRAL RUNTIME SCREEN (Visible immediately on layout start) -->
 <div class="appScreen" id="appScreen">
   <div class="app-container">
     
-    <!-- DESKTOP SIDER -->
     <div class="sidebar">
       <div>
         <div style="padding: 10px 15px;">
@@ -178,7 +175,6 @@
       </div>
     </div>
 
-    <!-- MAIN RIGHT STACK -->
     <div class="main-content">
       <div class="topbar">
         <h3 id="topbarTitle">Home</h3>
@@ -187,7 +183,6 @@
 
       <div class="pages">
         
-        <!-- PAGE: HOME -->
         <div class="page show" id="pg-home">
           <div class="stats-grid">
             <div class="stat-card">
@@ -212,7 +207,6 @@
           <div id="recentList"></div>
         </div>
 
-        <!-- PAGE: BROWSE BOARD -->
         <div class="page" id="pg-browse">
           <div style="margin-bottom: 20px;">
             <label style="color: var(--text-muted); font-size: 13px; display: block; margin-bottom: 8px;">Active Structural Filtering Matrix</label>
@@ -225,7 +219,6 @@
           <div class="item-list" id="browseList"></div>
         </div>
 
-        <!-- PAGE: REPORT ENTRY FORM -->
         <div class="page" id="pg-report">
           <div style="max-width: 600px; margin: 0 auto; background: var(--surface); padding: 25px; border-radius: 12px;">
             <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
@@ -257,7 +250,6 @@
           </div>
         </div>
 
-        <!-- PAGE: TESTIMONIAL REVIEWS -->
         <div class="page" id="pg-reviews">
           <h2>Success Testimonials</h2>
           <p style="color: var(--text-muted); margin-bottom: 20px;">Read about recovered belongings across the Victoria University community.</p>
@@ -270,7 +262,6 @@
           </div>
         </div>
 
-        <!-- PAGE: ADMIN CONSOLE -->
         <div class="page" id="pg-admin">
           <div class="admin-banner">
             <div style="display: flex; align-items: center; gap: 15px;">
@@ -296,7 +287,6 @@
     </div>
   </div>
 
-  <!-- MOBILE BOTTOM NAVIGATION -->
   <div class="bottom-nav">
     <button class="bnav-btn on" id="bn-home" onclick="nav('home')">
       <span class="bnav-ico">🏠</span>
@@ -320,18 +310,15 @@
   </div>
 </div>
 
-<!-- MAIN APPLICATION LOGIC SCRIPT -->
 <script>
   let currentFilter = 'all';
 
   document.addEventListener('DOMContentLoaded', () => {
-    // Hide splash screen cleanly
     const splash = document.getElementById('splash');
     if (splash) setTimeout(() => splash.classList.add('gone'), 800);
     
     renderApp();
 
-    // Handle Token Request using your structural Web Push Key Pair
     if (messaging) {
       messaging.getToken({ vapidKey: 'BL2kOckVO9eBNqPHqJBSQ98_iECPTWBdJYdhPjkF7eE184SNtfBl-Vj4xySOJM8xrelc7vWCzcNsFuJaw0wB2T8' })
         .then((currentToken) => {
@@ -344,14 +331,12 @@
           console.error('An error occurred while retrieving token: ', err);
         });
 
-      // Intercept background notifications matching layout focus
       messaging.onMessage((payload) => {
         showToast(payload.notification.body || "System Notification Received", "nf");
       });
     }
   });
 
-  /* ── Navigation Mechanics ── */
   function nav(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
     document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('on'));
@@ -405,7 +390,6 @@
     nav('home');
   }
 
-  /* ── Core Interface Render Engineering ── */
   function renderApp() {
     const counts = { lost: 0, found: 0, claimed: 0 };
     itemsData.forEach(item => {
