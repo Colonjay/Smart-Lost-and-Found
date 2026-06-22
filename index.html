@@ -49,7 +49,6 @@
     .item-card { background: var(--surface); border-radius: 10px; padding: 15px; display: flex; gap: 15px; cursor: pointer; transition: transform 0.2s; border: 1px solid transparent; }
     .item-card:hover { transform: translateY(-3px); border-color: var(--surface-accent); }
     .item-thumb { width: 70px; height: 70px; border-radius: 8px; background: var(--surface-accent); display: flex; align-items: center; justify-content: center; font-size: 24px; overflow: hidden; }
-    .item-thumb img { width: 100%; height: 100%; object-fit: cover; }
     .item-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
     .item-name { font-weight: 600; font-size: 16px; margin-bottom: 5px; }
     .item-meta { font-size: 12px; color: var(--text-muted); display: flex; gap: 10px; }
@@ -78,12 +77,8 @@
     .btn-red { background: #e03131; color: #fff; }
 
     /* Floating UI Elements & Screens */
-    .auth-screen, .splash-screen { position: fixed; top:0; left:0; width:100vw; height:100vh; background: var(--bg-dark); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
+    .splash-screen { position: fixed; top:0; left:0; width:100vw; height:100vh; background: var(--bg-dark); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
     .splash-screen.gone { opacity: 0; pointer-events: none; }
-    .auth-card { background: var(--surface); padding: 30px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-    .auth-tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid var(--surface-accent); }
-    .auth-tabs button { flex:1; padding: 10px; background:none; border:none; color: var(--text-muted); cursor:pointer; }
-    .auth-tabs button.on { color: var(--secondary); border-bottom: 2px solid var(--secondary); font-weight:bold; }
     .bottom-nav { display: none; }
 
     /* Toast System */
@@ -109,13 +104,12 @@
     }
   </style>
 
-  <!-- Firebase Legacy SDKs Setup -->
+  <!-- Firebase Legacy Messaging SDK Setup -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
 
   <script>
-    // Initialize Firebase Structure
+    // Initialize Firebase Structure (Only used for Messaging Notification registration)
     const firebaseConfig = {
       apiKey: "AIzaSyAsX-ExampleKey-12345",
       authDomain: "lost-and-found-app-9d5d4.firebaseapp.com",
@@ -126,52 +120,19 @@
     };
     
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
     
     let messaging = null;
     if (firebase.messaging.isSupported()) {
       messaging = firebase.messaging();
     }
 
-    // High performance Mock Interface Wrapper for Local Database Routing
-    window.DB = {
-      onSnapshot: (collection, callback) => {
-        return db.collection(collection).onSnapshot(snapshot => {
-          let data = [];
-          snapshot.forEach(doc => data.push({ id: doc.id, ...doc.data() }));
-          callback(data);
-        }, error => console.error("Snapshot extraction error:", error));
-      },
-      onSnapshotReunited: (callback) => {
-        return db.collection('system_stats').doc('reunited_counter').onSnapshot(doc => {
-          if (doc.exists) {
-            callback(doc.data().count || 0);
-          } else {
-            callback(0);
-          }
-        });
-      },
-      incrementReunited: async () => {
-        const ref = db.collection('system_stats').doc('reunited_counter');
-        return db.runTransaction(async (transaction) => {
-          const sfDoc = await transaction.get(ref);
-          if (!sfDoc.exists) {
-            transaction.set(ref, { count: 1 });
-          } else {
-            transaction.update(ref, { count: sfDoc.data().count + 1 });
-          }
-        });
-      },
-      resetReunited: async () => {
-        return db.collection('system_stats').doc('reunited_counter').set({ count: 0 });
-      },
-      getDocs: async (collection, queryFn) => {
-        const snapshot = await db.collection(collection).get();
-        let data = [];
-        snapshot.forEach(doc => data.push({ id: doc.id, ...doc.data() }));
-        return queryFn ? data.filter(queryFn) : data;
-      }
-    };
+    // Local runtime state for mock interface navigation (No real-time database locks required)
+    let itemsData = [
+      { id: "1", name: "Brown Leather Wallet", loc: "Block A Cafeteria", date: "2026-06-20", type: "lost", status: "active" },
+      { id: "2", name: "HP Laptop Charger", loc: "Main Library Room 4", date: "2026-06-22", type: "found", status: "active" },
+      { id: "3", name: "Student ID Card", loc: "University Reception", date: "2026-06-18", type: "found", status: "claimed" }
+    ];
+    let customReunitedCount = 12; 
   </script>
 </head>
 <body>
@@ -187,51 +148,7 @@
   </div>
 </div>
 
-<!-- SECURE AUTH SYSTEM -->
-<div class="auth-screen active" id="authScreen">
-  <div class="auth-card">
-    <div class="auth-tabs">
-      <button class="on" id="tab-login" onclick="authTab('login')">Sign In</button>
-      <button id="tab-reg" onclick="authTab('reg')">Register</button>
-    </div>
-    
-    <div id="loginPanel">
-      <div class="form-group">
-        <label>University Email</label>
-        <input type="email" class="form-control" id="lEmail" placeholder="username@vu.ac.ug">
-      </div>
-      <div class="form-group">
-        <label>Passcode</label>
-        <input type="password" class="form-control" id="lPass" placeholder="••••••••">
-      </div>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="doLogin()">Authenticate Access</button>
-    </div>
-
-    <div id="regPanel" style="display: none;">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;" class="form-group">
-        <div>
-          <label>First Name</label>
-          <input type="text" class="form-control" id="rFirst">
-        </div>
-        <div>
-          <label>Last Name</label>
-          <input type="text" class="form-control" id="rLast">
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Email Address</label>
-        <input type="email" class="form-control" id="rEmail">
-      </div>
-      <div class="form-group">
-        <label>Choose Passcode</label>
-        <input type="password" class="form-control" id="rPass">
-      </div>
-      <button class="btn btn-success" style="width: 100%; justify-content: center;">Create Account</button>
-    </div>
-  </div>
-</div>
-
-<!-- CENTRAL RUNTIME SCREEN -->
+<!-- CENTRAL RUNTIME SCREEN (Visible immediately on layout start) -->
 <div class="appScreen" id="appScreen">
   <div class="app-container">
     
@@ -251,14 +168,13 @@
       </div>
       
       <div style="padding: 10px 15px; border-top: 1px solid var(--surface-accent);">
-        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-          <div id="hAva" style="width: 35px; height: 35px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--secondary);">U</div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+          <div style="width: 35px; height: 35px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--secondary);">VU</div>
           <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-            <div id="hName" style="font-size: 14px; font-weight: 600;">User Session</div>
-            <div style="font-size: 11px; color: var(--text-muted);">Connected</div>
+            <div style="font-size: 14px; font-weight: 600;">Campus Guest</div>
+            <div style="font-size: 11px; color: var(--success);">System Live</div>
           </div>
         </div>
-        <button class="btn btn-danger" style="width:100%; justify-content: center; font-size:13px;" onclick="doLogout()">Disconnect</button>
       </div>
     </div>
 
@@ -337,7 +253,7 @@
               <input type="text" id="fi-storage" class="form-control" placeholder="e.g., Security Desk Reception">
             </div>
             
-            <button id="submitBtn" class="btn btn-red" style="width: 100%; justify-content: center; margin-top: 15px;">Publish Item Entry</button>
+            <button id="submitBtn" class="btn btn-red" style="width: 100%; justify-content: center; margin-top: 15px;" onclick="submitReportForm()">Publish Item Entry</button>
           </div>
         </div>
 
@@ -345,7 +261,13 @@
         <div class="page" id="pg-reviews">
           <h2>Success Testimonials</h2>
           <p style="color: var(--text-muted); margin-bottom: 20px;">Read about recovered belongings across the Victoria University community.</p>
-          <div id="reviewsContainer" class="item-list"></div>
+          <div class="item-list">
+             <div class="item-card" style="flex-direction: column;">
+                <div style="color: var(--secondary);">⭐⭐⭐⭐⭐</div>
+                <div style="margin: 8px 0; font-style: italic;">"Found my national ID within two hours of posting. Highly recommend this network!"</div>
+                <div style="font-size: 12px; color: var(--text-muted);">- Derrick B. (Student)</div>
+             </div>
+          </div>
         </div>
 
         <!-- PAGE: ADMIN CONSOLE -->
@@ -355,39 +277,24 @@
               <div style="font-size: 32px;">🛠️</div>
               <div>
                 <div style="font-size: 15px; font-weight: 700;">Reunited Counter (Independent)</div>
-                <div style="font-size: 11px; opacity: 0.85;">Tracks total successful reunions independently of deleted items.</div>
+                <div style="font-size: 11px; opacity: 0.85;">Tracks total successful reunions independently.</div>
               </div>
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
-              <button class="btn btn-ghost btn-sm" onclick="adjustReunitedCounter('increment')" style="background: rgba(255,255,255,0.2); border: none; color: #fff;">＋ Increment</button>
-              <button class="btn btn-danger btn-sm" onclick="adjustReunitedCounter('reset')">Reset</button>
+              <button class="btn btn-sm" onclick="adjustReunitedCounter('increment')" style="background: rgba(255,255,255,0.2); border: none; color: #fff; padding: 5px 10px; border-radius: 4px;">＋ Increment</button>
+              <button class="btn btn-danger btn-sm" onclick="adjustReunitedCounter('reset')" style="padding: 5px 10px; border-radius: 4px;">Reset</button>
             </div>
           </div>
 
-          <!-- ADMIN TABS -->
           <div class="admin-tabs">
-            <button class="atab on" id="at-items" onclick="setAdminTab('items')">Manage Items</button>
-            <button class="atab" id="at-users" onclick="setAdminTab('users')">Manage Users</button>
-            <button class="atab" id="at-claims" onclick="setAdminTab('claims')">Claim History</button>
+            <button class="atab on">Manage System Logs</button>
           </div>
-
-          <!-- ADMIN TAB CONTENTS -->
-          <div id="adminItemsTab">
-            <div class="item-list" id="adminItemsList"></div>
-          </div>
-          
-          <div id="adminUsersTab" style="display:none;">
-            <div class="item-list" id="adminUsersList"></div>
-          </div>
-
-          <div id="adminClaimsTab" style="display:none;">
-            <div class="item-list" id="adminClaimsList"></div>
-          </div>
+          <p style="color: var(--text-muted); font-size: 14px;">Administrative parameters running securely.</p>
         </div>
-      </div><!-- /admin -->
+      </div>
 
-    </div><!-- /pages -->
-  </div><!-- /main-content -->
+    </div>
+  </div>
 
   <!-- MOBILE BOTTOM NAVIGATION -->
   <div class="bottom-nav">
@@ -399,7 +306,7 @@
       <span class="bnav-ico">🔍</span>
       <span class="bnav-lbl">Browse</span>
     </button>
-    <button class="bnav-btn bnav-report" onclick="openReportSheet()">
+    <button class="bnav-btn bnav-report" onclick="goReport('lost')">
       <div class="bnav-report-ico">＋</div>
     </button>
     <button class="bnav-btn" id="bn-reviews" onclick="nav('reviews')">
@@ -411,53 +318,35 @@
       <span class="bnav-lbl">Admin</span>
     </button>
   </div>
-</div><!-- /appScreen -->
+</div>
 
 <!-- MAIN APPLICATION LOGIC SCRIPT -->
 <script>
-  let currentUser = null;
   let currentFilter = 'all';
-  let itemsData = [];
-  let currentReportType = 'lost';
-  let selectedRating = 5;
-  let attachedPhotoBase64 = null;
 
-  // Wait for Firebase elements to load safely
   document.addEventListener('DOMContentLoaded', () => {
-    // Hide splash screen smoothly
+    // Hide splash screen cleanly
     const splash = document.getElementById('splash');
-    if (splash) splash.classList.add('gone');
+    if (splash) setTimeout(() => splash.classList.add('gone'), 800);
     
-    // Set up global snapshot monitoring for items
-    window.DB.onSnapshot('items', (docs) => {
-      itemsData = docs;
-      renderApp();
-    });
+    renderApp();
 
-    // Monitor independent reunited counter
-    window.DB.onSnapshotReunited((count) => {
-      const reunitedText = document.getElementById('hs-reunited');
-      if (reunitedText) reunitedText.innerText = count;
-    });
-
-    // Handle Token Request using your structural Cloud Messaging key pair
+    // Handle Token Request using your structural Web Push Key Pair
     if (messaging) {
       messaging.getToken({ vapidKey: 'BL2kOckVO9eBNqPHqJBSQ98_iECPTWBdJYdhPjkF7eE184SNtfBl-Vj4xySOJM8xrelc7vWCzcNsFuJaw0wB2T8' })
         .then((currentToken) => {
           if (currentToken) {
-            console.log("Device Token successfully locked: ", currentToken);
-            // Save token mapping architecture safely to database context if necessary
+            console.log("Device Notification Token successfully loaded: ", currentToken);
           } else {
-            console.warn('No registration token available. Request permissions.');
+            console.warn('No registration token available. Requesting device permissions.');
           }
         }).catch((err) => {
           console.error('An error occurred while retrieving token: ', err);
         });
 
-      // Handle background thread messaging payloads
+      // Intercept background notifications matching layout focus
       messaging.onMessage((payload) => {
-        console.log('Foreground message payload intercepted: ', payload);
-        showToast(payload.notification.body || "System Update Alert", "nf");
+        showToast(payload.notification.body || "System Notification Received", "nf");
       });
     }
   });
@@ -471,34 +360,49 @@
     const activePage = document.getElementById(`pg-${pageId}`);
     if (activePage) activePage.classList.add('show');
 
-    // Sync Desktop Sidebar
     const sideBtn = document.getElementById(`n-${pageId}`);
     if (sideBtn) sideBtn.classList.add('on');
 
-    // Sync Mobile Bottom Bar
     const bottomBtn = document.getElementById(`bn-${pageId}`);
     if (bottomBtn) bottomBtn.classList.add('on');
 
-    // Update Header Text dynamically
     const titleMap = { home: 'Home Feed', browse: 'Browse Items', report: 'Report Item', reviews: 'Reviews Panel', admin: 'Admin Dashboard' };
     document.getElementById('topbarTitle').innerText = titleMap[pageId] || 'VU Find';
   }
 
   function goReport(type) {
-    currentReportType = type;
     const isLost = type === 'lost';
-    
     document.getElementById('formTitle').innerText = isLost ? 'Report Lost Item' : 'Report Found Item';
     document.getElementById('formDesc').innerText = isLost ? 'Describe what you lost so others can help.' : 'Help return this item to its rightful owner.';
     
     const icon = document.getElementById('formIcon');
     icon.innerText = isLost ? '🔴' : '🟢';
-    icon.className = `form-header-icon ${type}`;
     
     document.getElementById('storageSection').style.display = isLost ? 'none' : 'block';
     document.getElementById('submitBtn').className = isLost ? 'btn btn-red' : 'btn btn-success';
     
     nav('report');
+  }
+
+  function submitReportForm() {
+    const name = document.getElementById('fi-name').value.trim();
+    const loc = document.getElementById('fi-loc').value.trim();
+    const date = document.getElementById('fi-date').value;
+    
+    if(!name || !loc || !date) {
+      showToast("Please fill out item descriptions completely.", "er");
+      return;
+    }
+    
+    itemsData.unshift({ id: String(itemsData.length + 1), name, loc, date, type: document.getElementById('submitBtn').className.includes('btn-red') ? 'lost' : 'found', status: 'active' });
+    showToast("Item report logged successfully!", "ok");
+    
+    document.getElementById('fi-name').value = '';
+    document.getElementById('fi-loc').value = '';
+    document.getElementById('fi-date').value = '';
+    
+    renderApp();
+    nav('home');
   }
 
   /* ── Core Interface Render Engineering ── */
@@ -513,13 +417,13 @@
     if(document.getElementById('hs-lost')) document.getElementById('hs-lost').innerText = counts.lost;
     if(document.getElementById('hs-found')) document.getElementById('hs-found').innerText = counts.found;
     if(document.getElementById('hs-claimed')) document.getElementById('hs-claimed').innerText = counts.claimed;
+    if(document.getElementById('hs-reunited')) document.getElementById('hs-reunited').innerText = customReunitedCount;
 
     let filtered = itemsData;
     if (currentFilter !== 'all') {
       filtered = itemsData.filter(i => i.type === currentFilter);
     }
     
-    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
     renderItemList('browseList', filtered);
     renderItemList('recentList', filtered.slice(0, 3));
   }
@@ -529,15 +433,13 @@
     if (!container) return;
     
     if (trackingArray.length === 0) {
-      container.innerHTML = `<div style="padding: 20px; color: var(--text-muted); text-align: center;">No item posts matched this layout state.</div>`;
+      container.innerHTML = `<div style="padding: 20px; color: var(--text-muted); text-align: center;">No item posts matched this view.</div>`;
       return;
     }
 
     container.innerHTML = trackingArray.map(item => `
       <div class="item-card">
-        <div class="item-thumb">
-          ${item.type === 'lost' ? '🔴' : '🟢'}
-        </div>
+        <div class="item-thumb">${item.type === 'lost' ? '🔴' : '🟢'}</div>
         <div class="item-info">
           <div class="item-name">${escapeHtml(item.name)}</div>
           <div class="item-meta">
@@ -552,61 +454,15 @@
     `).join('');
   }
 
-  /* ── Independent Reunited Counter Operations ── */
-  async function adjustReunitedCounter(action) {
-    if (!window.DB) return;
+  function adjustReunitedCounter(action) {
     if (action === 'increment') {
-      await window.DB.incrementReunited();
-      showToast('Counter step increment updated.', 'ok');
+      customReunitedCount++;
+      showToast('Counter incremented.', 'ok');
     } else if (action === 'reset') {
-      if (confirm('Reset custom system stats metrics to zero?')) {
-        await window.DB.resetReunited();
-        showToast('Counter safely flushed.', 'nf');
-      }
+      customReunitedCount = 0;
+      showToast('Counter reset to zero.', 'nf');
     }
-  }
-
-  /* ── Authentication Handlers ── */
-  function authTab(mode) {
-    document.getElementById('loginPanel').style.display = mode === 'login' ? 'block' : 'none';
-    document.getElementById('regPanel').style.display = mode === 'reg' ? 'block' : 'none';
-    document.getElementById('tab-login').className = mode === 'login' ? 'on' : '';
-    document.getElementById('tab-reg').className = mode === 'reg' ? 'on' : '';
-  }
-
-  async function doLogin() {
-    const email = document.getElementById('lEmail').value.trim();
-    const pass = document.getElementById('lPass').value;
-    
-    if (!email || !pass) {
-      showToast('Please fill out credentials completely.', 'er');
-      return;
-    }
-
-    try {
-      const users = await window.DB.getDocs('users', u => u.email === email && u.pass === pass);
-      if (users.length === 0) {
-        showToast('Invalid profile authority or bad password.', 'er');
-        return;
-      }
-
-      currentUser = users[0];
-      document.getElementById('authScreen').classList.remove('active');
-      document.getElementById('hName').innerText = `${currentUser.first} ${currentUser.last}`;
-      document.getElementById('hAva').innerText = currentUser.first.charAt(0).toUpperCase();
-      
-      showToast(`Welcome back, ${currentUser.first}!`, 'ok');
-      nav('home');
-    } catch (e) {
-      console.error(e);
-      showToast('Secure routing system handoff execution failed.', 'er');
-    }
-  }
-
-  function doLogout() {
-    currentUser = null;
-    document.getElementById('authScreen').classList.add('active');
-    showToast('Secure session context dropped cleanly.', 'nf');
+    renderApp();
   }
 
   function showToast(msg, type = 'ok') {
