@@ -220,6 +220,8 @@ textarea.finput{resize:vertical;min-height:76px}
 .live-badge{display:inline-flex;align-items:center;gap:5px;background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px;letter-spacing:.3px;}
 .live-dot{width:6px;height:6px;border-radius:50%;background:#16a34a;animation:livePulse 1.4s ease infinite;}
 @keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.offline-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.75);font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px;letter-spacing:.3px;}
+.offline-badge-dot{width:6px;height:6px;border-radius:50%;background:#f87171;}
 
 /* APP LAYOUT */
 #appScreen{flex-direction:row;background:var(--content-bg)}
@@ -230,7 +232,7 @@ textarea.finput{resize:vertical;min-height:76px}
 .vu-logo-text .vn{font-size:13px;font-weight:700;color:var(--vu-blue);}
 .vu-logo-text .vs{font-size:10px;color:var(--text-muted);}
 .topbar-right{flex:1;display:flex;align-items:center;justify-content:space-between;padding-left:20px}
-.topbar-page-title{font-size:16px;font-weight:600;color:var(--vu-blue)}
+.topbar-page-title{font-size:16px;font-weight:600;color:var(--vu-blue);display:none}
 .topbar-user{display:flex;align-items:center;gap:9px;cursor:pointer;padding:6px 12px;border-radius:100px;border:1.5px solid var(--border);background:#f8fafc;transition:background .2s}
 .topbar-user:hover{background:#eef2ff}
 .ava{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--vu-red),var(--vu-blue))}
@@ -423,9 +425,8 @@ textarea.finput{resize:vertical;min-height:76px}
 /* CAROUSEL */
 .carousel-section{margin-bottom:22px}
 .carousel-wrap{position:relative;overflow:hidden;border-radius:14px;background:var(--card-bg);border:1.5px solid var(--border);height:160px;box-shadow:var(--shadow);}
-.carousel-track{display:flex;height:100%;animation:carouselScroll 32s linear infinite;will-change:transform;}
-.carousel-track:hover{animation-play-state:paused}
-@keyframes carouselScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.carousel-track{display:flex;height:100%;will-change:transform;cursor:grab;user-select:none;}
+.carousel-track:active{cursor:grabbing;}
 .carousel-item{flex-shrink:0;width:140px;height:100%;margin-right:10px;position:relative;cursor:pointer;border-radius:10px;overflow:hidden;transition:transform .2s;}
 .carousel-item:hover{transform:scale(1.04)}
 .carousel-item-img{width:100%;height:100%;background:#eef2ff;display:flex;align-items:center;justify-content:center;font-size:36px;}
@@ -460,9 +461,8 @@ textarea.finput{resize:vertical;min-height:76px}
 .reviews-scroll-title{font-size:16px;font-weight:700;color:var(--text-dark);margin-bottom:12px}
 .reviews-carousel-outer{border-radius:20px;overflow:hidden;position:relative;background:linear-gradient(135deg,var(--vu-blue) 0%,#0d1e4a 100%);padding:24px 0;}
 .reviews-carousel-wrap{position:relative;overflow:hidden;height:170px;}
-.reviews-carousel-track{display:flex;height:100%;animation:reviewsScroll 30s linear infinite;will-change:transform;}
-.reviews-carousel-track:hover{animation-play-state:paused}
-@keyframes reviewsScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.reviews-carousel-track{display:flex;height:100%;will-change:transform;cursor:grab;user-select:none;}
+.reviews-carousel-track:active{cursor:grabbing;}
 .review-slide{flex-shrink:0;width:240px;height:150px;margin-right:14px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:16px;backdrop-filter:blur(8px);padding:16px;display:flex;flex-direction:column;gap:8px;}
 .review-slide-stars{font-size:14px;letter-spacing:2px}
 .review-slide-text{font-size:12px;color:rgba(255,255,255,0.88);line-height:1.55;flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
@@ -557,8 +557,10 @@ textarea.finput{resize:vertical;min-height:76px}
 
 /* MOBILE OVERRIDES */
 .menu-toggle{display:none;align-items:center;justify-content:center;width:36px;height:36px;border:1.5px solid var(--border);border-radius:8px;background:#f8fafc;cursor:pointer;font-size:18px;flex-shrink:0;margin-right:6px;}
-.topbar-logout-btn{display:none;align-items:center;gap:5px;padding:6px 12px;border-radius:100px;border:1.5px solid #fecaca;background:#fef2f2;color:var(--vu-red);font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background .2s;}
-.topbar-logout-btn:hover{background:#fee2e2}
+.topbar-logout-btn{display:none;align-items:center;gap:7px;padding:6px 4px;border:none;background:none;color:var(--text-muted);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:color .18s;}
+.topbar-logout-btn:hover{color:var(--vu-red)}
+.topbar-user{display:none;align-items:center;gap:9px;cursor:pointer;padding:6px 12px;border-radius:100px;border:1.5px solid var(--border);background:#f8fafc;transition:background .2s}
+.topbar-user:hover{background:#eef2ff}
 .mobile-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:190;display:none}
 .mobile-overlay.show{display:block}
 
@@ -568,7 +570,7 @@ textarea.finput{resize:vertical;min-height:76px}
   .sidebar.open{transform:translateX(0)}
   .main-content{margin-left:0;height:calc(100vh - 58px - var(--nav-h));}
   .menu-toggle{display:none!important}
-  .topbar-left .vu-logo-box{display:none}
+  .topbar-logo-desktop{display:none!important}
   .topbar-page-title{display:none}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
   .qa-grid{grid-template-columns:1fr 1fr}
@@ -587,8 +589,9 @@ textarea.finput{resize:vertical;min-height:76px}
   .toast{max-width:100%}
   .carousel-wrap{height:130px}
   .carousel-item{width:110px}
-  .topbar-user{gap:7px;padding:5px 10px}
+  .topbar-user{gap:7px;padding:5px 10px;display:inline-flex!important}
   .topbar-logout-btn{display:inline-flex!important}
+  .topbar-page-title{display:block!important}
 }
 @media(min-width:769px) and (max-width:1024px){
   :root{--sidebar-w:190px}
@@ -795,27 +798,22 @@ textarea.finput{resize:vertical;min-height:76px}
   <div class="offline-bar" id="offlineBar">📡 You're offline — showing cached data</div>
 
   <!-- TOP BAR -->
-  <div class="topbar">
-    <div class="topbar-left">
-      <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()">☰</button>
-      <div class="vu-logo-box">
+  <div class="topbar" style="padding:0 10px;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:8px;margin-left:6px">
+      <div class="vu-logo-box topbar-logo-desktop">
         <div class="vu-logo-shield">VU</div>
         <div class="vu-logo-text">
           <div class="vn">VICTORIA UNIVERSITY</div>
           <div class="vs">Kampala, Uganda</div>
         </div>
       </div>
-    </div>
-    <div class="topbar-right">
-      <div class="topbar-page-title" id="topbarTitle">Home</div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div class="topbar-user" title="Logged in user">
-          <div class="ava" id="hAva">?</div>
-          <span class="uname" id="hName">User</span>
-        </div>
-        <button class="topbar-logout-btn" onclick="doLogout()" title="Logout">🚪 Logout</button>
+      <div class="topbar-user" title="Logged in user">
+        <div class="ava" id="hAva">?</div>
+        <span class="uname" id="hName">User</span>
       </div>
     </div>
+    <div class="topbar-page-title" id="topbarTitle">Home</div>
+    <button class="topbar-logout-btn" onclick="doLogout()" title="Logout" style="margin-right:8px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>Logout</span></button>
   </div>
 
   <!-- SIDEBAR -->
@@ -824,6 +822,7 @@ textarea.finput{resize:vertical;min-height:76px}
     <button class="navbtn on" id="n-home" onclick="nav('home')"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg></span><span class="nav-label">Home</span></button>
     <button class="navbtn" id="n-browse" onclick="nav('browse')"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><span class="nav-label">Browse Items</span></button>
     <button class="navbtn" id="n-reviews" onclick="nav('reviews')"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span><span class="nav-label">Reviews</span></button>
+
     <div class="nav-dropdown" id="reportDropdown">
       <button class="navbtn" id="n-report" onclick="toggleReportDropdown(event)">
         <span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
@@ -851,10 +850,6 @@ textarea.finput{resize:vertical;min-height:76px}
         <div class="home-banner">
           <h2>Smart Lost &amp; Found System</h2>
           <p>Report lost items, check found items, and help reunite students with their belongings on campus.</p>
-          <div class="home-banner-meta">
-            <div class="live-badge"><div class="live-dot"></div> Live Data</div>
-            <span style="font-size:11px;color:rgba(255,255,255,.6)">Updates in real time across the Campus</span>
-          </div>
         </div>
 
         <div class="carousel-section">
@@ -935,10 +930,40 @@ textarea.finput{resize:vertical;min-height:76px}
             <div>
               <div class="footer-section-title">Connect With Us</div>
               <div class="footer-socials">
-                <a class="footer-social-item" href="" target="_blank" rel="noopener"><span class="footer-social-icon"></span> Instagram</a>
-                <a class="footer-social-item" href="" target="_blank" rel="noopener"><span class="footer-social-icon"></span> Facebook</a>
-                <a class="footer-social-item" href="" target="_blank" rel="noopener"><span class="footer-social-icon">𝕏</span> Twitter / X</a>
-                <a class="footer-social-item" href="" target="_blank" rel="noopener"><span class="footer-social-icon"></span> LinkedIn</a>
+                <a class="footer-social-item" href="" target="_blank" rel="noopener">
+                  <span class="footer-social-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <defs><radialGradient id="ig1" cx="30%" cy="107%" r="150%"><stop offset="0%" stop-color="#fdf497"/><stop offset="10%" stop-color="#fdf497"/><stop offset="50%" stop-color="#fd5949"/><stop offset="68%" stop-color="#d6249f"/><stop offset="100%" stop-color="#285AEB"/></radialGradient></defs>
+                      <rect x="2" y="2" width="20" height="20" rx="6" fill="url(#ig1)"/>
+                      <circle cx="12" cy="12" r="4.5" stroke="white" stroke-width="1.8" fill="none"/>
+                      <circle cx="17.2" cy="6.8" r="1.2" fill="white"/>
+                    </svg>
+                  </span> Instagram
+                </a>
+                <a class="footer-social-item" href="" target="_blank" rel="noopener">
+                  <span class="footer-social-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="24" height="24" rx="6" fill="#1877F2"/>
+                      <path d="M16 8h-2a1 1 0 0 0-1 1v2h3l-.5 3H13v7h-3v-7H8v-3h2V9a4 4 0 0 1 4-4h2v3z" fill="white"/>
+                    </svg>
+                  </span> Facebook
+                </a>
+                <a class="footer-social-item" href="" target="_blank" rel="noopener">
+                  <span class="footer-social-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="24" height="24" rx="6" fill="#000"/>
+                      <path d="M17.5 4h2.5l-5.8 6.6L21 20h-5.3l-3.7-4.8L7.5 20H5l6.2-7.1L4 4h5.4l3.4 4.4L17.5 4zm-.9 14.4h1.4L7.5 5.4H6L16.6 18.4z" fill="white"/>
+                    </svg>
+                  </span> Twitter / X
+                </a>
+                <a class="footer-social-item" href="" target="_blank" rel="noopener">
+                  <span class="footer-social-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="24" height="24" rx="6" fill="#0A66C2"/>
+                      <path d="M7 9.5H4.5V19H7V9.5zM5.75 8.25a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM19.5 13.2c0-2.6-1.4-3.9-3.3-3.9-1.4 0-2.1.8-2.4 1.3V9.5H11.5V19h2.5v-5.1c0-1.2.6-2 1.7-2 1 0 1.3.8 1.3 2V19h2.5v-5.8z" fill="white"/>
+                    </svg>
+                  </span> LinkedIn
+                </a>
               </div>
             </div>
           </div>
@@ -957,7 +982,7 @@ textarea.finput{resize:vertical;min-height:76px}
       <div class="page" id="pg-browse">
         <div class="browse-header">
           <h2>Browse Items</h2>
-          <p>Search all lost &amp; found reports on campus · <span class="live-badge" style="vertical-align:middle"><span class="live-dot"></span> Live</span></p>
+          <p>Search all lost &amp; found reports on campus</p>
         </div>
         <div class="search-wrap">
           <span class="search-ico">🔍</span>
@@ -969,6 +994,7 @@ textarea.finput{resize:vertical;min-height:76px}
           <button class="chip" onclick="setFilter(this,'found')">🟢 Found</button>
           <button class="chip" onclick="setFilter(this,'claimed')">⭐ Claimed</button>
           <button class="chip" onclick="setFilter(this,'pending')">⏳ Pending</button>
+          <button class="chip" onclick="setFilter(this,'archived')">📦 Archived</button>
         </div>
         <div class="item-list" id="browseList"></div>
       </div>
@@ -1100,7 +1126,7 @@ textarea.finput{resize:vertical;min-height:76px}
             <h2>Admin Panel</h2>
             <p>Review, verify and manage all campus reports and user accounts</p>
             <div class="admin-hero-meta">
-              <div class="live-badge"><div class="live-dot"></div> Live Data</div>
+              <div id="adminNetBadge" class="live-badge"><div class="live-dot"></div> Live</div>
               <span style="font-size:11px;color:rgba(255,255,255,.6)">New registrations, claims &amp; reports appear instantly</span>
             </div>
             <!-- REUNITED COUNTER BANNER -->
@@ -1214,6 +1240,10 @@ function startListeners(){
     renderBrowse();
     if(me?.role==='admin' && document.getElementById('pg-admin').classList.contains('show'))
       renderAdmin();
+    // Check if a new found item was posted — run matching for current user's lost items
+    docs.filter(d=>d.type==='found'&&d.status==='pending').forEach(fi=>{
+      if(fi._new) checkLostMatchForFound(fi);
+    });
   });
 
   if(unsubUsers) unsubUsers();
@@ -1304,6 +1334,8 @@ function clearAuthForms(){
 
 function bootApp(u){
   me = u;
+  _reviewShownThisSession = false;
+  clearTimeout(_inactivityTimer);
   clearAuthForms();
   document.getElementById('authScreen').classList.remove('active');
   document.getElementById('appScreen').classList.add('active');
@@ -1316,11 +1348,16 @@ function bootApp(u){
   const bnAdmin = document.getElementById('bn-admin');
   if(bnAdmin) bnAdmin.style.display = isAdmin ? 'flex' : 'none';
   startListeners();
+  _resetInactivityTimer();
   toast(`Welcome back, ${u.first}!`,'ok');
+  // Run auto-archive check
+  setTimeout(autoArchiveOldItems, 3000);
 }
 
 window.doLogout = function(){
   me = null;
+  _reviewShownThisSession = false;
+  clearTimeout(_inactivityTimer);
   stopListeners();
   allItems=[]; allUsers=[]; allReviews=[];
   document.getElementById('appScreen').classList.remove('active');
@@ -1331,6 +1368,44 @@ window.doLogout = function(){
 
 /* NAVIGATION */
 const pageTitles={home:'Home',browse:'Browse Items',report:'Report Item',admin:'Admin Panel',reviews:'Reviews'};
+
+/* ── REVIEW GATE ── 
+   Show review panel only after:
+   1. User submits a report (lost/found), OR
+   2. 10 minutes of inactivity on any page
+   Never show again in the same session until next login or next report.
+*/
+let _reviewShownThisSession = false;
+let _inactivityTimer = null;
+const INACTIVITY_MS = 10 * 60 * 1000; // 10 minutes
+
+function _resetInactivityTimer(){
+  clearTimeout(_inactivityTimer);
+  if(_reviewShownThisSession || !me) return;
+  _inactivityTimer = setTimeout(()=>{
+    if(!_reviewShownThisSession && me){
+      _reviewShownThisSession = true;
+      showReviewPanel();
+    }
+  }, INACTIVITY_MS);
+}
+
+function showReviewPanel(){
+  // Show the modal review prompt (reuse existing review prompt UI but with different title)
+  curPromptStar = 0;
+  const txt = document.getElementById('promptReviewText');
+  if(txt) txt.value = '';
+  document.querySelectorAll('#promptStarRow .review-prompt-star').forEach(s=>{s.textContent='☆';s.classList.remove('lit');});
+  const titleEl = document.querySelector('#reviewPromptOverlay [style*="font-size:18px"]');
+  if(titleEl) titleEl.textContent = 'Share Your Experience';
+  document.getElementById('reviewPromptOverlay').classList.add('open');
+}
+
+['click','touchstart','keydown','scroll','mousemove'].forEach(ev=>{
+  document.addEventListener(ev, _resetInactivityTimer, {passive:true});
+});
+
+
 
 window.nav = function(pg){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('show'));
@@ -1434,7 +1509,8 @@ function renderBrowse(){
   let items = allItems;
   if(curFilter==='claimed')      items = items.filter(i=>i.status==='claimed');
   else if(curFilter==='pending') items = items.filter(i=>i.status==='pending');
-  else if(curFilter!=='all')     items = items.filter(i=>i.type===curFilter&&i.status!=='claimed');
+  else if(curFilter==='archived') items = items.filter(i=>i.status==='archived');
+  else if(curFilter!=='all')     items = items.filter(i=>i.type===curFilter&&i.status!=='claimed'&&i.status!=='archived');
   if(q) items = items.filter(i=>
     (i.name||'').toLowerCase().includes(q)||(i.loc||'').toLowerCase().includes(q)||
     (i.desc||'').toLowerCase().includes(q)||(i.cat||'').toLowerCase().includes(q)
@@ -1465,15 +1541,22 @@ window.openSheet = function(id){
     <div class="drow"><span>Location</span><span>${esc(i.loc)}</span></div>
     ${i.desc?`<div class="drow"><span>Description</span><span>${esc(i.desc)}</span></div>`:''}
     ${i.storage?`<div class="drow"><span>Currently at</span><span>${esc(i.storage)}</span></div>`:''}
-    ${i.phone?`<div class="drow"><span>Contact</span><span><a href="tel:${i.phone}" style="color:var(--vu-red);font-weight:600">${i.phone}</a></span></div>`:''}
+    ${(me?.role==='admin'&&i.phone)?`<div class="drow"><span>Reporter Contact</span><span><a href="tel:${i.phone}" style="color:var(--vu-red);font-weight:600">${i.phone}</a></span></div>`:''}
     <div class="drow"><span>Reported by</span><span>${i.byName||'Unknown'}</span></div>
+  </div>
+  <div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:11px 14px;margin-top:14px;font-size:12px;color:var(--text-mid)">
+    📞 <strong>Admin Contact:</strong> <a href="tel:0700000000" style="color:var(--vu-red);font-weight:600">0700000000</a> &nbsp;·&nbsp;
+    📧 <a href="mailto:admin@vu.ac.ug" style="color:var(--vu-blue3);font-weight:500">admin@vu.ac.ug</a>
   </div>`;
 
   if(i.status!=='claimed'){
     const claimBtn = me
       ? `<button class="btn btn-success btn-sm" style="flex:1" id="claimBtn_${id}" onclick="claimItem('${id}')">Mark as Claimed ⭐</button>`
       : `<button class="btn btn-ghost btn-sm" style="flex:1;cursor:not-allowed;opacity:.6" onclick="toast('Please log in to claim an item','er')">🔒 Login to Claim</button>`;
-    html += `<div style="display:flex;gap:9px;margin-top:20px">${claimBtn}<button class="btn btn-ghost btn-sm" onclick="closeSheet()">Close</button></div>`;
+    const transferBtn = (me&&me.id===i.byId&&i.type==='found')
+      ? `<button class="btn btn-ghost btn-sm" style="flex:1" onclick="transferToSecurity('${id}')">📍 Hand to Security</button>`
+      : '';
+    html += `<div style="display:flex;gap:9px;margin-top:20px;flex-wrap:wrap">${claimBtn}${transferBtn}<button class="btn btn-ghost btn-sm" onclick="closeSheet()">Close</button></div>`;
   } else {
     if(me?.role==='admin'){
       const snap = i.claimantSnapshot||{};
@@ -1541,8 +1624,19 @@ window.claimItem = async function(id){
     await DB.incrementReunited();
     closeSheet();
     toast('Item marked as claimed ⭐','ok');
+    // Push notification for claim approved
+    if(Notification&&Notification.permission==='granted'){
+      new Notification('VU Find — Item Claimed!',{
+        body:`You've successfully claimed "${allItems.find(x=>x.id===id)?.name||'an item'}". Admin has been notified.`,
+        icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="%231a3580"/><text x="32" y="44" font-size="30" text-anchor="middle" fill="white">VU</text></svg>'
+      });
+    }
     pendingReviewItemId = id;
-    setTimeout(()=>showReviewPrompt(), 700);
+    if(!_reviewShownThisSession){
+      _reviewShownThisSession = true;
+      clearTimeout(_inactivityTimer);
+      setTimeout(()=>showReviewPrompt(), 700);
+    }
   } catch(e){
     toast('Failed to claim item: '+e.message,'er');
     if(btn){ btn.disabled=false; btn.textContent='Mark as Claimed ⭐'; }
@@ -1604,7 +1698,7 @@ window.submitReport = async function(){
   if(!name||!cat||!date||!loc){toast('Fill all required fields','er');return;}
   setBtn('submitBtn',true,'Submitting…');
   try{
-    await DB.addDoc('items',{
+    const newId = await DB.addDoc('items',{
       type: reportType, name, cat, date, loc,
       desc: v('fDesc'), storage: v('fStorage'), phone: v('fPhone'),
       status: 'pending',
@@ -1613,6 +1707,11 @@ window.submitReport = async function(){
       byName: me.first+' '+me.last,
       at: new Date().toISOString()
     });
+    // If a found item was just posted, check if it matches any user's lost reports
+    if(reportType==='found'){
+      const fakeItem={type:'found',name,cat,loc,desc:v('fDesc')};
+      checkLostMatchForFound(fakeItem);
+    }
     ['fName','fCat','fDesc','fStorage','fPhone'].forEach(id=>{
       const el=document.getElementById(id); if(el) el.value='';
     });
@@ -1620,11 +1719,84 @@ window.submitReport = async function(){
     toast(reportType==='lost'?'Lost item reported! 🔴':'Found item reported! 🟢','ok');
     setBtn('submitBtn',false,'Submit Report →');
     nav('browse');
+    // Trigger review prompt after successful report (if not already shown this session)
+    if(!_reviewShownThisSession){
+      _reviewShownThisSession = true;
+      clearTimeout(_inactivityTimer);
+      setTimeout(()=>showReviewPanel(), 1200);
+    }
   } catch(e){
     toast('Submit failed: '+e.message,'er');
     setBtn('submitBtn',false,'Submit Report →');
   }
 };
+
+/* ── "I LOST SOMETHING SIMILAR" MATCHING ──
+   When a found item is posted, check existing lost reports for keyword matches
+   and toast-notify the current user if their lost item matches.
+*/
+function checkLostMatchForFound(foundItem){
+  if(!me || !allItems) return;
+  const keywords = [foundItem.name, foundItem.cat, foundItem.loc, foundItem.desc]
+    .filter(Boolean).join(' ').toLowerCase().split(/\s+/).filter(w=>w.length>3);
+  const myLost = allItems.filter(i=>i.type==='lost'&&i.status==='pending'&&i.byId===me.id);
+  for(const lost of myLost){
+    const lostText = [lost.name,lost.cat,lost.loc,lost.desc].filter(Boolean).join(' ').toLowerCase();
+    const match = keywords.some(kw=>lostText.includes(kw));
+    if(match){
+      toast(`🔔 A found item may match your lost "${lost.name}" — check Browse!`,'ok');
+      // Browser push notification (if permission granted)
+      if(Notification&&Notification.permission==='granted'){
+        new Notification('VU Find — Possible Match!',{
+          body:`A found item may match your lost "${lost.name}". Open VU Find to check.`,
+          icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="%231a3580"/><text x="32" y="44" font-size="30" text-anchor="middle" fill="white">VU</text></svg>'
+        });
+      }
+      break;
+    }
+  }
+}
+
+/* ── ITEM TRANSFER (hand off to security) ──
+   Found-item reporters can transfer their held item to security desk.
+*/
+window.transferToSecurity = async function(id){
+  const location = prompt('Enter security location (e.g. "Security Desk Gate A"):');
+  if(!location) return;
+  try{
+    await DB.updateDoc('items', id, { storage: location, transferredAt: new Date().toISOString() });
+    closeSheet();
+    toast('Item transferred to security ✓','ok');
+  } catch(e){ toast('Transfer failed: '+e.message,'er'); }
+};
+
+/* ── AUTO-ARCHIVE (30-day expiry) ──
+   Unclaimed found items automatically move to "archived" status after 30 days.
+*/
+async function autoArchiveOldItems(){
+  if(!DB||!me) return;
+  const thirtyDaysAgo = Date.now() - 30*24*60*60*1000;
+  const toArchive = allItems.filter(i=>
+    i.type==='found' && i.status==='pending' &&
+    new Date(i.at).getTime() < thirtyDaysAgo
+  );
+  for(const item of toArchive){
+    try{
+      await DB.updateDoc('items', item.id, { status:'archived', archivedAt: new Date().toISOString() });
+    } catch(e){ console.warn('Auto-archive failed for',item.id,e); }
+  }
+  if(toArchive.length) toast(`📦 ${toArchive.length} old item(s) auto-archived after 30 days`,'nf');
+}
+
+/* ── MY ITEMS PAGE ── */
+
+/* Request notification permission on first interaction */
+function requestNotificationPermission(){
+  if(typeof Notification!=='undefined'&&Notification.permission==='default'){
+    Notification.requestPermission().catch(()=>{});
+  }
+}
+document.addEventListener('click', requestNotificationPermission, {once:true});
 
 /* ADMIN PANEL */
 window.aTab = function(btn,t){
@@ -1971,7 +2143,6 @@ function renderCarousel(){
       <div class="carousel-item-pill ${pillCls}">${pillTxt}</div>
     </div>`;
   }).join('');
-  track.style.animationDuration = Math.max(18, items.length*5)+'s';
 }
 
 function renderHomeReviewsCarousel(){
@@ -1989,7 +2160,6 @@ function renderHomeReviewsCarousel(){
       <div class="review-slide-name">— ${esc(r.name)}</div>
     </div>`;
   }).join('');
-  track.style.animationDuration = Math.max(20, reviews.length*8)+'s';
 }
 
 /* REPORT DROPDOWN (desktop sidebar) */
@@ -2016,6 +2186,7 @@ window.clearPhoto = function(){
   pendingImgData=null;
   const fp = document.getElementById('fPhoto'); if(fp) fp.value='';
   document.getElementById('imgResizeWrap').classList.remove('show');
+  document.getElementById('uploadZone').style.display='';
 };
 window.onPhoto = function(input){
   if(!input.files||!input.files[0]) return;
@@ -2042,6 +2213,7 @@ window.onPhoto = function(input){
       const meta = document.getElementById('fPreviewMeta');
       if(meta) meta.textContent = `${SIZE}×${SIZE}px · ~${kb} KB`;
       document.getElementById('imgResizeWrap').classList.add('show');
+      document.getElementById('uploadZone').style.display='none';
     };
     img.src = e.target.result;
   };
@@ -2154,7 +2326,107 @@ self.addEventListener('fetch', e=>{
   });
 }
 
-/* Inline PWA manifest */
+/* ── JS-DRIVEN CAROUSEL ENGINE ──
+   Completely replaces CSS animation. Uses requestAnimationFrame so we
+   always know exactly where each track is — drag in any direction works.
+*/
+function makeCarouselSwipeable(trackId, pxPerSec){
+  const track = document.getElementById(trackId);
+  if(!track) return;
+
+  let pos       = 0;        // current translateX in px (always negative, loops)
+  let halfW     = 0;        // half of scrollWidth — the loop boundary
+  let dragging  = false;
+  let lastTouch = 0;        // last clientX during drag
+  let rafId     = null;
+  let lastTime  = null;
+  let speed     = pxPerSec; // auto-scroll speed (px/s), positive = scrolls left
+
+  function loop(ts){
+    if(lastTime === null) lastTime = ts;
+    const dt = (ts - lastTime) / 1000;
+    lastTime = ts;
+
+    halfW = track.scrollWidth / 2;
+    if(halfW <= 0){ rafId = requestAnimationFrame(loop); return; }
+
+    if(!dragging){
+      pos -= speed * dt;          // auto-scroll left
+    }
+
+    // Wrap: keep pos in [-halfW, 0)
+    pos = ((pos % halfW) - halfW) % halfW;   // always in range [-halfW, 0)
+
+    track.style.transform = `translateX(${pos}px)`;
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function startLoop(){ if(!rafId) rafId = requestAnimationFrame(loop); }
+  function stopLoop(){  if(rafId){ cancelAnimationFrame(rafId); rafId=null; lastTime=null; } }
+
+  function onDragStart(clientX){
+    dragging  = true;
+    lastTouch = clientX;
+  }
+  function onDragMove(clientX){
+    if(!dragging) return;
+    const delta = clientX - lastTouch;   // positive = finger moved right = scroll right
+    lastTouch   = clientX;
+    pos        += delta;                  // add directly — works both directions
+    halfW = track.scrollWidth / 2;
+    if(halfW > 0) pos = ((pos % halfW) - halfW) % halfW;
+    track.style.transform = `translateX(${pos}px)`;
+  }
+  function onDragEnd(){ dragging = false; }
+
+  // Touch
+  track.addEventListener('touchstart',  e=>{ onDragStart(e.touches[0].clientX); }, {passive:true});
+  track.addEventListener('touchmove',   e=>{ onDragMove(e.touches[0].clientX);  }, {passive:true});
+  track.addEventListener('touchend',    onDragEnd);
+  track.addEventListener('touchcancel', onDragEnd);
+
+  // Mouse
+  track.addEventListener('mousedown', e=>{ onDragStart(e.clientX); e.preventDefault(); });
+  document.addEventListener('mousemove', e=>{ if(dragging) onDragMove(e.clientX); });
+  document.addEventListener('mouseup',   ()=>{ if(dragging) onDragEnd(); });
+
+  // Prevent click firing after a drag
+  track.addEventListener('click', e=>{ if(Math.abs(e.clientX - lastTouch) > 5) e.stopPropagation(); }, true);
+
+  startLoop();
+  return { stop: stopLoop, start: startLoop };
+}
+
+function initCarouselSwipe(){
+  makeCarouselSwipeable('carouselTrack',      55);   // items carousel: 55 px/s
+  makeCarouselSwipeable('homeReviewsTrack',   45);   // reviews carousel: 45 px/s
+}
+document.addEventListener('DOMContentLoaded', ()=>{ setTimeout(initCarouselSwipe, 2500); });
+
+/* ── ADMIN ONLINE / OFFLINE STATUS BADGE ── */
+function updateAdminNetBadge(){
+  const badge = document.getElementById('adminNetBadge');
+  if(!badge) return;
+  if(navigator.onLine){
+    badge.className = 'live-badge';
+    badge.innerHTML = '<div class="live-dot"></div> Live';
+  } else {
+    badge.className = 'offline-badge';
+    badge.innerHTML = '<div class="offline-badge-dot"></div> Offline';
+  }
+}
+window.addEventListener('online',  updateAdminNetBadge);
+window.addEventListener('offline', updateAdminNetBadge);
+// Also update whenever admin panel is rendered
+const _origRenderAdmin = window.renderAdmin;
+// Patch: call updateAdminNetBadge after the admin page is shown
+const _origNavFn = window.nav;
+window.nav = function(pg){
+  _origNavFn(pg);
+  if(pg==='admin') setTimeout(updateAdminNetBadge, 50);
+};
+
+
 (function(){
   const manifest = {
     name: "VU Find — Smart Lost & Found",
