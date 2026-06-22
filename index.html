@@ -444,13 +444,16 @@ textarea.finput{resize:vertical;min-height:76px}
 .reviews-hero p{font-size:13px;opacity:.8}
 .review-write-wrap{background:var(--card-bg);border:1.5px solid var(--border);border-radius:14px;padding:20px;margin-bottom:18px;box-shadow:var(--shadow);}
 .review-write-wrap h3{font-size:15px;font-weight:700;color:var(--text-dark);margin-bottom:14px}
-.star-row{display:flex;gap:6px;margin-bottom:12px}
-.star-btn{font-size:24px;background:none;border:none;cursor:pointer;padding:2px;transition:transform .15s;line-height:1}
-.star-btn:hover,.star-btn.lit{transform:scale(1.18)}
+.star-row{display:flex;gap:4px;margin-bottom:12px}
+.star-btn{font-size:0;background:none;border:none;cursor:pointer;padding:2px;transition:transform .15s;line-height:1;width:30px;height:30px;display:flex;align-items:center;justify-content:center}
+.star-btn:hover{transform:scale(1.18)}
+.star-btn svg{width:24px;height:24px;transition:fill .15s,stroke .15s}
+.star-btn .star-outline{fill:none;stroke:#d1d5db;stroke-width:1.5}
+.star-btn.lit .star-outline,.star-btn:hover .star-outline{fill:#f59e0b;stroke:#f59e0b}
 .review-card{background:var(--card-bg);border:1.5px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;box-shadow:var(--shadow);}
 .review-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;flex-wrap:wrap;}
 .review-card-name{font-size:13px;font-weight:700;color:var(--text-dark)}
-.review-card-stars{font-size:13px;letter-spacing:1px}
+.review-card-stars{display:flex;align-items:center;gap:2px}
 .review-card-text{font-size:13px;color:var(--text-mid);line-height:1.6;margin-bottom:6px}
 .review-card-date{font-size:11px;color:var(--text-muted)}
 .review-empty{text-align:center;padding:40px 20px;color:var(--text-muted)}
@@ -464,7 +467,7 @@ textarea.finput{resize:vertical;min-height:76px}
 .reviews-carousel-track{display:flex;height:100%;will-change:transform;cursor:grab;user-select:none;}
 .reviews-carousel-track:active{cursor:grabbing;}
 .review-slide{flex-shrink:0;width:240px;height:150px;margin-right:14px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:16px;backdrop-filter:blur(8px);padding:16px;display:flex;flex-direction:column;gap:8px;}
-.review-slide-stars{font-size:14px;letter-spacing:2px}
+.review-slide-stars{display:flex;align-items:center;gap:2px}
 .review-slide-text{font-size:12px;color:rgba(255,255,255,0.88);line-height:1.55;flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
 .review-slide-name{font-size:11px;font-weight:700;color:rgba(255,255,255,0.6)}
 .reviews-fade-left{position:absolute;left:0;top:0;bottom:0;width:70px;background:linear-gradient(to right,#1a3580 0%,transparent 100%);pointer-events:none;z-index:2;}
@@ -491,9 +494,12 @@ textarea.finput{resize:vertical;min-height:76px}
 .review-prompt-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:700;display:none;align-items:center;justify-content:center;padding:20px;}
 .review-prompt-overlay.open{display:flex}
 .review-prompt-box{background:var(--card-bg);border:1.5px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:380px;text-align:center;animation:sheetIn .3s cubic-bezier(.22,1,.36,1);box-shadow:0 30px 80px rgba(0,0,0,0.25);}
-.review-prompt-stars{display:flex;gap:8px;justify-content:center;margin:16px 0 12px}
-.review-prompt-star{font-size:30px;cursor:pointer;transition:transform .15s;background:none;border:none;}
-.review-prompt-star:hover,.review-prompt-star.lit{transform:scale(1.2)}
+.review-prompt-stars{display:flex;gap:6px;justify-content:center;margin:16px 0 12px}
+.review-prompt-star{font-size:0;cursor:pointer;transition:transform .15s;background:none;border:none;width:44px;height:44px;display:flex;align-items:center;justify-content:center;padding:2px;}
+.review-prompt-star svg{width:36px;height:36px;transition:fill .15s,stroke .15s}
+.review-prompt-star .star-outline{fill:none;stroke:#d1d5db;stroke-width:1.5}
+.review-prompt-star.lit .star-outline,.review-prompt-star:hover .star-outline{fill:#f59e0b;stroke:#f59e0b}
+.review-prompt-star:hover{transform:scale(1.15)}
 
 /* ADMIN CLAIM DIALOG */
 .admin-claim-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:650;display:none;align-items:center;justify-content:center;padding:20px;}
@@ -651,11 +657,11 @@ textarea.finput{resize:vertical;min-height:76px}
     <div style="font-size:18px;font-weight:700;color:var(--text-dark);margin-bottom:6px">Item Recovered!</div>
     <div style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:18px">Would you like to leave a quick review about your experience with VU Find?</div>
     <div class="review-prompt-stars" id="promptStarRow">
-      <button class="review-prompt-star" onclick="setPromptStar(1)">☆</button>
-      <button class="review-prompt-star" onclick="setPromptStar(2)">☆</button>
-      <button class="review-prompt-star" onclick="setPromptStar(3)">☆</button>
-      <button class="review-prompt-star" onclick="setPromptStar(4)">☆</button>
-      <button class="review-prompt-star" onclick="setPromptStar(5)">☆</button>
+      <button class="review-prompt-star" onclick="setPromptStar(1)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
+      <button class="review-prompt-star" onclick="setPromptStar(2)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
+      <button class="review-prompt-star" onclick="setPromptStar(3)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
+      <button class="review-prompt-star" onclick="setPromptStar(4)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
+      <button class="review-prompt-star" onclick="setPromptStar(5)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
     </div>
     <div class="fgroup" style="text-align:left">
       <div class="flabel">Tell us about your experience</div>
@@ -868,9 +874,9 @@ textarea.finput{resize:vertical;min-height:76px}
           <div class="stats-grid">
             <div class="stat-card"><div class="stat-val r" id="hs-lost">0</div><div class="stat-lbl">🔴 Lost Reports</div></div>
             <div class="stat-card"><div class="stat-val g" id="hs-found">0</div><div class="stat-lbl">🟢 Found Reports</div></div>
-            <div class="stat-card"><div class="stat-val y" id="hs-claimed">0</div><div class="stat-lbl">⭐ Recovered</div></div>
-            <div class="stat-card"><div class="stat-val b" id="hs-pending">0</div><div class="stat-lbl">⏳ Pending</div></div>
-            <div class="stat-card" style="border-color:#d1fae5;background:linear-gradient(135deg,#f0fdf4,#dcfce7)"><div class="stat-val" style="color:#059669" id="hs-reunited">0</div><div class="stat-lbl">🏆 Total Reunited</div></div>
+            <div class="stat-card"><div class="stat-val y" id="hs-claimed">0</div><div class="stat-lbl">Recovered</div></div>
+            <div class="stat-card"><div class="stat-val b" id="hs-pending">0</div><div class="stat-lbl">Pending</div></div>
+            <div class="stat-card" style="border-color:#d1fae5;background:linear-gradient(135deg,#f0fdf4,#dcfce7)"><div class="stat-val" style="color:#059669" id="hs-reunited">0</div><div class="stat-lbl">Total Reunited</div></div>
           </div>
         </div>
 
@@ -1090,11 +1096,11 @@ textarea.finput{resize:vertical;min-height:76px}
               <h3>Share Your Experience</h3>
               <div class="flabel" style="margin-bottom:8px">Rating</div>
               <div class="star-row" id="starRow">
-                <button class="star-btn" onclick="setReviewStar(1)">☆</button>
-                <button class="star-btn" onclick="setReviewStar(2)">☆</button>
-                <button class="star-btn" onclick="setReviewStar(3)">☆</button>
-                <button class="star-btn" onclick="setReviewStar(4)">☆</button>
-                <button class="star-btn" onclick="setReviewStar(5)">☆</button>
+                <button class="star-btn" onclick="setReviewStar(1)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
+                <button class="star-btn" onclick="setReviewStar(2)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
+                <button class="star-btn" onclick="setReviewStar(3)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
+                <button class="star-btn" onclick="setReviewStar(4)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
+                <button class="star-btn" onclick="setReviewStar(5)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
               </div>
               <div class="fgroup">
                 <div class="flabel">Your Review *</div>
@@ -1397,7 +1403,7 @@ function showReviewPanel(){
   curPromptStar = 0;
   const txt = document.getElementById('promptReviewText');
   if(txt) txt.value = '';
-  document.querySelectorAll('#promptStarRow .review-prompt-star').forEach(s=>{s.textContent='☆';s.classList.remove('lit');});
+  document.querySelectorAll('#promptStarRow .review-prompt-star').forEach(s=>{s.classList.remove('lit');});
   const titleEl = document.querySelector('#reviewPromptOverlay [style*="font-size:18px"]');
   if(titleEl) titleEl.textContent = 'Share Your Experience';
   document.getElementById('reviewPromptOverlay').classList.add('open');
@@ -2048,7 +2054,6 @@ window.toggleReviewForm = function(){
 window.setReviewStar = function(n){
   curReviewStar = n;
   document.querySelectorAll('#starRow .star-btn').forEach((b,i)=>{
-    b.textContent = i<n?'⭐':'☆';
     b.classList.toggle('lit',i<n);
   });
 };
@@ -2076,7 +2081,8 @@ function renderReviews(){
     return;
   }
   list.innerHTML = allReviews.map(r=>{
-    const stars = '⭐'.repeat(r.rating)+'☆'.repeat(5-r.rating);
+    const starSVG = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="14" height="14"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" style="stroke-width:1.5"/></svg>`;
+    const stars = Array.from({length:5},(_,i)=>`<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="14" height="14"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" style="fill:${i<r.rating?'#f59e0b':'none'};stroke:${i<r.rating?'#f59e0b':'#d1d5db'};stroke-width:1.5"/></svg>`).join('');
     const dateStr = new Date(r.at).toLocaleDateString('en-UG',{day:'numeric',month:'short',year:'numeric'});
     const delBtn = me?.role==='admin'
       ?`<button class="btn btn-danger btn-sm" onclick="adminDelReview('${r.id}')" style="padding:4px 10px;font-size:11px">🗑</button>`:''
@@ -2098,7 +2104,7 @@ function renderReviews(){
 function showReviewPrompt(){
   curPromptStar = 0;
   document.getElementById('promptReviewText').value='';
-  document.querySelectorAll('#promptStarRow .review-prompt-star').forEach(s=>{s.textContent='☆';s.classList.remove('lit');});
+  document.querySelectorAll('#promptStarRow .review-prompt-star').forEach(s=>{s.classList.remove('lit');});
   document.getElementById('reviewPromptOverlay').classList.add('open');
 }
 window.closeReviewPrompt = function(){
@@ -2108,7 +2114,6 @@ window.closeReviewPrompt = function(){
 window.setPromptStar = function(n){
   curPromptStar = n;
   document.querySelectorAll('#promptStarRow .review-prompt-star').forEach((s,i)=>{
-    s.textContent = i<n?'⭐':'☆';
     s.classList.toggle('lit', i<n);
   });
 };
@@ -2155,7 +2160,7 @@ function renderHomeReviewsCarousel(){
   ];
   const all = [...reviews,...reviews];
   track.innerHTML = all.map(r=>{
-    const stars = '⭐'.repeat(r.rating)+'☆'.repeat(5-r.rating);
+    const stars = Array.from({length:5},(_,i)=>`<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="13" height="13"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" style="fill:${i<r.rating?'#f59e0b':'none'};stroke:${i<r.rating?'#f59e0b':'rgba(255,255,255,0.4)'};stroke-width:1.5"/></svg>`).join('');
     return`<div class="review-slide">
       <div class="review-slide-stars">${stars}</div>
       <div class="review-slide-text">${esc(r.text)}</div>
