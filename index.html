@@ -26,7 +26,8 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import {
     getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc,
-    onSnapshot, query, orderBy, serverTimestamp, getDocs as fsGetDocs
+    onSnapshot, query, orderBy, serverTimestamp, getDocs as fsGetDocs,
+    getDoc, increment as fsIncrement
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -77,6 +78,37 @@
         try{ cb(docs); } catch(e){ console.warn('Snapshot cb error:',e); }
       }, err=>console.error('Snapshot error:',err));
       return unsub;
+    },
+
+    /* ── Reunited counter (persists independently of item deletions) ── */
+    async incrementReunited(){
+      const ref = doc(db,'_meta','reunited_counter');
+      try{
+        await updateDoc(ref, { count: fsIncrement(1) });
+      } catch(e){
+        // Doc may not exist yet — create it
+        await setDoc(ref, { count: 1 });
+      }
+    },
+
+    async resetReunited(){
+      const ref = doc(db,'_meta','reunited_counter');
+      await setDoc(ref, { count: 0 });
+    },
+
+    async getReunited(){
+      const ref = doc(db,'_meta','reunited_counter');
+      try{
+        const snap = await getDoc(ref);
+        return snap.exists() ? (snap.data().count||0) : 0;
+      } catch(e){ return 0; }
+    },
+
+    onSnapshotReunited(cb){
+      const ref = doc(db,'_meta','reunited_counter');
+      return onSnapshot(ref, snap=>{
+        cb(snap.exists() ? (snap.data().count||0) : 0);
+      }, ()=>cb(0));
     }
   };
 
@@ -238,7 +270,7 @@ textarea.finput{resize:vertical;min-height:76px}
 .home-banner h2{font-size:20px;font-weight:700;margin-bottom:5px}
 .home-banner p{font-size:13px;opacity:.8;max-width:420px;line-height:1.6}
 .home-banner-meta{display:flex;align-items:center;gap:9px;margin-top:11px;flex-wrap:wrap}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px;margin-bottom:22px}
 .stat-card{background:var(--card-bg);border:1.5px solid var(--border);border-radius:14px;padding:18px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;box-shadow:var(--shadow);}
 .stat-val{font-size:28px;font-weight:700;line-height:1}
 .stat-val.r{color:var(--vu-red)}.stat-val.g{color:var(--success)}.stat-val.y{color:var(--warn)}.stat-val.b{color:var(--vu-blue3)}
@@ -358,6 +390,15 @@ textarea.finput{resize:vertical;min-height:76px}
 .install-bar-text{flex:1;font-size:12px;line-height:1.4}
 .install-bar-text strong{display:block;font-weight:700;margin-bottom:2px;color:var(--text-dark)}
 .install-bar-text span{color:var(--text-muted);font-size:11px}
+
+/* CLAIM COMPLAINT */
+.complaint-box{background:#fff8f0;border:1.5px solid #fde68a;border-radius:12px;padding:16px;margin-top:16px;}
+.complaint-box-title{font-size:13px;font-weight:700;color:#b45309;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.complaint-box-desc{font-size:11px;color:var(--text-muted);margin-bottom:12px;line-height:1.5}
+.complaint-form{display:none;margin-top:10px;border-top:1px solid #fde68a;padding-top:12px;}
+.complaint-form.open{display:block}
+.complaint-submitted{display:none;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:9px;padding:12px;text-align:center;font-size:12px;color:var(--success);font-weight:600;margin-top:10px;}
+.complaint-submitted.show{display:block}
 
 /* CONFIRM MODAL */
 .confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);z-index:600;display:none;align-items:center;justify-content:center;padding:20px;}
@@ -832,6 +873,7 @@ textarea.finput{resize:vertical;min-height:76px}
             <div class="stat-card"><div class="stat-val g" id="hs-found">0</div><div class="stat-lbl">🟢 Found Reports</div></div>
             <div class="stat-card"><div class="stat-val y" id="hs-claimed">0</div><div class="stat-lbl">⭐ Recovered</div></div>
             <div class="stat-card"><div class="stat-val b" id="hs-pending">0</div><div class="stat-lbl">⏳ Pending</div></div>
+            <div class="stat-card" style="border-color:#d1fae5;background:linear-gradient(135deg,#f0fdf4,#dcfce7)"><div class="stat-val" style="color:#059669" id="hs-reunited">0</div><div class="stat-lbl">🏆 Total Reunited</div></div>
           </div>
         </div>
 
@@ -1061,12 +1103,25 @@ textarea.finput{resize:vertical;min-height:76px}
               <div class="live-badge"><div class="live-dot"></div> Live Data</div>
               <span style="font-size:11px;color:rgba(255,255,255,.6)">New registrations, claims &amp; reports appear instantly</span>
             </div>
+            <!-- REUNITED COUNTER BANNER -->
+            <div style="margin-top:16px;background:rgba(255,255,255,0.13);border:1.5px solid rgba(255,255,255,0.22);border-radius:12px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="font-size:32px">🏆</div>
+                <div>
+                  <div style="font-size:11px;color:rgba(255,255,255,.65);font-weight:600;letter-spacing:.4px;text-transform:uppercase">Total Items Reunited</div>
+                  <div style="font-size:32px;font-weight:800;color:#fff;line-height:1.1" id="admin-reunited-val">—</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:2px">Counter persists even when claimed items are deleted</div>
+                </div>
+              </div>
+              <button class="btn btn-ghost btn-sm" style="background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:#fff;white-space:nowrap" onclick="adminResetReunited()">🔄 Reset Counter</button>
+            </div>
           </div>
           <div class="admin-tabs">
             <button class="atab on" onclick="aTab(this,'pending')">⏳ Pending</button>
             <button class="atab" onclick="aTab(this,'all')">📋 All Items</button>
             <button class="atab" onclick="aTab(this,'claimed')">✅ Claimed</button>
             <button class="atab" onclick="aTab(this,'reviews')">💬 Reviews</button>
+            <button class="atab" onclick="aTab(this,'complaints')">⚠️ Complaints</button>
             <button class="atab" onclick="aTab(this,'users')">👥 Users</button>
           </div>
           <div id="adminContent"></div>
@@ -1123,6 +1178,7 @@ let pendingReviewItemId  = null;
 let unsubItems     = null;
 let unsubUsers     = null;
 let unsubReviews   = null;
+let unsubReunited  = null;
 
 /* SEED DEFAULT DATA */
 function seedIfEmpty(){
@@ -1177,12 +1233,20 @@ function startListeners(){
        document.getElementById('pg-admin').classList.contains('show'))
       renderAdmin();
   });
+
+  if(unsubReunited) unsubReunited();
+  unsubReunited = DB.onSnapshotReunited(count => {
+    setText('hs-reunited', count);
+    const el = document.getElementById('admin-reunited-val');
+    if(el) el.textContent = count;
+  });
 }
 
 function stopListeners(){
   if(unsubItems){unsubItems();unsubItems=null;}
   if(unsubUsers){unsubUsers();unsubUsers=null;}
   if(unsubReviews){unsubReviews();unsubReviews=null;}
+  if(unsubReunited){unsubReunited();unsubReunited=null;}
 }
 
 /* AUTH */
@@ -1407,7 +1471,7 @@ window.openSheet = function(id){
 
   if(i.status!=='claimed'){
     const claimBtn = me
-      ? `<button class="btn btn-success btn-sm" style="flex:1" onclick="claimItem('${id}')">Mark as Claimed ⭐</button>`
+      ? `<button class="btn btn-success btn-sm" style="flex:1" id="claimBtn_${id}" onclick="claimItem('${id}')">Mark as Claimed ⭐</button>`
       : `<button class="btn btn-ghost btn-sm" style="flex:1;cursor:not-allowed;opacity:.6" onclick="toast('Please log in to claim an item','er')">🔒 Login to Claim</button>`;
     html += `<div style="display:flex;gap:9px;margin-top:20px">${claimBtn}<button class="btn btn-ghost btn-sm" onclick="closeSheet()">Close</button></div>`;
   } else {
@@ -1420,7 +1484,36 @@ window.openSheet = function(id){
         <div style="margin-top:4px"><span style="color:var(--text-muted)">Phone: </span><a href="tel:${esc(snap.phone||'')}" style="color:var(--vu-red);font-weight:600">${esc(snap.phone||'—')}</a></div>
       </div>`;
     }
-    html += `<div style="margin-top:18px"><button class="btn btn-ghost btn-sm" onclick="closeSheet()" style="width:100%">Close</button></div>`;
+
+    /* ── CLAIM COMPLAINT SECTION (shown to all, right below claimed status) ── */
+    const alreadyComplained = me ? false : false; // evaluated at submit time
+    html += `
+    <div class="complaint-box" id="complaintBox_${id}">
+      <div class="complaint-box-title">⚠️ Think this item is yours?</div>
+      <div class="complaint-box-desc">If this item was incorrectly claimed and actually belongs to you, raise a complaint below. Admin will review and contact both parties.</div>
+      <div class="complaint-submitted" id="complaintDone_${id}">✅ Complaint submitted! Admin will review it shortly.</div>
+      <button class="btn btn-sm" style="background:#fef3c7;border:1.5px solid #fde68a;color:#92400e;width:100%" onclick="toggleComplaintForm('${id}')">⚠️ Raise a Claim Complaint</button>
+      <div class="complaint-form" id="complaintForm_${id}">
+        <div class="fgroup" style="margin-bottom:10px">
+          <div class="flabel">Your Full Name *</div>
+          <input type="text" class="finput" id="cmpName_${id}" placeholder="e.g. Nakato Sarah" style="font-size:13px" value="${me ? esc(me.first+' '+me.last) : ''}"/>
+        </div>
+        <div class="fgroup" style="margin-bottom:10px">
+          <div class="flabel">Your Contact (Phone or Email) *</div>
+          <input type="text" class="finput" id="cmpContact_${id}" placeholder="07XXXXXXXX or you@email.com" style="font-size:13px" value="${me ? esc(me.phone||me.email||'') : ''}"/>
+        </div>
+        <div class="fgroup" style="margin-bottom:10px">
+          <div class="flabel">Why do you believe this item belongs to you? *</div>
+          <textarea class="finput" id="cmpReason_${id}" placeholder="Describe identifying features, proof of ownership, or circumstances..." style="min-height:72px;font-size:13px"></textarea>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm" style="background:#b45309;color:#fff;flex:1" onclick="submitComplaint('${id}','${esc(i.name)}')">Submit Complaint</button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleComplaintForm('${id}')">Cancel</button>
+        </div>
+      </div>
+    </div>`;
+
+    html += `<div style="margin-top:14px"><button class="btn btn-ghost btn-sm" onclick="closeSheet()" style="width:100%">Close</button></div>`;
   }
   document.getElementById('sheetContent').innerHTML = html;
   document.getElementById('detailOverlay').classList.add('open');
@@ -1431,8 +1524,13 @@ window.closeSheet = function(e){
     document.getElementById('detailOverlay').classList.remove('open');
 };
 
+let _claimingInProgress = false;
 window.claimItem = async function(id){
   if(!me){toast('You must be logged in to claim an item','er');return;}
+  if(_claimingInProgress) return;
+  _claimingInProgress = true;
+  const btn = document.getElementById('claimBtn_'+id);
+  if(btn){ btn.disabled=true; btn.textContent='Claiming…'; }
   try{
     await DB.updateDoc('items', id, {
       status: 'claimed',
@@ -1440,13 +1538,63 @@ window.claimItem = async function(id){
       claimedAt: new Date().toISOString(),
       claimantSnapshot: {name:me.first+' '+me.last,email:me.email,phone:me.phone||'—'}
     });
+    await DB.incrementReunited();
     closeSheet();
     toast('Item marked as claimed ⭐','ok');
     pendingReviewItemId = id;
     setTimeout(()=>showReviewPrompt(), 700);
   } catch(e){
     toast('Failed to claim item: '+e.message,'er');
+    if(btn){ btn.disabled=false; btn.textContent='Mark as Claimed ⭐'; }
+  } finally{
+    _claimingInProgress = false;
   }
+};
+
+/* CLAIM COMPLAINTS */
+window.toggleComplaintForm = function(id){
+  const form = document.getElementById('complaintForm_'+id);
+  if(form) form.classList.toggle('open');
+};
+
+window.submitComplaint = async function(itemId, itemName){
+  const name    = (document.getElementById('cmpName_'+itemId)?.value||'').trim();
+  const contact = (document.getElementById('cmpContact_'+itemId)?.value||'').trim();
+  const reason  = (document.getElementById('cmpReason_'+itemId)?.value||'').trim();
+  if(!name||!contact||!reason){ toast('Please fill all complaint fields','er'); return; }
+  try{
+    await DB.addDoc('complaints',{
+      itemId,
+      itemName,
+      name,
+      contact,
+      reason,
+      submittedById: me?.id||null,
+      status: 'open',
+      at: new Date().toISOString()
+    });
+    const form = document.getElementById('complaintForm_'+itemId);
+    const done = document.getElementById('complaintDone_'+itemId);
+    if(form) form.classList.remove('open');
+    if(done) done.classList.add('show');
+    toast('Complaint submitted — admin will review it','ok');
+  } catch(e){
+    toast('Failed to submit complaint: '+e.message,'er');
+  }
+};
+
+window.adminResolveComplaint = async function(id){
+  try{
+    await DB.updateDoc('complaints', id, { status:'resolved', resolvedAt: new Date().toISOString() });
+    toast('Complaint marked as resolved ✓','ok');
+  } catch(e){ toast('Error: '+e.message,'er'); }
+};
+
+window.adminDelComplaint = async function(id){
+  showConfirm('Delete Complaint','Delete this complaint permanently?','🗑️', async ()=>{
+    await DB.deleteDoc('complaints', id);
+    toast('Complaint deleted','ok');
+  });
 };
 
 /* REPORT ITEM */
@@ -1489,6 +1637,38 @@ window.aTab = function(btn,t){
 function renderAdmin(){
   const c = document.getElementById('adminContent');
   if(!c) return;
+
+  if(curATab==='complaints'){
+    window.DB.getDocs('complaints').then(complaints=>{
+      complaints = complaints.sort((a,b)=>new Date(b.at)-new Date(a.at));
+      if(!complaints.length){
+        c.innerHTML='<div class="empty"><div class="empty-ico">⚠️</div><h3>No complaints yet</h3><p>Claim complaints from users will appear here.</p></div>';
+        return;
+      }
+      c.innerHTML = complaints.map(cp=>{
+        const dateStr = new Date(cp.at).toLocaleDateString('en-UG',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+        const isResolved = cp.status==='resolved';
+        return`<div class="admin-card" style="${isResolved?'opacity:.6':''}">
+          <div style="font-size:24px;flex-shrink:0">${isResolved?'✅':'⚠️'}</div>
+          <div class="admin-info">
+            <div class="admin-name">${esc(cp.name)} <span style="font-size:10px;color:var(--text-muted);font-weight:400">re: <em>${esc(cp.itemName||cp.itemId)}</em></span>
+              ${isResolved?'<span style="background:#f0fdf4;color:#16a34a;font-size:9px;font-weight:700;padding:2px 7px;border-radius:100px;margin-left:5px">Resolved</span>':'<span style="background:#fef3c7;color:#b45309;font-size:9px;font-weight:700;padding:2px 7px;border-radius:100px;margin-left:5px">Open</span>'}
+            </div>
+            <div class="admin-meta">📞 ${esc(cp.contact)}</div>
+            <div class="admin-meta" style="margin-top:4px;line-height:1.5;color:var(--text-dark)">${esc(cp.reason)}</div>
+            <div class="admin-meta" style="margin-top:3px">📅 ${dateStr}</div>
+          </div>
+          <div class="admin-actions" style="flex-direction:column;gap:5px">
+            ${!isResolved?`<button class="btn btn-success btn-sm" onclick="adminResolveComplaint('${cp.id}')">✓ Resolve</button>`:''}
+            <button class="btn btn-danger btn-sm" onclick="adminDelComplaint('${cp.id}')">🗑</button>
+          </div>
+        </div>`;
+      }).join('');
+    }).catch(()=>{
+      c.innerHTML='<div class="empty"><div class="empty-ico">⚠️</div><h3>Could not load complaints</h3></div>';
+    });
+    return;
+  }
 
   if(curATab==='reviews'){
     if(!allReviews.length){
@@ -1611,8 +1791,13 @@ window.closeAdminClaimOverlay = function(){
   document.getElementById('adminClaimOverlay').classList.remove('open');
   pendingAdminClaimId = null;
 };
+let _adminClaimingInProgress = false;
 window.confirmAdminClaim = async function(){
   if(!pendingAdminClaimId) return;
+  if(_adminClaimingInProgress) return;
+  _adminClaimingInProgress = true;
+  const confirmBtn = document.querySelector('#adminClaimOverlay .btn-success');
+  if(confirmBtn){ confirmBtn.disabled=true; confirmBtn.textContent='Saving…'; }
   const sel = document.getElementById('claimantSelect');
   const uid = sel.value||null;
   const claimer = uid ? allUsers.find(u=>u.id===uid) : null;
@@ -1622,9 +1807,15 @@ window.confirmAdminClaim = async function(){
       claimedAt:new Date().toISOString(),
       claimantSnapshot:claimer?{name:claimer.first+' '+claimer.last,email:claimer.email,phone:claimer.phone||'—'}:{}
     });
+    await DB.incrementReunited();
     closeAdminClaimOverlay();
     toast('Marked as claimed ✓','ok');
-  } catch(e){ toast('Failed: '+e.message,'er'); }
+  } catch(e){
+    toast('Failed: '+e.message,'er');
+    if(confirmBtn){ confirmBtn.disabled=false; confirmBtn.textContent='Confirm Claimed ✓'; }
+  } finally{
+    _adminClaimingInProgress = false;
+  }
 };
 
 window.adminDelItem = function(id){
@@ -1639,6 +1830,20 @@ window.adminDelReview = function(id){
     try{ await DB.deleteDoc('reviews', id); toast('Review deleted','nf'); }
     catch(e){ toast('Delete failed: '+e.message,'er'); }
   });
+};
+
+window.adminResetReunited = function(){
+  showConfirm(
+    'Reset Reunited Counter',
+    'This will reset the "Total Reunited" counter to 0. This action cannot be undone. Are you sure?',
+    '🔄',
+    async ()=>{
+      try{
+        await DB.resetReunited();
+        toast('Reunited counter has been reset to 0','ok');
+      } catch(e){ toast('Reset failed: '+e.message,'er'); }
+    }
+  );
 };
 
 window.adminDelUser = function(id){
