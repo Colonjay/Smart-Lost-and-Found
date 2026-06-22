@@ -1155,7 +1155,7 @@ textarea.finput{resize:vertical;min-height:76px}
             <button class="atab" onclick="aTab(this,'all')">📋 All Items</button>
             <button class="atab" onclick="aTab(this,'claimed')">✅ Claimed</button>
             <button class="atab" onclick="aTab(this,'reviews')">💬 Reviews</button>
-            <button class="atab" onclick="aTab(this,'complaints')">⚠️ Complaints</button>
+            <button class="atab" onclick="aTab(this,'complaints')">⚠️ Complaints <span id="complaintsTabBadge" style="display:none;background:#cc1414;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:100px;margin-left:3px;vertical-align:middle"></span></button>
             <button class="atab" onclick="aTab(this,'users')">👥 Users</button>
           </div>
           <div id="adminContent"></div>
@@ -1199,6 +1199,7 @@ let me             = null;
 let allUsers       = [];
 let allItems       = [];
 let allReviews     = [];
+let allComplaints  = [];
 let curFilter      = 'all';
 let curATab        = 'pending';
 let reportType     = 'lost';
@@ -1213,6 +1214,7 @@ let unsubItems     = null;
 let unsubUsers     = null;
 let unsubReviews   = null;
 let unsubReunited  = null;
+let unsubComplaints = null;
 
 /* SEED DEFAULT DATA */
 function seedIfEmpty(){
@@ -1239,8 +1241,10 @@ function seedIfEmpty(){
 
 /* LIVE LISTENERS */
 function startListeners(){
+  let _itemsInitialized = false;
   if(unsubItems) unsubItems();
   unsubItems = DB.onSnapshot('items', docs => {
+    const prev = allItems;
     allItems = docs.sort((a,b)=>new Date(b.at)-new Date(a.at));
     updateStats();
     renderRecent();
@@ -1248,17 +1252,45 @@ function startListeners(){
     renderBrowse();
     if(me?.role==='admin' && document.getElementById('pg-admin').classList.contains('show'))
       renderAdmin();
-    // Check if a new found item was posted — run matching for current user's lost items
-    docs.filter(d=>d.type==='found'&&d.status==='pending').forEach(fi=>{
-      if(fi._new) checkLostMatchForFound(fi);
-    });
+
+    // Detect brand-new items (after initial load) and notify when app is open
+    if(_itemsInitialized){
+      const prevIds = new Set(prev.map(i=>i.id));
+      docs.filter(d=>!prevIds.has(d.id) && d.byId !== me?.id && d.status==='pending').forEach(item=>{
+        // In-app: check lost matches
+        if(item.type==='found') checkLostMatchForFound(item);
+        // System notification when app is open but SW may not have fired yet
+        if(Notification && Notification.permission==='granted'){
+          const isLost = item.type==='lost';
+          new Notification(isLost ? '🔴 New Lost Item Report' : '🟢 New Found Item Report', {
+            body: item.name + (item.loc ? ' — ' + item.loc : ''),
+            icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='36' fill='%231a3580'/><rect x='20' y='20' width='152' height='152' rx='24' fill='%23cc1414'/><text x='96' y='130' font-family='Arial' font-weight='900' font-size='90' fill='white' text-anchor='middle'>VU</text></svg>",
+            tag: 'vufind-item-' + item.id
+          });
+        }
+      });
+    }
+    _itemsInitialized = true;
   });
 
   if(unsubUsers) unsubUsers();
   unsubUsers = DB.onSnapshot('users', docs => {
     allUsers = docs;
-    if(me?.role==='admin' && curATab==='users' &&
-       document.getElementById('pg-admin').classList.contains('show'))
+    if(me?.role==='admin' && document.getElementById('pg-admin').classList.contains('show'))
+      renderAdmin();
+  });
+
+  if(unsubComplaints) unsubComplaints();
+  unsubComplaints = DB.onSnapshot('complaints', docs => {
+    allComplaints = docs.sort((a,b)=>new Date(b.at)-new Date(a.at));
+    // Update tab badge with open complaint count
+    const openCount = allComplaints.filter(c=>c.status==='open').length;
+    const badge = document.getElementById('complaintsTabBadge');
+    if(badge){
+      badge.textContent = openCount;
+      badge.style.display = openCount ? 'inline' : 'none';
+    }
+    if(me?.role==='admin' && document.getElementById('pg-admin').classList.contains('show'))
       renderAdmin();
   });
 
@@ -1285,6 +1317,7 @@ function stopListeners(){
   if(unsubUsers){unsubUsers();unsubUsers=null;}
   if(unsubReviews){unsubReviews();unsubReviews=null;}
   if(unsubReunited){unsubReunited();unsubReunited=null;}
+  if(unsubComplaints){unsubComplaints();unsubComplaints=null;}
 }
 
 /* AUTH */
@@ -1358,8 +1391,27 @@ function bootApp(u){
   startListeners();
   _resetInactivityTimer();
   toast(`Welcome back, ${u.first}!`,'ok');
+  // Ask for push notification permission
+  requestNotificationPermission();
   // Run auto-archive check
   setTimeout(autoArchiveOldItems, 3000);
+  // Tell the service worker who just logged in so it can push background notifications
+  if('serviceWorker' in navigator && navigator.serviceWorker.controller){
+    navigator.serviceWorker.controller.postMessage({
+      type: 'USER_LOGIN',
+      userId: u.id,
+      seenAt: new Date().toISOString()
+    });
+  } else if('serviceWorker' in navigator){
+    // SW not yet controlling — wait for it
+    navigator.serviceWorker.ready.then(reg=>{
+      if(reg.active) reg.active.postMessage({
+        type: 'USER_LOGIN',
+        userId: u.id,
+        seenAt: new Date().toISOString()
+      });
+    });
+  }
 }
 
 window.doLogout = function(){
@@ -1367,11 +1419,15 @@ window.doLogout = function(){
   _reviewShownThisSession = false;
   clearTimeout(_inactivityTimer);
   stopListeners();
-  allItems=[]; allUsers=[]; allReviews=[];
+  allItems=[]; allUsers=[]; allReviews=[]; allComplaints=[];
   document.getElementById('appScreen').classList.remove('active');
   document.getElementById('authScreen').classList.add('active');
   clearAuthForms();
   nav('home');
+  // Tell the service worker to stop sending notifications
+  if('serviceWorker' in navigator && navigator.serviceWorker.controller){
+    navigator.serviceWorker.controller.postMessage({ type: 'USER_LOGOUT' });
+  }
 };
 
 /* NAVIGATION */
@@ -1798,13 +1854,28 @@ async function autoArchiveOldItems(){
 
 /* ── MY ITEMS PAGE ── */
 
-/* Request notification permission on first interaction */
+/* Ask for notification permission shortly after login */
 function requestNotificationPermission(){
-  if(typeof Notification!=='undefined'&&Notification.permission==='default'){
-    Notification.requestPermission().catch(()=>{});
-  }
+  if(typeof Notification === 'undefined') return;
+  if(Notification.permission === 'granted') return;
+  if(Notification.permission === 'denied') return;
+  // Show after a short delay so it doesn't collide with the login toast
+  setTimeout(()=>{
+    Notification.requestPermission().then(perm=>{
+      if(perm === 'granted'){
+        toast('Notifications enabled — you\'ll be alerted about new items 🔔','ok');
+        // Re-send login info to SW now that permission is granted
+        if(me && 'serviceWorker' in navigator && navigator.serviceWorker.controller){
+          navigator.serviceWorker.controller.postMessage({
+            type: 'USER_LOGIN',
+            userId: me.id,
+            seenAt: new Date().toISOString()
+          });
+        }
+      }
+    }).catch(()=>{});
+  }, 2000);
 }
-document.addEventListener('click', requestNotificationPermission, {once:true});
 
 /* ADMIN PANEL */
 window.aTab = function(btn,t){
@@ -1819,12 +1890,10 @@ function renderAdmin(){
   if(!c) return;
 
   if(curATab==='complaints'){
-    window.DB.getDocs('complaints').then(complaints=>{
-      complaints = complaints.sort((a,b)=>new Date(b.at)-new Date(a.at));
-      if(!complaints.length){
-        c.innerHTML='<div class="empty"><div class="empty-ico">⚠️</div><h3>No complaints yet</h3><p>Claim complaints from users will appear here.</p></div>';
-        return;
-      }
+    const complaints = allComplaints;
+    if(!complaints.length){
+      c.innerHTML='<div class="empty"><div class="empty-ico">⚠️</div><h3>No complaints yet</h3><p>Claim complaints from users will appear here.</p></div>';
+    } else {
       c.innerHTML = complaints.map(cp=>{
         const dateStr = new Date(cp.at).toLocaleDateString('en-UG',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
         const isResolved = cp.status==='resolved';
@@ -1844,9 +1913,7 @@ function renderAdmin(){
           </div>
         </div>`;
       }).join('');
-    }).catch(()=>{
-      c.innerHTML='<div class="empty"><div class="empty-ico">⚠️</div><h3>Could not load complaints</h3></div>';
-    });
+    }
     return;
   }
 
@@ -2286,19 +2353,24 @@ window.installPWA = function(){
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{
     const swCode = `
-const CACHE = 'vufind-v1';
+importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js');
+
+const CACHE = 'vufind-v2';
 const ASSETS = [
   '/',
   '/index.html',
   'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
 ];
 
+const VU_ICON = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='36' fill='%231a3580'/><rect x='20' y='20' width='152' height='152' rx='24' fill='%23cc1414'/><text x='96' y='130' font-family='Arial' font-weight='900' font-size='90' fill='white' text-anchor='middle'>VU</text></svg>";
+
+/* ── CACHE ── */
 self.addEventListener('install', e=>{
   e.waitUntil(
     caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())
   );
 });
-
 self.addEventListener('activate', e=>{
   e.waitUntil(
     caches.keys().then(keys=>Promise.all(
@@ -2306,14 +2378,11 @@ self.addEventListener('activate', e=>{
     )).then(()=>self.clients.claim())
   );
 });
-
 self.addEventListener('fetch', e=>{
-  // Network first for Firebase/API calls
-  if(e.request.url.includes('firebase') || e.request.url.includes('googleapis.com/identitytoolkit')){
+  if(e.request.url.includes('firebase') || e.request.url.includes('googleapis.com')){
     e.respondWith(fetch(e.request));
     return;
   }
-  // Cache first for everything else
   e.respondWith(
     caches.match(e.request).then(cached=>{
       if(cached) return cached;
@@ -2326,7 +2395,103 @@ self.addEventListener('fetch', e=>{
       }).catch(()=>caches.match('/index.html'));
     })
   );
-});`;
+});
+
+/* ── NOTIFICATION CLICK ── */
+self.addEventListener('notificationclick', e=>{
+  e.notification.close();
+  e.waitUntil(
+    clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>{
+      for(const c of list){
+        if(c.url && c.focus) return c.focus();
+      }
+      return clients.openWindow('/');
+    })
+  );
+});
+
+/* ── FIREBASE FIRESTORE LISTENER (runs in SW — survives app close) ── */
+let db = null;
+let unsubItems = null;
+let swUserId = null;
+let lastSeenAt = null;
+
+function initFirebaseInSW(){
+  if(db) return;
+  try{
+    if(!firebase.apps.length){
+      firebase.initializeApp({
+        apiKey: "AIzaSyB_hIRIfUfI0uivKKkRk8xno9TQwt0T4jM",
+        authDomain: "lost-and-found-app-9d5d4.firebaseapp.com",
+        projectId: "lost-and-found-app-9d5d4",
+        storageBucket: "lost-and-found-app-9d5d4.firebasestorage.app",
+        messagingSenderId: "334727118690",
+        appId: "1:334727118690:web:6430baaf5ac60522cfb63b"
+      });
+    }
+    db = firebase.firestore();
+  } catch(e){ console.warn('[SW] Firebase init failed:', e); }
+}
+
+function startItemListener(){
+  if(!db || unsubItems) return;
+  // lastSeenAt defaults to now so we only notify about items posted AFTER login
+  if(!lastSeenAt) lastSeenAt = new Date().toISOString();
+
+  unsubItems = db.collection('items').onSnapshot(snap=>{
+    snap.docChanges().forEach(change=>{
+      if(change.type !== 'added') return;
+      const item = { id: change.doc.id, ...change.doc.data() };
+
+      // Skip items that were already there when we started listening
+      if(!item.at || item.at <= lastSeenAt) return;
+      // Skip items posted by this user (don't notify yourself)
+      if(swUserId && item.byId === swUserId) return;
+      // Only notify about lost/found pending items
+      if(item.status !== 'pending') return;
+
+      const isLost  = item.type === 'lost';
+      const title   = isLost ? '🔴 New Lost Item Report' : '🟢 New Found Item Report';
+      const body    = item.name + (item.loc ? ' — ' + item.loc : '');
+
+      self.registration.showNotification(title, {
+        body,
+        icon: VU_ICON,
+        badge: VU_ICON,
+        tag: 'vufind-item-' + item.id,
+        renotify: true,
+        data: { itemId: item.id }
+      });
+
+      // Advance the cursor so we don't re-notify
+      if(item.at > lastSeenAt) lastSeenAt = item.at;
+    });
+  }, err=>{ console.warn('[SW] Firestore listen error:', err); });
+}
+
+function stopItemListener(){
+  if(unsubItems){ unsubItems(); unsubItems = null; }
+}
+
+/* ── RECEIVE MESSAGES FROM MAIN THREAD ── */
+self.addEventListener('message', e=>{
+  const { type, userId, seenAt } = e.data || {};
+
+  if(type === 'USER_LOGIN'){
+    swUserId   = userId  || null;
+    lastSeenAt = seenAt  || new Date().toISOString();
+    initFirebaseInSW();
+    stopItemListener();
+    startItemListener();
+  }
+
+  if(type === 'USER_LOGOUT'){
+    swUserId   = null;
+    lastSeenAt = null;
+    stopItemListener();
+  }
+});
+`;
     const blob = new Blob([swCode],{type:'application/javascript'});
     const swUrl = URL.createObjectURL(blob);
     navigator.serviceWorker.register(swUrl,{scope:'/'}).catch(()=>{});
