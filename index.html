@@ -12,6 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
+<!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-B26ZNCVY33"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -20,6 +21,7 @@
   gtag('config', 'G-B26ZNCVY33');
 </script>
 
+<!-- Firebase -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import {
@@ -359,68 +361,48 @@ textarea.finput{resize:vertical;min-height:76px}
 /* EMPTY */
 .empty{text-align:center;padding:50px 20px}
 .empty-ico{font-size:44px;margin-bottom:14px;opacity:.4}
-.empty h3{font-size:17px;font-weight:600;color:var(--text-dark);margin-bottom:4px}
-.empty p{font-size:12px;color:var(--text-muted)}
+.empty h3{font-size:17px;font-weight:600;color:var(--text-dark);margin-bottom:7px}
+.empty p{color:var(--text-muted);font-size:13px;line-height:1.7}
+
+/* OVERLAYS & SHEETS */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:400;display:none;align-items:center;justify-content:center;padding:20px;}
+.overlay.open{display:flex}
+.sheet{background:var(--card-bg);border:1.5px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;animation:sheetIn .3s cubic-bezier(.22,1,.36,1);position:relative;box-shadow:0 30px 80px rgba(0,0,0,0.25);}
+.sheet::-webkit-scrollbar{width:4px}
+.sheet::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+@keyframes sheetIn{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.sheet-close{position:absolute;top:16px;right:16px;background:#f1f5f9;border:none;border-radius:7px;width:30px;height:30px;cursor:pointer;color:var(--text-muted);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.sheet-close:hover{background:#e2e8f0;color:var(--text-dark)}
+.sheet-img{width:100%;border-radius:12px;max-height:200px;object-fit:cover;margin-bottom:16px}
+.drow{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1.5px solid var(--border);font-size:13px}
+.drow:last-of-type{border-bottom:none}
+.drow span:first-child{color:var(--text-muted)}
+.drow span:last-child{font-weight:600;text-align:right;max-width:60%;color:var(--text-dark)}
+.modal-title{font-size:20px;font-weight:700;margin-bottom:8px;color:var(--text-dark)}
 
 /* TOAST */
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);z-index:9999;background:#1e293b;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,0.25);display:flex;align-items:center;gap:10px;transition:transform .3s cubic-bezier(.175,.885,.32,1.275),opacity .3s;opacity:0;pointer-events:none;max-width:90%;width:max-content}
-#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-#toast.ok{background:#065f46;border:1px solid #047857}
-#toast.er{background:#991b1b;border:1px solid #b91c1c}
-#toast.nf{background:#1e3a8a;border:1px solid #1d4ed8}
+#toasts{position:fixed;top:70px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:9px;font-size:13px;font-weight:500;color:var(--text-dark);box-shadow:0 4px 20px rgba(0,0,0,0.12);pointer-events:auto;animation:tIn .3s ease;max-width:300px;}
+.toast.ok{border-left:3px solid var(--success)}.toast.er{border-left:3px solid var(--vu-red)}.toast.nf{border-left:3px solid var(--vu-blue3)}
+@keyframes tIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
 
-/* DETAILED OVERLAY MODULES */
-.detail-overlay, .confirm-overlay, .review-prompt-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(8px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;transition:opacity .25s;}
-.detail-overlay.open, .confirm-overlay.open, .review-prompt-overlay.open{display:flex}
-.detail-card{background:var(--card-bg);border:1.5px solid var(--border);border-radius:20px;width:100%;max-width:460px;box-shadow:var(--shadow2);overflow:hidden;animation:sheetIn .35s cubic-bezier(.34,1.56,.64,1) both;display:flex;flex-direction:column;max-height:85vh;}
-@keyframes sheetIn{from{opacity:0;transform:translateY(30px) scale(0.96)}to{opacity:1;transform:translateY(0) scale(1)}}
-.detail-img-box{width:100%;height:180px;background:#f1f5f9;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;border-bottom:1.5px solid var(--border)}
-.detail-img-box img{width:100%;height:100%;object-fit:cover}
-.detail-img-placeholder{font-size:48px;opacity:.3}
-.detail-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.9);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;font-weight:700;color:var(--text-dark);box-shadow:0 2px 8px rgba(0,0,0,0.1);transition:transform .2s,background .2s;z-index:10;}
-.detail-close:hover{transform:scale(1.05);background:#fff}
-.detail-body{padding:24px;overflow-y:auto;flex:1}
-.detail-title{font-size:18px;font-weight:700;color:var(--text-dark);margin-bottom:12px;line-height:1.3}
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-.detail-meta-box{background:#f8fafc;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px}
-.detail-meta-lbl{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
-.detail-meta-val{font-size:12.5px;font-weight:500;color:var(--text-dark)}
-.detail-desc-box{background:#f8fafc;border:1.5px solid var(--border);border-radius:10px;padding:12px;margin-bottom:16px}
-.detail-action-bar{display:flex;gap:10px;padding:16px 24px;background:#f8fafc;border-top:1.5px solid var(--border)}
+/* INSTALL BAR */
+.install-bar{position:fixed;bottom:16px;left:calc(var(--sidebar-w) + 16px);right:16px;background:#fff;border:1.5px solid rgba(204,20,20,.25);border-radius:14px;padding:13px 16px;display:none;align-items:center;gap:13px;z-index:200;box-shadow:0 4px 24px rgba(0,0,0,0.13);}
+.install-bar.show{display:flex}
+.install-bar-text{flex:1;font-size:12px;line-height:1.4}
+.install-bar-text strong{display:block;font-weight:700;margin-bottom:2px;color:var(--text-dark)}
+.install-bar-text span{color:var(--text-muted);font-size:11px}
 
-/* REVIEWS TAB LAYOUT */
-.reviews-dashboard{background:var(--card-bg);border:1.5px solid var(--border);border-radius:14px;padding:20px;margin-bottom:18px;box-shadow:var(--shadow)}
-.reviews-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px}
-.review-item-card{background:var(--card-bg);border:1.5px solid var(--border);border-radius:12px;padding:16px;box-shadow:var(--shadow);position:relative}
-.review-item-header{display:flex;align-items:center;justify-content:between;margin-bottom:8px}
-.review-item-name{font-weight:600;font-size:13.5px;color:var(--text-dark)}
-.review-item-stars{display:flex;gap:2px;color:#f59e0b;font-size:12px}
-.review-item-text{font-size:13px;color:var(--text-mid);line-height:1.5}
-.review-item-date{font-size:10px;color:var(--text-muted);margin-top:8px;text-align:right}
-.star-row{display:flex;gap:6px;margin:8px 0 14px}
-.star-btn{background:none;border:none;cursor:pointer;padding:2px;color:var(--border2);transition:transform .15s}
-.star-btn svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
-.star-btn.lit{color:#f59e0b}
-.star-btn.lit svg{fill:#f59e0b}
+/* CLAIM COMPLAINT */
+.complaint-box{background:#fff8f0;border:1.5px solid #fde68a;border-radius:12px;padding:16px;margin-top:16px;}
+.complaint-box-title{font-size:13px;font-weight:700;color:#b45309;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.complaint-box-desc{font-size:11px;color:var(--text-muted);margin-bottom:12px;line-height:1.5}
+.complaint-form{display:none;margin-top:10px;border-top:1px solid #fde68a;padding-top:12px;}
+.complaint-form.open{display:block}
+.complaint-submitted{display:none;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:9px;padding:12px;text-align:center;font-size:12px;color:var(--success);font-weight:600;margin-top:10px;}
+.complaint-submitted.show{display:block}
 
-/* STUDENT FEEDBACK HOME LOOPS */
-.reviews-scroll-container{background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);padding:28px 20px;border-radius:16px;margin-bottom:24px;color:#fff;overflow:hidden;position:relative;box-shadow:var(--shadow2);}
-.reviews-scroll-title{font-size:11px;font-weight:700;color:#ff8585;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;text-align:center}
-.reviews-section-heading{font-size:17px;font-weight:600;text-align:center;margin-bottom:20px;color:rgba(255,255,255,0.9)}
-.reviews-section-heading span{color:#38bdf8;font-weight:700}
-.reviews-carousel-wrap{position:relative;width:100%;overflow:hidden;padding:10px 0}
-.reviews-carousel-track{display:flex;gap:14px;width:max-content;animation:scrollReviews 32s linear infinite}
-.reviews-carousel-track:hover{animation-play-state:paused}
-@keyframes scrollReviews{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-.review-slide{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:16px;width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15)}
-.review-slide-stars{display:flex;gap:2px}
-.review-slide-text{font-size:12px;color:rgba(255,255,255,0.85);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;height:54px}
-.review-slide-name{font-size:10px;font-weight:600;color:#38bdf8;text-align:right;margin-top:auto}
-.reviews-fade-left, .reviews-fade-right{position:absolute;top:0;bottom:0;width:40px;z-index:2;pointer-events:none}
-.reviews-fade-left{left:0;background:linear-gradient(90deg,#0f172a 0%,transparent 100%)}
-.reviews-fade-right{right:0;background:linear-gradient(-90deg,#0f172a 0%,transparent 100%)}
-
-/* CONFIRM OVERLAY SPECIFICS */
+/* CONFIRM MODAL */
 .confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);z-index:600;display:none;align-items:center;justify-content:center;padding:20px;}
 .confirm-overlay.open{display:flex}
 .confirm-box{background:var(--card-bg);border:1.5px solid var(--border);border-radius:18px;padding:28px;width:100%;max-width:340px;text-align:center;animation:sheetIn .28s ease;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
@@ -440,20 +422,154 @@ textarea.finput{resize:vertical;min-height:76px}
 .dot-red{width:8px;height:8px;border-radius:50%;background:#cc1414;flex-shrink:0}
 .dot-green{width:8px;height:8px;border-radius:50%;background:#16a34a;flex-shrink:0}
 
-/* BOTTOM NAVIGATION BAR MOBILE */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:#ffffff;border-top:1.5px solid var(--border);display:none;align-items:center;justify-content:space-around;padding:0 8px;z-index:190;box-shadow:0 -4px 16px rgba(26,53,128,0.06)}
-.bnav-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;background:none;border:none;color:var(--text-muted);font-family:'Inter',sans-serif;font-size:10px;font-weight:500;cursor:pointer;flex:1;height:100%;transition:color .15s;gap:3px}
-.bnav-btn:hover, .bnav-btn.on{color:var(--vu-blue3)}
-.bnav-btn.on{font-weight:600}
-.bnav-ico{display:flex;align-items:center;justify-content:center;height:22px;transition:transform .2s}
-.bnav-btn:active .bnav-ico{transform:scale(0.9)}
-.bnav-report{position:relative;top:-14px;background:linear-gradient(135deg,var(--vu-red),var(--vu-red2));width:50px;height:50px;border-radius:50%;box-shadow:0 4px 16px rgba(204,20,20,0.45);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;border:3px solid #fff;transition:transform .2s;}
-.bnav-report:active{transform:scale(0.93)}
-.bnav-report-ico{display:flex;align-items:center;justify-content:center}
-.mobile-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.3);backdrop-filter:blur(4px);z-index:195;display:none}
+/* CAROUSEL */
+.carousel-section{margin-bottom:22px}
+.carousel-wrap{position:relative;overflow:hidden;border-radius:14px;background:var(--card-bg);border:1.5px solid var(--border);height:160px;box-shadow:var(--shadow);}
+.carousel-track{display:flex;height:100%;will-change:transform;cursor:grab;user-select:none;}
+.carousel-track:active{cursor:grabbing;}
+.carousel-item{flex-shrink:0;width:140px;height:100%;margin-right:10px;position:relative;cursor:pointer;border-radius:10px;overflow:hidden;transition:transform .2s;}
+.carousel-item:hover{transform:scale(1.04)}
+.carousel-item-img{width:100%;height:100%;background:#eef2ff;display:flex;align-items:center;justify-content:center;font-size:36px;}
+.carousel-item-img img{width:100%;height:100%;object-fit:cover}
+.carousel-item-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,0.72) 0%,rgba(0,0,0,0) 100%);color:#fff;font-size:10px;font-weight:600;padding:18px 7px 6px;line-height:1.3;pointer-events:none;}
+.carousel-item-pill{position:absolute;top:6px;right:6px;font-size:9px;font-weight:700;padding:2px 6px;border-radius:100px;}
+.carousel-item-pill.lost{background:rgba(204,20,20,0.85);color:#fff}
+.carousel-item-pill.found{background:rgba(22,163,74,0.85);color:#fff}
+.carousel-fade-left{position:absolute;left:0;top:0;bottom:0;width:50px;background:linear-gradient(to right,var(--card-bg) 0%,transparent 100%);pointer-events:none;z-index:2;}
+.carousel-fade-right{position:absolute;right:0;top:0;bottom:0;width:50px;background:linear-gradient(to left,var(--card-bg) 0%,transparent 100%);pointer-events:none;z-index:2;}
+
+/* REVIEWS PAGE */
+.reviews-hero{background:linear-gradient(135deg,#1a3580 0%,#2856c8 100%);border-radius:14px;padding:22px;margin-bottom:18px;color:#fff;box-shadow:var(--shadow2);}
+.reviews-hero h2{font-size:20px;font-weight:700;margin-bottom:5px}
+.reviews-hero p{font-size:13px;opacity:.8}
+.review-write-wrap{background:var(--card-bg);border:1.5px solid var(--border);border-radius:14px;padding:20px;margin-bottom:18px;box-shadow:var(--shadow);}
+.review-write-wrap h3{font-size:15px;font-weight:700;color:var(--text-dark);margin-bottom:14px}
+.star-row{display:flex;gap:4px;margin-bottom:12px}
+.star-btn{font-size:0;background:none;border:none;cursor:pointer;padding:2px;transition:transform .15s;line-height:1;width:30px;height:30px;display:flex;align-items:center;justify-content:center}
+.star-btn:hover{transform:scale(1.18)}
+.star-btn svg{width:24px;height:24px;transition:fill .15s,stroke .15s}
+.star-btn .star-outline{fill:none;stroke:#d1d5db;stroke-width:1.5}
+.star-btn.lit .star-outline,.star-btn:hover .star-outline{fill:#f59e0b;stroke:#f59e0b}
+.review-card{background:var(--card-bg);border:1.5px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;box-shadow:var(--shadow);}
+.review-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;flex-wrap:wrap;}
+.review-card-name{font-size:13px;font-weight:700;color:var(--text-dark)}
+.review-card-stars{display:flex;align-items:center;gap:2px}
+.review-card-text{font-size:13px;color:var(--text-mid);line-height:1.6;margin-bottom:6px}
+.review-card-date{font-size:11px;color:var(--text-muted)}
+.review-empty{text-align:center;padding:40px 20px;color:var(--text-muted)}
+.review-empty-ico{font-size:40px;margin-bottom:10px;opacity:.4}
+
+/* REVIEWS CAROUSEL */
+.reviews-scroll-section{margin-bottom:0}
+.reviews-scroll-title{font-size:16px;font-weight:700;color:var(--text-dark);margin-bottom:12px}
+.reviews-carousel-outer{border-radius:20px;overflow:hidden;position:relative;background:linear-gradient(135deg,var(--vu-blue) 0%,#0d1e4a 100%);padding:24px 0;}
+.reviews-carousel-wrap{position:relative;overflow:hidden;height:170px;}
+.reviews-carousel-track{display:flex;height:100%;will-change:transform;cursor:grab;user-select:none;}
+.reviews-carousel-track:active{cursor:grabbing;}
+.review-slide{flex-shrink:0;width:240px;height:150px;margin-right:14px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:16px;backdrop-filter:blur(8px);padding:16px;display:flex;flex-direction:column;gap:8px;}
+.review-slide-stars{display:flex;align-items:center;gap:2px}
+.review-slide-text{font-size:12px;color:rgba(255,255,255,0.88);line-height:1.55;flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.review-slide-name{font-size:11px;font-weight:700;color:rgba(255,255,255,0.6)}
+.reviews-fade-left{position:absolute;left:0;top:0;bottom:0;width:70px;background:linear-gradient(to right,#1a3580 0%,transparent 100%);pointer-events:none;z-index:2;}
+.reviews-fade-right{position:absolute;right:0;top:0;bottom:0;width:70px;background:linear-gradient(to left,#0d1e4a 0%,transparent 100%);pointer-events:none;z-index:2;}
+.reviews-section-heading{text-align:center;color:#fff;padding:0 20px 14px;font-size:15px;font-weight:700;opacity:.95;}
+.reviews-section-heading span{color:#fbbf24}
+
+/* CLAIMED CARDS */
+.claimed-card{background:var(--card-bg);border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow);}
+.claimed-card-top{display:flex;gap:13px;align-items:flex-start;margin-bottom:12px}
+.claimed-card-img{width:54px;height:54px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1.5px solid var(--border);}
+.claimed-item-info{flex:1;min-width:0}
+.claimed-item-name{font-size:14px;font-weight:700;color:var(--text-dark);margin-bottom:3px}
+.claimed-item-meta{font-size:11px;color:var(--text-muted)}
+.claimed-divider{height:1.5px;background:var(--border);margin:0 0 12px}
+.claimed-claimant{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px;}
+.claimed-claimant-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#16a34a;margin-bottom:7px}
+.claimed-claimant-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.claimed-claimant-row span:first-child{font-size:12px;color:var(--text-muted);min-width:70px}
+.claimed-at-badge{display:inline-flex;align-items:center;gap:5px;background:#fffbeb;border:1px solid #fde68a;color:var(--warn);border-radius:100px;font-size:10px;font-weight:600;padding:3px 10px;margin-top:7px;}
+.admin-claimed-empty{text-align:center;padding:50px 20px}
+
+/* REVIEW PROMPT MODAL */
+.review-prompt-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:700;display:none;align-items:center;justify-content:center;padding:20px;}
+.review-prompt-overlay.open{display:flex}
+.review-prompt-box{background:var(--card-bg);border:1.5px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:380px;text-align:center;animation:sheetIn .3s cubic-bezier(.22,1,.36,1);box-shadow:0 30px 80px rgba(0,0,0,0.25);}
+.review-prompt-stars{display:flex;gap:6px;justify-content:center;margin:16px 0 12px}
+.review-prompt-star{font-size:0;cursor:pointer;transition:transform .15s;background:none;border:none;width:44px;height:44px;display:flex;align-items:center;justify-content:center;padding:2px;}
+.review-prompt-star svg{width:36px;height:36px;transition:fill .15s,stroke .15s}
+.review-prompt-star .star-outline{fill:none;stroke:#d1d5db;stroke-width:1.5}
+.review-prompt-star.lit .star-outline,.review-prompt-star:hover .star-outline{fill:#f59e0b;stroke:#f59e0b}
+.review-prompt-star:hover{transform:scale(1.15)}
+
+/* ADMIN CLAIM DIALOG */
+.admin-claim-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:650;display:none;align-items:center;justify-content:center;padding:20px;}
+.admin-claim-overlay.open{display:flex}
+.admin-claim-box{background:var(--card-bg);border:1.5px solid var(--border);border-radius:18px;padding:26px;width:100%;max-width:360px;animation:sheetIn .28s ease;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
+.admin-claim-box h3{font-size:16px;font-weight:700;color:var(--text-dark);margin-bottom:5px}
+.admin-claim-box p{font-size:12px;color:var(--text-muted);margin-bottom:16px;line-height:1.5}
+
+/* FOOTER */
+.vu-footer{background:linear-gradient(180deg,#0a1633 0%,#071027 100%);margin-top:32px;border-radius:20px 20px 0 0;border-top:3px solid var(--vu-red);padding:36px 28px 20px;color:#fff;}
+.footer-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px;margin-bottom:28px;}
+.footer-brand{display:flex;flex-direction:column;gap:12px}
+.footer-logo-wrap{display:flex;align-items:center;gap:12px}
+.footer-logo-shield{width:52px;height:52px;border-radius:14px;background:linear-gradient(145deg,var(--vu-red),var(--vu-red2));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;flex-shrink:0;}
+.footer-logo-img{width:52px;height:52px;object-fit:contain;border-radius:10px;background:#fff;padding:4px;}
+.footer-uni-name{font-size:15px;font-weight:800;color:#fff;line-height:1.2}
+.footer-uni-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px}
+.footer-tagline{font-size:12px;color:rgba(255,255,255,.5);line-height:1.65}
+.footer-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--vu-red);margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:7px;}
+.footer-links{display:flex;flex-direction:column;gap:7px}
+.footer-link{font-size:13px;color:rgba(255,255,255,.65);cursor:pointer;background:none;border:none;text-align:left;font-family:'Inter',sans-serif;padding:0;transition:color .2s;}
+.footer-link:hover{color:#fff}
+.footer-socials{display:flex;flex-direction:column;gap:8px}
+.footer-social-item{display:flex;align-items:center;gap:10px;color:rgba(255,255,255,.65);font-size:13px;cursor:pointer;padding:7px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);transition:all .2s;text-decoration:none;}
+.footer-social-item:hover{background:rgba(255,255,255,.08);color:#fff}
+.footer-social-icon{font-size:15px;width:20px;text-align:center}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:18px;text-align:center;}
+.footer-bottom-text{font-size:11px;color:rgba(255,255,255,.35);line-height:1.7}
+.footer-bottom-text a{color:rgba(255,255,255,.5);text-decoration:none}
+.footer-policies{display:flex;justify-content:center;gap:16px;margin-top:6px;flex-wrap:wrap}
+.footer-policy-link{font-size:11px;color:rgba(255,255,255,.4);cursor:pointer;background:none;border:none;font-family:'Inter',sans-serif;transition:color .2s}
+
+/* MOBILE BOTTOM NAV */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:#fff;border-top:1.5px solid var(--border);z-index:150;align-items:stretch;box-shadow:0 -4px 20px rgba(26,53,128,0.10);}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:transparent;cursor:pointer;font-family:'Inter',sans-serif;padding:6px 2px;color:var(--text-muted);transition:color .2s;position:relative;}
+.bnav-btn.on{color:var(--vu-blue)}
+.bnav-btn .bnav-ico{font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center}
+.bnav-btn .bnav-lbl{font-size:9px;font-weight:600;letter-spacing:.2px;text-transform:uppercase}
+.bnav-btn.on::after{content:'';position:absolute;top:0;left:20%;right:20%;height:2.5px;background:var(--vu-red);border-radius:0 0 3px 3px;}
+.bnav-report{flex:1.1}
+.bnav-report-ico{width:40px;height:40px;background:linear-gradient(135deg,var(--vu-red),var(--vu-red2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 12px rgba(204,20,20,0.35);}
+
+/* MOBILE REPORT SHEET */
+.report-sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:500;display:none;align-items:flex-end;justify-content:center;}
+.report-sheet-overlay.open{display:flex}
+.report-sheet{background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;animation:slideUp .3s cubic-bezier(.22,1,.36,1);}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.report-sheet h3{font-size:17px;font-weight:700;color:var(--text-dark);margin-bottom:5px}
+.report-sheet p{font-size:12px;color:var(--text-muted);margin-bottom:20px}
+.rsheet-btns{display:flex;flex-direction:column;gap:11px}
+.rsheet-btn{display:flex;align-items:center;gap:14px;padding:16px;border-radius:14px;border:1.5px solid var(--border);background:#fff;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;}
+.rsheet-btn:hover,.rsheet-btn:active{transform:translateY(-1px);box-shadow:var(--shadow2)}
+.rsheet-btn.lost-btn{border-color:rgba(204,20,20,.3)}
+.rsheet-btn.lost-btn:hover{background:#fef2f2}
+.rsheet-btn.found-btn{border-color:rgba(22,163,74,.3)}
+.rsheet-btn.found-btn:hover{background:#f0fdf4}
+.rsheet-ico{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.rsheet-ico.lost{background:#fef2f2}.rsheet-ico.found{background:#f0fdf4}
+.rsheet-title{font-size:14px;font-weight:700;color:var(--text-dark);margin-bottom:2px}
+.rsheet-desc{font-size:12px;color:var(--text-muted)}
+
+/* MOBILE OVERRIDES */
+.menu-toggle{display:none;align-items:center;justify-content:center;width:36px;height:36px;border:1.5px solid var(--border);border-radius:8px;background:#f8fafc;cursor:pointer;font-size:18px;flex-shrink:0;margin-right:6px;}
+.topbar-logout-btn{display:none;align-items:center;gap:7px;padding:6px 4px;border:none;background:none;color:var(--text-muted);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:color .18s;}
+.topbar-logout-btn:hover{color:var(--vu-red)}
+.topbar-user{display:none;align-items:center;gap:9px;cursor:pointer;padding:6px 12px;border-radius:100px;border:1.5px solid var(--border);background:#f8fafc;transition:background .2s}
+.topbar-user:hover{background:#eef2ff}
+.mobile-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:190;display:none}
 .mobile-overlay.show{display:block}
 
-/* RESPONSIVE BREAKPOINTS */
 @media(max-width:768px){
   :root{--sidebar-w:0px}
   .sidebar{width:260px;transform:translateX(-100%);transition:transform .3s cubic-bezier(.22,1,.36,1);z-index:200;box-shadow:4px 0 24px rgba(0,0,0,0.12);top:58px;}
@@ -464,89 +580,206 @@ textarea.finput{resize:vertical;min-height:76px}
   .topbar-page-title{display:none}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
   .qa-grid{grid-template-columns:1fr 1fr}
-  .page{padding:16px 16px 36px}
+  .install-bar{left:16px;bottom:calc(var(--nav-h) + 8px)}
+  .form-row{grid-template-columns:1fr}
+  .home-banner{padding:18px}
+  .home-banner h2{font-size:17px}
+  .page{padding:16px}
+  .stats-grid{gap:10px}
+  .sheet{padding:20px 16px;border-radius:16px}
+  .admin-tabs{gap:2px}
+  .atab{font-size:10px;padding:8px 3px}
+  .footer-grid{grid-template-columns:1fr;gap:20px}
   .bottom-nav{display:flex}
-  .topbar-right{padding-left:0}
-  .topbar{justify-content:space-between}
-  .topbar-left{width:auto}
+  #toasts{right:10px;left:10px;top:64px}
+  .toast{max-width:100%}
+  .carousel-wrap{height:130px}
+  .carousel-item{width:110px}
+  .topbar-user{gap:0;padding:0;display:inline-flex!important;border:none;background:transparent;}
+  .topbar-user .uname{display:none!important}
+  .topbar-user .ava{width:34px;height:34px;font-size:13px;font-weight:700}
+  .topbar-logout-btn{display:inline-flex!important}
+  .topbar-page-title{display:block!important}
 }
-@media(min-width:769px){
-  .bottom-nav, .mobile-overlay{display:none!important}
-  .menu-toggle{display:none!important}
+@media(min-width:769px) and (max-width:1024px){
+  :root{--sidebar-w:190px}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(min-width:1400px){
+  :root{--sidebar-w:240px}
 }
 </style>
 </head>
 <body>
 
+<!-- MOBILE SIDEBAR OVERLAY -->
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+
+<!-- TOASTS -->
+<div id="toasts"></div>
+
+<!-- INSTALL BAR -->
+<div class="install-bar" id="installBar">
+  <span style="font-size:28px">📲</span>
+  <div class="install-bar-text">
+    <strong>Install VU Find</strong>
+    <span>Works offline · Home screen shortcut</span>
+  </div>
+  <button class="btn btn-red btn-sm" onclick="installPWA()">Install</button>
+  <button class="btn btn-ghost btn-sm" onclick="document.getElementById('installBar').classList.remove('show')" style="width:34px;padding:7px">✕</button>
+</div>
+
+<!-- ITEM DETAIL SHEET -->
+<div class="overlay" id="detailOverlay" onclick="closeSheet(event)">
+  <div class="sheet" id="detailSheet">
+    <button class="sheet-close" onclick="closeSheet()">✕</button>
+    <div id="sheetContent"></div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div style="font-size:40px;margin-bottom:12px" id="cIcon">⚠️</div>
+    <div class="c-title" id="cTitle">Confirm</div>
+    <div class="c-msg" id="cMsg"></div>
+    <div style="display:flex;gap:9px">
+      <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger btn-sm" style="flex:1" id="cBtn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEW PROMPT MODAL -->
+<div class="review-prompt-overlay" id="reviewPromptOverlay">
+  <div class="review-prompt-box">
+    <div style="font-size:44px;margin-bottom:8px">🎉</div>
+    <div style="font-size:18px;font-weight:700;color:var(--text-dark);margin-bottom:6px">Item Recovered!</div>
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:18px">Would you like to leave a quick review about your experience with VU Find?</div>
+    <div class="review-prompt-stars" id="promptStarRow">
+      <button class="review-prompt-star" onclick="setPromptStar(1)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
+      <button class="review-prompt-star" onclick="setPromptStar(2)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
+      <button class="review-prompt-star" onclick="setPromptStar(3)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
+      <button class="review-prompt-star" onclick="setPromptStar(4)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
+      <button class="review-prompt-star" onclick="setPromptStar(5)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
+    </div>
+    <div class="fgroup" style="text-align:left">
+      <div class="flabel">Tell us about your experience</div>
+      <textarea class="finput" id="promptReviewText" placeholder="I recovered my item in 2 days… amazing!" style="min-height:72px"></textarea>
+    </div>
+    <div style="display:flex;gap:9px;margin-top:4px">
+      <button class="btn btn-success btn-sm" style="flex:1" onclick="submitPromptReview()">Submit ⭐</button>
+      <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeReviewPrompt()">Maybe Later</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN CLAIM DIALOG -->
+<div class="admin-claim-overlay" id="adminClaimOverlay">
+  <div class="admin-claim-box">
+    <h3>✅ Mark as Claimed</h3>
+    <p>Select the user who claimed this item. This will be recorded in the admin dashboard.</p>
+    <div class="fgroup">
+      <div class="flabel">Claimed By</div>
+      <select class="finput" id="claimantSelect">
+        <option value="">— Not Specified —</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:9px;margin-top:6px">
+      <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeAdminClaimOverlay()">Cancel</button>
+      <button class="btn btn-success btn-sm" style="flex:1" onclick="confirmAdminClaim()">Confirm Claimed ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE REPORT SHEET -->
+<div class="report-sheet-overlay" id="reportSheetOverlay" onclick="closeReportSheet(event)">
+  <div class="report-sheet">
+    <h3>📋 Report an Item</h3>
+    <p>Choose what you want to report</p>
+    <div class="rsheet-btns">
+      <button class="rsheet-btn lost-btn" onclick="goReport('lost');closeReportSheetDirect()">
+        <div class="rsheet-ico lost">🔴</div>
+        <div><div class="rsheet-title">Report Lost Item</div><div class="rsheet-desc">Describe what you lost so others can help</div></div>
+      </button>
+      <button class="rsheet-btn found-btn" onclick="goReport('found');closeReportSheetDirect()">
+        <div class="rsheet-ico found">🟢</div>
+        <div><div class="rsheet-title">Report Found Item</div><div class="rsheet-desc">Help return this item to its owner</div></div>
+      </button>
+    </div>
+    <button class="btn btn-ghost" style="margin-top:14px" onclick="closeReportSheetDirect()">Cancel</button>
+  </div>
+</div>
+
+<!-- SPLASH -->
 <div id="splash">
   <div class="splash-shield">VU</div>
   <div class="splash-name">VU Find</div>
-  <div class="splash-sub">Smart Lost &amp; Found System</div>
+  <div class="splash-sub">Smart Campus Lost &amp; Found · Victoria University</div>
   <div class="ld-dots"><span></span><span></span><span></span></div>
 </div>
 
+<!-- AUTH SCREEN -->
 <div class="screen active" id="authScreen">
   <div class="auth-wrap">
     <div class="auth-brand">
       <div class="brand-logo">VU</div>
-      <h1 class="brand-name">VU <span>Find</span></h1>
-      <p class="brand-sub">Smart Lost &amp; Found Platform</p>
+      <div class="brand-name">VU <span>Find</span></div>
+      <div class="brand-sub">Smart Campus Lost &amp; Found System</div>
       <div class="auth-uni">
-        <span style="font-size:20px">🏫</span>
         <div class="auth-uni-text">
-          <strong>VICTORIA UNIVERSITY</strong>
+          <strong>Victoria University</strong>
           Kampala, Uganda
         </div>
       </div>
     </div>
-
     <div class="glass-card">
       <div class="auth-toggle">
         <button class="on" id="tab-login" onclick="authTab('login')">Sign In</button>
         <button id="tab-reg" onclick="authTab('reg')">Register</button>
       </div>
-
+      <!-- LOGIN -->
       <div id="loginPanel">
         <div class="fgroup">
-          <div class="flabel">University Email Address</div>
-          <input type="email" class="finput" id="lEmail" placeholder="student@vu.ac.ug" value="admin@vu.ac.ug"/>
+          <div class="flabel">Email Address</div>
+          <input type="email" class="finput" id="lEmail" placeholder="yourname@gmail.com" onkeydown="if(event.key==='Enter')doLogin()"/>
         </div>
         <div class="fgroup">
           <div class="flabel">Password</div>
           <div class="pw-wrap">
-            <input type="password" class="finput" id="lPass" placeholder="••••••••" value="admin123"/>
+            <input type="password" class="finput" id="lPass" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()"/>
             <button type="button" class="pw-toggle" onclick="togglePw('lPass',this)" tabindex="-1" aria-label="Show password">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
         </div>
-        <button class="btn btn-red mt8" id="loginBtn" onclick="doLogin()">Sign In →</button>
-        <div class="hint-line">Demo Access: Use <strong>admin@vu.ac.ug</strong> / <strong>admin123</strong></div>
+        <button class="btn btn-blue mt8" id="loginBtn" onclick="doLogin()">Sign In →</button>
+       <!-- <div class="hint-line">Admin: <strong style="color:var(--vu-red)">admin@vu.ac.ug</strong> / admin123</div>-->
       </div>
-
+      <!-- REGISTER -->
       <div id="regPanel" style="display:none">
         <div class="form-row">
           <div class="fgroup">
             <div class="flabel">First Name</div>
-            <input type="text" class="finput" id="rFirst" placeholder="John"/>
+            <input type="text" class="finput" id="rFirst" placeholder="MALE"/>
           </div>
           <div class="fgroup">
             <div class="flabel">Last Name</div>
-            <input type="text" class="finput" id="rLast" placeholder="Doe"/>
+            <input type="text" class="finput" id="rLast" placeholder="JORDAN"/>
           </div>
         </div>
         <div class="fgroup">
-          <div class="flabel">University Email</div>
-          <input type="email" class="finput" id="rEmail" placeholder="j.doe@vu.ac.ug"/>
-        </div>
-        <div class="fgroup">
           <div class="flabel">Phone Number</div>
-          <input type="tel" class="finput" id="rPhone" placeholder="0700000000"/>
+          <input type="tel" class="finput" id="rPhone" placeholder="07XXXXXXXX"/>
         </div>
         <div class="fgroup">
-          <div class="flabel">Password</div>
+          <div class="flabel">Email Address</div>
+          <input type="email" class="finput" id="rEmail" placeholder="yourname@gmail.com"/>
+        </div>
+        <div class="fgroup">
+          <div class="flabel">Create Password</div>
           <div class="pw-wrap">
-            <input type="password" class="finput" id="rPass" placeholder="Choose password"/>
+            <input type="password" class="finput" id="rPass" placeholder="Min. 6 characters"/>
             <button type="button" class="pw-toggle" onclick="togglePw('rPass',this)" tabindex="-1" aria-label="Show password">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
@@ -568,107 +801,104 @@ textarea.finput{resize:vertical;min-height:76px}
   </div>
 </div>
 
+<!-- APP SCREEN -->
 <div class="screen" id="appScreen">
   <div class="offline-bar" id="offlineBar">📡 You're offline — showing cached data</div>
 
-  <div class="topbar">
-    <div class="topbar-left">
-      <div class="vu-logo-box">
+  <!-- TOP BAR -->
+  <div class="topbar" style="padding:0 10px;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:8px;margin-left:6px">
+      <div class="vu-logo-box topbar-logo-desktop">
         <div class="vu-logo-shield">VU</div>
         <div class="vu-logo-text">
-          <div class="vn">VU Find</div>
-          <div class="vs">Smart Lost &amp; Found</div>
+          <div class="vn">VICTORIA UNIVERSITY</div>
+          <div class="vs">Kampala, Uganda</div>
         </div>
       </div>
-    </div>
-    <div class="topbar-right">
-      <div class="topbar-page-title" id="topbarTitle">Dashboard</div>
-      <div></div>
-      <div class="topbar-user" onclick="nav('myitems')">
-        <div class="ava" id="userAva">A</div>
-        <div class="uname" id="userUname">User</div>
+      <div class="topbar-user" title="Logged in user">
+        <div class="ava" id="hAva">?</div>
+        <span class="uname" id="hName">User</span>
       </div>
     </div>
+    <div class="topbar-page-title" id="topbarTitle">Home</div>
+    <button class="topbar-logout-btn" onclick="doLogout()" title="Logout" style="margin-right:8px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>Logout</span></button>
   </div>
 
-  <div class="sidebar">
-    <div class="nav-section-label">Main Navigation</div>
-    <button class="navbtn on" id="n-home" onclick="nav('home')">
-      <span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
-      <span class="nav-label">Dashboard</span>
-    </button>
-    <button class="navbtn" id="n-browse" onclick="nav('browse')">
-      <span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
-      <span class="nav-label">Browse Items</span>
-    </button>
-    
-    <div class="nav-dropdown" id="sidebarReportDropdown">
-      <button class="navbtn" onclick="toggleReportDropdown()">
-        <span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span>
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="nav-section-label">Main Menu</div>
+    <button class="navbtn on" id="n-home" onclick="nav('home')"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg></span><span class="nav-label">Home</span></button>
+    <button class="navbtn" id="n-browse" onclick="nav('browse')"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><span class="nav-label">Browse Items</span></button>
+    <button class="navbtn" id="n-reviews" onclick="nav('reviews')"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span><span class="nav-label">Reviews</span></button>
+
+    <div class="nav-dropdown" id="reportDropdown">
+      <button class="navbtn" id="n-report" onclick="toggleReportDropdown(event)">
+        <span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
         <span class="nav-label">Report Item</span>
-        <span class="nav-dropdown-arrow">▼</span>
+        <span class="nav-dropdown-arrow">▾</span>
       </button>
       <div class="nav-dropdown-menu">
-        <button class="nav-dropdown-item" onclick="goReport('lost')"><span>🔴 Lost Something</span><span class="dot-red"></span></button>
-        <button class="nav-dropdown-item" onclick="goReport('found')"><span>🟢 Found Something</span><span class="dot-green"></span></button>
+        <button class="nav-dropdown-item" onclick="goReport('lost');closeReportDropdown()"><span>Lost Item</span><span class="dot-red"></span></button>
+        <button class="nav-dropdown-item" onclick="goReport('found');closeReportDropdown()"><span>Found Item</span><span class="dot-green"></span></button>
       </div>
     </div>
-
-    <button class="navbtn" id="n-myitems" onclick="nav('myitems')">
-      <span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
-      <span class="nav-label">My Reports</span>
-    </button>
-
-    <button class="navbtn" id="n-reviews" onclick="nav('reviews')">
-      <span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-      <span class="nav-label">Student Reviews</span>
-    </button>
-
-    <div id="adminNavSection" style="display:none">
-      <div class="nav-section-label" style="margin-top:6px">Administration</div>
-      <button class="navbtn" id="n-admin" onclick="nav('admin')">
-        <span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
-        <span class="nav-label">Control Panel</span>
-      </button>
-    </div>
-
+    <div class="nav-section-label" style="margin-top:6px">Administration</div>
+    <button class="navbtn" id="n-admin" onclick="nav('admin')"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span class="nav-label">Admin Panel</span></button>
     <div class="sidebar-footer">
-      <button class="logout-btn" onclick="doLogout()">
-        <span style="font-size:15px">🚪</span> Logout Account
-      </button>
+      <button class="logout-btn" onclick="doLogout()"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>Logout</span></button>
     </div>
-  </div>
+  </nav>
 
+  <!-- MAIN CONTENT -->
   <div class="main-content">
     <div class="pages">
 
+      <!-- HOME -->
       <div class="page show" id="pg-home">
         <div class="home-banner">
-          <h2 id="homeWelcome">Welcome back!</h2>
-          <p>VU Find unifies all faculty lost &amp; found activities into one real-time cloud registry.</p>
-          <div class="home-banner-meta">
-            <div class="live-badge"><span class="live-dot"></span> Firestore Engine Syncing</div>
+          <h2>Smart Lost &amp; Found System</h2>
+          <p>Report lost items, check found items, and help reunite students with their belongings on campus.</p>
+        </div>
+
+        <div class="carousel-section">
+          <div class="sec-title" style="margin-bottom:10px">Items Spotlight</div>
+          <div class="carousel-wrap" id="carouselWrap" style="display:none">
+            <div class="carousel-fade-left"></div>
+            <div class="carousel-fade-right"></div>
+            <div class="carousel-track" id="carouselTrack"></div>
           </div>
         </div>
 
-        <div class="stats-grid">
-          <div class="stat-card"><span class="stat-val r" id="hs-lost">0</span><span class="stat-lbl">Active Lost Items</span></div>
-          <div class="stat-card"><span class="stat-val g" id="hs-found">0</span><span class="stat-lbl">Unclaimed Found</span></div>
-          <div class="stat-card"><span class="stat-val b" id="hs-reunited">0</span><span class="stat-lbl">Items Reunited 🎉</span></div>
+        <div style="margin-bottom:18px">
+          <div class="sec-title" style="margin-bottom:14px">Campus Overview</div>
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-val r" id="hs-lost">0</div><div class="stat-lbl">🔴 Lost Reports</div></div>
+            <div class="stat-card"><div class="stat-val g" id="hs-found">0</div><div class="stat-lbl">🟢 Found Reports</div></div>
+            <div class="stat-card"><div class="stat-val y" id="hs-claimed">0</div><div class="stat-lbl">Recovered</div></div>
+            <div class="stat-card"><div class="stat-val b" id="hs-pending">0</div><div class="stat-lbl">Pending</div></div>
+            <div class="stat-card" style="border-color:#d1fae5;background:linear-gradient(135deg,#f0fdf4,#dcfce7)"><div class="stat-val" style="color:#059669" id="hs-reunited">0</div><div class="stat-lbl">Total Reunited</div></div>
+          </div>
         </div>
 
-        <div class="qa-grid">
-          <button class="qa-btn ql" onclick="goReport('lost')">
+        <div class="qa-grid" style="margin-bottom:24px">
+          <div class="qa-btn ql" onclick="goReport('lost')">
             <div class="qa-icon ql">🔴</div>
-            <div style="text-align:left"><div class="qa-title">I Lost Something</div><div class="qa-desc">List a missing item on campus</div></div>
-          </button>
-          <button class="qa-btn qf" onclick="goReport('found')">
+            <div><div class="qa-title">Report Lost Item</div><div class="qa-desc">Describe what you lost so others can help</div></div>
+          </div>
+          <div class="qa-btn qf" onclick="goReport('found')">
             <div class="qa-icon qf">🟢</div>
-            <div style="text-align:left"><div class="qa-title">I Found Something</div><div class="qa-desc">Handover / catalog a discovered item</div></div>
-          </button>
+            <div><div class="qa-title">Report Found Item</div><div class="qa-desc">Help return this item to its owner</div></div>
+          </div>
         </div>
 
-        <div class="reviews-scroll-container">
+        <div class="sec-head">
+          <div class="sec-title">Recent Activity</div>
+          <button class="see-all" onclick="nav('browse')">See All →</button>
+        </div>
+        <div class="item-list" id="recentList"></div>
+
+        <!-- REVIEWS CAROUSEL -->
+        <div class="reviews-scroll-section" style="margin-top:28px">
           <div class="reviews-scroll-title">💬 What Students Are Saying</div>
           <div class="reviews-carousel-outer">
             <div class="reviews-section-heading">Real experiences from <span>VU Find</span> users</div>
@@ -680,13 +910,83 @@ textarea.finput{resize:vertical;min-height:76px}
           </div>
         </div>
 
-        <div class="sec-head">
-          <h3 class="sec-title">Recent Campus Activities</h3>
-          <button class="see-all" onclick="nav('browse')">View All Reports →</button>
-        </div>
-        <div class="item-list" id="homeRecentList"></div>
-      </div>
+        <!-- FOOTER -->
+        <footer class="vu-footer">
+          <div class="footer-grid">
+            <div class="footer-brand">
+              <div class="footer-logo-wrap">
+                <img src="https://www.vu.ac.ug/images/logo.png" class="footer-logo-img" alt="VU Logo" onerror="this.style.display='none';document.getElementById('footerShield').style.display='flex'">
+                <div class="footer-logo-shield" id="footerShield" style="display:none">VU</div>
+                <div>
+                  <div class="footer-uni-name">VICTORIA UNIVERSITY</div>
+                  <div class="footer-uni-sub">Kampala, Uganda</div>
+                </div>
+              </div>
+              <p class="footer-tagline">VU Find is a student-powered Smart Lost &amp; Found system dedicated to helping Victoria University students recover their belongings on campus.</p>
+            </div>
+            <div>
+              <div class="footer-section-title">Quick Links</div>
+              <div class="footer-links">
+                <button class="footer-link" onclick="nav('home')">🏠 Home</button>
+                <button class="footer-link" onclick="goReport('lost')">🔴 Report Lost Item</button>
+                <button class="footer-link" onclick="goReport('found')">🟢 Report Found Item</button>
+                <button class="footer-link" onclick="nav('browse')">🔍 Browse Found Items</button>
+                <button class="footer-link" onclick="nav('reviews')">⭐ Read Reviews</button>
+                <button class="footer-link" onclick="nav('reviews');setTimeout(()=>{const s=document.getElementById('reviewFormSection');if(s)s.style.display='block'},200)">✍️ Add a Review</button>
+              </div>
+            </div>
+            <div>
+              <div class="footer-section-title">Connect With Us</div>
+              <div class="footer-socials">
+                <a class="footer-social-item" href="" target="_blank" rel="noopener">
+                  <span class="footer-social-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <defs><radialGradient id="ig1" cx="30%" cy="107%" r="150%"><stop offset="0%" stop-color="#fdf497"/><stop offset="10%" stop-color="#fdf497"/><stop offset="50%" stop-color="#fd5949"/><stop offset="68%" stop-color="#d6249f"/><stop offset="100%" stop-color="#285AEB"/></radialGradient></defs>
+                      <rect x="2" y="2" width="20" height="20" rx="6" fill="url(#ig1)"/>
+                      <circle cx="12" cy="12" r="4.5" stroke="white" stroke-width="1.8" fill="none"/>
+                      <circle cx="17.2" cy="6.8" r="1.2" fill="white"/>
+                    </svg>
+                  </span> Instagram
+                </a>
+                <a class="footer-social-item" href="" target="_blank" rel="noopener">
+                  <span class="footer-social-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="24" height="24" rx="6" fill="#1877F2"/>
+                      <path d="M16 8h-2a1 1 0 0 0-1 1v2h3l-.5 3H13v7h-3v-7H8v-3h2V9a4 4 0 0 1 4-4h2v3z" fill="white"/>
+                    </svg>
+                  </span> Facebook
+                </a>
+                <a class="footer-social-item" href="" target="_blank" rel="noopener">
+                  <span class="footer-social-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="24" height="24" rx="6" fill="#000"/>
+                      <path d="M17.5 4h2.5l-5.8 6.6L21 20h-5.3l-3.7-4.8L7.5 20H5l6.2-7.1L4 4h5.4l3.4 4.4L17.5 4zm-.9 14.4h1.4L7.5 5.4H6L16.6 18.4z" fill="white"/>
+                    </svg>
+                  </span> Twitter / X
+                </a>
+                <a class="footer-social-item" href="" target="_blank" rel="noopener">
+                  <span class="footer-social-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="24" height="24" rx="6" fill="#0A66C2"/>
+                      <path d="M7 9.5H4.5V19H7V9.5zM5.75 8.25a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM19.5 13.2c0-2.6-1.4-3.9-3.3-3.9-1.4 0-2.1.8-2.4 1.3V9.5H11.5V19h2.5v-5.1c0-1.2.6-2 1.7-2 1 0 1.3.8 1.3 2V19h2.5v-5.8z" fill="white"/>
+                    </svg>
+                  </span> LinkedIn
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="footer-bottom">
+            <div class="footer-bottom-text">A Student Initiative · <a href="https://www.vu.ac.ug" target="_blank">Victoria University Uganda</a> · VU Find © 2026. All rights reserved.</div>
+            <div class="footer-policies">
+              <button class="footer-policy-link">Privacy Policy</button>
+              <button class="footer-policy-link">Cookie Policy</button>
+              <button class="footer-policy-link">Terms of Use</button>
+            </div>
+          </div>
+        </footer>
+      </div><!-- /home -->
 
+      <!-- BROWSE -->
       <div class="page" id="pg-browse">
         <div class="browse-header">
           <h2>Browse Items</h2>
@@ -707,6 +1007,7 @@ textarea.finput{resize:vertical;min-height:76px}
         <div class="item-list" id="browseList"></div>
       </div>
 
+      <!-- REPORT -->
       <div class="page" id="pg-report">
         <div class="form-header" id="formHeader">
           <div class="form-header-icon lost" id="formIcon">🔴</div>
@@ -722,315 +1023,293 @@ textarea.finput{resize:vertical;min-height:76px}
             <div class="fgroup">
               <div class="flabel">Category *</div>
               <select class="finput" id="fCat">
-                <option value="">Choose a category...</option>
-                <option value="📱 Mobile Phone">📱 Mobile Phone</option>
-                <option value="💻 Laptop / Charger">💻 Laptop / Charger</option>
-                <option value="🪪 Student ID Card">🪪 Student ID Card</option>
-                <option value="🎒 Bag / Backpack">🎒 Bag / Backpack</option>
-                <option value="💰 Wallet / Money">💰 Wallet / Money</option>
-                <option value="🔑 Keys">🔑 Keys</option>
-                <option value="📚 Books / Notebooks">📚 Books / Notebooks</option>
-                <option value="🧥 Clothing / Watch">🧥 Clothing / Watch</option>
-                <option value="🧸 Others">🧸 Others</option>
+                <option value="">Choose…</option>
+                <option>📱 Mobile Phone</option>
+                <option>💻 Laptop</option>
+                <option>🎒 Bag / Backpack</option>
+                <option>📚 Books / Notes</option>
+                <option>🪪 ID / Documents</option>
+                <option>👗 Clothing</option>
+                <option>🔑 Keys</option>
+                <option>💰 Wallet / Money</option>
+                <option>🎧 Earphones / Headset</option>
+                <option>📦 Other</option>
               </select>
             </div>
             <div class="fgroup">
-              <div class="flabel">Date Lost / Found *</div>
+              <div class="flabel">Date *</div>
               <input type="date" class="finput" id="fDate"/>
             </div>
           </div>
           <div class="fgroup">
-            <div class="flabel">Campus Location Details *</div>
-            <input type="text" class="finput" id="fLoc" placeholder="e.g. Main Library Room 4, Classroom 1A"/>
+            <div class="flabel">Location *</div>
+            <input type="text" class="finput" id="fLoc" placeholder="e.g. Library 2nd Floor, Room 204"/>
           </div>
           <div class="fgroup">
-            <div class="flabel">Elaborate Description *</div>
-            <textarea class="finput" id="fDesc" placeholder="Provide clear identifying characteristics (colors, decals, labels)"></textarea>
+            <div class="flabel">Description</div>
+            <textarea class="finput" id="fDesc" placeholder="Colour, brand, markings, serial number…"></textarea>
           </div>
         </div>
-
-        <div class="form-section">
-          <h4>🖼 Attachment Image</h4>
-          <div class="upload-zone">
-            <input type="file" id="fFile" accept="image/*" onchange="previewImg(event)"/>
-            <div class="upload-ico">📸</div>
-            <div class="upload-text">Tap here to <strong>upload photos</strong> of the item</div>
-          </div>
-          <div class="img-preview-wrap" id="fPreviewWrap">
-            <img class="img-preview-thumb" id="fPreview" src="#" alt="Preview"/>
-            <div class="img-preview-info">
-              <div class="img-preview-label">Image Ready!</div>
-              <div class="img-preview-sub">Will save instantly to index payload.</div>
-              <button class="btn btn-danger btn-sm" style="width:fit-content;padding:4px 10px;font-size:11px" onclick="clearPreviewImg()">Remove</button>
-            </div>
-          </div>
-        </div>
-
         <div class="form-section" id="storageSection" style="display:none">
-          <h4>📦 Physical Storage (Admin Only)</h4>
+          <h4>📍 Storage Info</h4>
           <div class="fgroup">
-            <div class="flabel">Safe Keeping Location / Locker Assignment</div>
-            <input type="text" class="finput" id="fStorage" placeholder="e.g. Front Gate Box A, Registry Drawer 3"/>
+            <div class="flabel">Currently Stored At</div>
+            <input type="text" class="finput" id="fStorage" placeholder="e.g. Security desk, holding personally"/>
           </div>
         </div>
-
-        <div class="fgroup">
-          <div class="flabel">Contact Telephone Context *</div>
-          <input type="tel" class="finput" id="fPhone" placeholder="Provide active number for collection alerts"/>
+        <div class="form-section">
+          <h4>📞 Contact</h4>
+          <div class="fgroup">
+            <div class="flabel">Your Phone Number</div>
+            <input type="tel" class="finput" id="fPhone" placeholder="07XXXXXXXX"/>
+          </div>
         </div>
-
-        <div class="form-row" style="margin-top:20px">
-          <button class="btn btn-ghost" onclick="nav('home')">Cancel</button>
-          <button class="btn btn-red" id="submitFormBtn" onclick="submitForm()">Publish Report</button>
+        <div class="form-section">
+          <h4>📷 Photo (optional)</h4>
+          <div class="upload-zone" id="uploadZone">
+            <input type="file" accept="image/*" capture="environment" id="fPhoto" onchange="onPhoto(this)"/>
+            <div class="upload-ico">📷</div>
+            <div class="upload-text"><strong>Click to upload or take photo</strong> — PNG, JPG up to 5MB</div>
+          </div>
+          <div class="img-preview-wrap" id="imgResizeWrap">
+            <img class="img-preview-thumb" id="fPreview" alt="Preview"/>
+            <div class="img-preview-info">
+              <div class="img-preview-label">✅ Photo ready</div>
+              <div class="img-preview-sub" id="fPreviewMeta">Image attached</div>
+              <button class="btn btn-ghost btn-sm" style="width:auto;margin-top:2px" onclick="clearPhoto()">✕ Remove</button>
+            </div>
+          </div>
         </div>
+        <button class="btn btn-red" id="submitBtn" onclick="submitReport()" style="margin-top:4px;max-width:300px">Submit Report →</button>
       </div>
 
-      <div class="page" id="pg-myitems">
-        <div class="browse-header">
-          <h2>My Reports</h2>
-          <p>Manage and update items reported by your account</p>
-        </div>
-        <div class="item-list" id="myItemsList"></div>
-      </div>
-
+      <!-- REVIEWS -->
       <div class="page" id="pg-reviews">
-        <div class="reviews-dashboard">
-          <h2 style="font-size:18px;font-weight:700;color:var(--vu-blue)">System Feedback</h2>
-          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Read feedback or share your experience about recovering items.</p>
-          <button class="btn btn-blue btn-sm" onclick="toggleReviewForm()">✍️ Leave a Feedback Review</button>
-          
-          <div class="form-section" id="reviewFormSection" style="display:none;margin-top:14px;animation:riseIn .25s ease">
-            <h4>Share Your Experience</h4>
-            <div class="flabel" style="margin-bottom:2px">Star Rating *</div>
-            <div class="star-row" id="starRow">
-              <button class="star-btn" onclick="setReviewStar(1)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
-              <button class="star-btn" onclick="setReviewStar(2)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
-              <button class="star-btn" onclick="setReviewStar(3)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
-              <button class="star-btn" onclick="setReviewStar(4)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
-              <button class="star-btn" onclick="setReviewStar(5)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
-            </div>
-            <div class="fgroup">
-              <div class="flabel">Your Review Message *</div>
-              <textarea class="finput" id="reviewText" placeholder="Write your feedback here (minimum 10 characters)..."></textarea>
-            </div>
-            <div class="form-row">
-              <button class="btn btn-ghost btn-sm" onclick="toggleReviewForm()">Cancel</button>
-              <button class="btn btn-success btn-sm" onclick="submitReview()">Submit Feedback</button>
+        <div class="reviews-hero">
+          <h2>⭐ Reviews &amp; Testimonials</h2>
+          <p>See how VU Find has helped Victoria University students recover their belongings</p>
+        </div>
+        <div style="margin-bottom:14px">
+          <button class="btn btn-blue" style="max-width:220px;margin-bottom:14px" onclick="toggleReviewForm()"> Write a Review</button>
+          <div id="reviewFormSection" style="display:none">
+            <div class="review-write-wrap">
+              <h3>Share Your Experience</h3>
+              <div class="flabel" style="margin-bottom:8px">Rating</div>
+              <div class="star-row" id="starRow">
+                <button class="star-btn" onclick="setReviewStar(1)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
+                <button class="star-btn" onclick="setReviewStar(2)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
+                <button class="star-btn" onclick="setReviewStar(3)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
+                <button class="star-btn" onclick="setReviewStar(4)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
+                <button class="star-btn" onclick="setReviewStar(5)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon class="star-outline" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
+              </div>
+              <div class="fgroup">
+                <div class="flabel">Your Review *</div>
+                <textarea class="finput" id="reviewText" placeholder="How did VU Find help you? Share your experience…" style="min-height:90px"></textarea>
+              </div>
+              <div style="display:flex;gap:9px;margin-top:4px">
+                <button class="btn btn-success btn-sm" style="flex:1" onclick="submitReview()">Submit Review ⭐</button>
+                <button class="btn btn-ghost btn-sm" onclick="toggleReviewForm()">Cancel</button>
+              </div>
             </div>
           </div>
         </div>
-        <div style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;margin-bottom:8px" id="reviewCount">All Reviews (0)</div>
-        <div class="reviews-grid" id="reviewsList"></div>
+        <div class="sec-head" style="margin-bottom:14px">
+          <div class="sec-title">All Reviews</div>
+          <span id="reviewCount" style="font-size:12px;color:var(--text-muted)"></span>
+        </div>
+        <div id="reviewsList"></div>
       </div>
 
+      <!-- ADMIN -->
       <div class="page" id="pg-admin">
-        <div class="admin-hero">
-          <h2>VU Central Registry</h2>
-          <p>System Administration, User Moderation and Claims Auditing Panel</p>
-          <div class="admin-hero-meta">
-            <button class="btn btn-ghost btn-sm" style="background:rgba(255,255,255,0.15);border:none;color:#fff" onclick="triggerResetReunited()">🔄 Reset Counter</button>
+        <div id="adminGate">
+          <div class="empty">
+            <div class="empty-ico">🔐</div>
+            <h3>Admin Only</h3>
+            <p>Sign in with an administrator account to access this panel.</p>
           </div>
         </div>
-        <div class="admin-tabs">
-          <button class="atab on" onclick="aTab(this,'pending')">⏳ Audit Pending</button>
-          <button class="atab" onclick="aTab(this,'all')">📋 All Registry Items</button>
-          <button class="atab" onclick="aTab(this,'complaints')">⚠️ Claims &amp; Disputes</button>
-          <button class="atab" onclick="aTab(this,'users')">👥 User Directory</button>
-          <button class="atab" onclick="aTab(this,'reviews')">💬 Mod Reviews</button>
+        <div id="adminPanel" style="display:none">
+          <div class="admin-hero">
+            <h2>Admin Panel</h2>
+            <p>Review, verify and manage all campus reports and user accounts</p>
+            <div class="admin-hero-meta">
+              <div id="adminNetBadge" class="live-badge"><div class="live-dot"></div> Live</div>
+              <span style="font-size:11px;color:rgba(255,255,255,.6)">New registrations, claims &amp; reports appear instantly</span>
+            </div>
+            <!-- REUNITED COUNTER BANNER -->
+            <div style="margin-top:16px;background:rgba(255,255,255,0.13);border:1.5px solid rgba(255,255,255,0.22);border-radius:12px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="font-size:32px">🏆</div>
+                <div>
+                  <div style="font-size:11px;color:rgba(255,255,255,.65);font-weight:600;letter-spacing:.4px;text-transform:uppercase">Total Items Reunited</div>
+                  <div style="font-size:32px;font-weight:800;color:#fff;line-height:1.1" id="admin-reunited-val">—</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:2px">Counter persists even when claimed items are deleted</div>
+                </div>
+              </div>
+              <button class="btn btn-ghost btn-sm" style="background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:#fff;white-space:nowrap" onclick="adminResetReunited()">🔄 Reset Counter</button>
+            </div>
+          </div>
+          <div class="admin-tabs">
+            <button class="atab on" onclick="aTab(this,'pending')">⏳ Pending</button>
+            <button class="atab" onclick="aTab(this,'all')">📋 All Items</button>
+            <button class="atab" onclick="aTab(this,'claimed')">✅ Claimed</button>
+            <button class="atab" onclick="aTab(this,'reviews')">💬 Reviews</button>
+            <button class="atab" onclick="aTab(this,'complaints')">⚠️ Complaints <span id="complaintsTabBadge" style="display:none;background:#cc1414;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:100px;margin-left:3px;vertical-align:middle"></span></button>
+            <button class="atab" onclick="aTab(this,'users')">👥 Users</button>
+          </div>
+          <div id="adminContent"></div>
         </div>
-        <div id="adminContent"></div>
       </div>
 
-    </div>
-  </div>
-</div>
+    </div><!-- /pages -->
+  </div><!-- /main-content -->
 
-<div class="bottom-nav">
-  <button class="bnav-btn on" id="bn-home" onclick="nav('home')">
-    <span class="bnav-ico"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
-    <span class="bnav-lbl">Home</span>
-  </button>
-  <button class="bnav-btn" id="bn-browse" onclick="nav('browse')">
-    <span class="bnav-ico"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
-    <span class="bnav-lbl">Browse</span>
-  </button>
-  <button class="bnav-report" id="bn-report" onclick="openReportSheet()">
-    <div class="bnav-report-ico"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
-    <span class="bnav-lbl" style="margin-top:2px;color:white">Report</span>
-  </button>
-  <button class="bnav-btn" id="bn-reviews" onclick="nav('reviews')">
-    <span class="bnav-ico"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-    <span class="bnav-lbl">Reviews</span>
-  </button>
-  <button class="bnav-btn" id="bn-myitems" onclick="nav('myitems')">
-    <span class="bnav-ico"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
-    <span class="bnav-lbl">My Items</span>
-  </button>
-</div>
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="bnav-btn on" id="bn-home" onclick="nav('home')">
+      <span class="bnav-ico"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg></span><span class="bnav-lbl">Home</span>
+    </button>
+    <button class="bnav-btn" id="bn-browse" onclick="nav('browse')">
+      <span class="bnav-ico"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><span class="bnav-lbl">Browse</span>
+    </button>
+    <button class="bnav-btn bnav-report" id="bn-report" onclick="openReportSheet()">
+      <div class="bnav-report-ico"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><span class="bnav-lbl" style="margin-top:2px">Report</span>
+    </button>
+    <button class="bnav-btn" id="bn-reviews" onclick="nav('reviews')">
+      <span class="bnav-ico"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span><span class="bnav-lbl">Reviews</span>
+    </button>
+    <button class="bnav-btn" id="bn-admin" onclick="nav('admin')">
+      <span class="bnav-ico"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span class="bnav-lbl">Admin</span>
+    </button>
+  </nav>
 
-<div class="detail-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
-  <div class="detail-card">
-    <div class="detail-img-box" id="dImgBox"></div>
-    <div class="detail-body">
-      <div id="dBadgeRow" style="margin-bottom:8px"></div>
-      <h3 class="detail-title" id="dName">Item Name</h3>
-      <div class="detail-grid">
-        <div class="detail-meta-box"><div class="detail-meta-lbl">📍 Campus Location</div><div class="detail-meta-val" id="dLoc">—</div></div>
-        <div class="detail-meta-box"><div class="detail-meta-lbl">📅 Date Logged</div><div class="detail-meta-val" id="dDate">—</div></div>
-        <div class="detail-meta-box"><div class="detail-meta-lbl">🗂 Category</div><div class="detail-meta-val" id="dCat">—</div></div>
-        <div class="detail-meta-box" id="dStorageBox"><div class="detail-meta-lbl">📦 Safe Keeping</div><div class="detail-meta-val" id="dStorage" style="color:var(--success);font-weight:600">—</div></div>
-      </div>
-      <div class="detail-desc-box">
-        <div class="detail-meta-lbl">📝 Description context</div>
-        <div id="dDesc" style="font-size:13px;line-height:1.5;color:var(--text-mid);margin-top:4px">—</div>
-      </div>
-      <div id="dClaimantInfoBox" style="display:none;margin-top:12px"></div>
-    </div>
-    <div class="detail-action-bar" id="dActionBar"></div>
-  </div>
-</div>
-
-<div class="confirm-overlay" id="confirmOverlay" onclick="if(event.target===this)closePromptConfirm()">
-  <div class="confirm-box">
-    <div class="c-title" id="confirmTitle">Are you sure?</div>
-    <div class="c-msg" id="confirmMsg">This action cannot be undone.</div>
-    <div class="form-row">
-      <button class="btn btn-ghost btn-sm" onclick="closePromptConfirm()">No, Cancel</button>
-      <button class="btn btn-red btn-sm" id="confirmYesBtn">Yes, Proceed</button>
-    </div>
-  </div>
-</div>
-
-<div class="review-prompt-overlay" id="reviewPromptOverlay" onclick="if(event.target===this)closeReviewPrompt()">
-  <div class="confirm-box" style="max-width:380px">
-    <div style="font-size:18px;font-weight:700;color:var(--vu-blue);margin-bottom:4px">Rate Your Experience!</div>
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Did you find your missing item? Share an update review to keep other students motivated!</div>
-    <div class="star-row" id="promptStarRow" style="justify-content:center;margin-bottom:16px">
-      <button class="star-btn review-prompt-star" onclick="setPromptReviewStar(1)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
-      <button class="star-btn review-prompt-star" onclick="setPromptReviewStar(2)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
-      <button class="star-btn review-prompt-star" onclick="setPromptReviewStar(3)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
-      <button class="star-btn review-prompt-star" onclick="setPromptReviewStar(4)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
-      <button class="star-btn review-prompt-star" onclick="setPromptReviewStar(5)"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></button>
-    </div>
-    <div class="fgroup">
-      <textarea class="finput" id="promptReviewText" placeholder="Write a short note about your recovery experience..."></textarea>
-    </div>
-    <div class="form-row">
-      <button class="btn btn-ghost btn-sm" onclick="closeReviewPrompt()">Skip For Now</button>
-      <button class="btn btn-success btn-sm" onclick="submitPromptReview()">Publish Story</button>
-    </div>
-  </div>
-</div>
-
-<div class="confirm-overlay" id="mobileReportSheetOverlay" onclick="if(event.target===this)closeReportSheet()" style="align-items:flex-end;padding:0;z-index:198">
-  <div class="confirm-box" style="max-width:100%;width:100%;border-radius:20px 20px 0 0;padding:24px;text-align:left;animation:slideUpSheet .3s cubic-bezier(0.1, 1, 0.1, 1)">
-    <div style="font-size:16px;font-weight:700;color:var(--vu-blue);margin-bottom:4px">Report Registry Item</div>
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:20px">Choose what kind of listing you want to submit:</div>
-    <button class="btn btn-red" style="justify-content:flex-start;margin-bottom:12px;padding:14px" onclick="closeReportSheet();goReport('lost')">🔴 I Lost Something</button>
-    <button class="btn btn-success" style="justify-content:flex-start;margin-bottom:16px;padding:14px" onclick="closeReportSheet();goReport('found')">🟢 I Found Something</button>
-    <button class="btn btn-ghost" style="width:100%" onclick="closeReportSheet()">Dismiss</button>
-  </div>
-</div>
-
-<style>
-@keyframes slideUpSheet{from{transform:translateY(100%)}to{transform:translateY(0)}}
-</style>
-
-<div id="toast">🔔 <span id="toastMsg">Notification toast message context.</span></div>
+</div><!-- /appScreen -->
 
 <script>
-/* CORE HELPERS */
-const v = id => { const e = document.getElementById(id); return e ? e.value.trim() : ''; };
-const setText = (id, txt) => { const e = document.getElementById(id); if(e) e.textContent = txt; };
-const setBtn = (id, loading, label) => {
-  const b = document.getElementById(id);
-  if(!b) return;
-  b.disabled = loading;
-  b.innerHTML = label;
-};
-const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+/* ══════════════════════════════════════════════════════
+   VU Find — Real-time Firebase Firestore Database
+   Changes sync instantly across ALL users & devices.
+══════════════════════════════════════════════════════ */
+/* DB is set by the Firebase module script above.
+   This block runs after firebaseReady event fires.   */
 
-/* GLOBAL APP DATA */
-let me = null;
-let allItems = [];
-let allUsers = [];
-let allReviews = [];
-let allComplaints = [];
-let curFilter = 'all';
-let curATab = 'pending';
-let curReviewStar = 0;
-let curPromptStar = 0;
-let curFormType = 'lost'; 
-let curActiveFileBase64 = null;
-
-/* SYNC & LIFECYCLE CONTROLLER */
-let unsubItems = null;
-let unsubUsers = null;
-let unsubReviews = null;
-let unsubReunited = null;
+/* STATE */
+let me             = null;
+let allUsers       = [];
+let allItems       = [];
+let allReviews     = [];
+let allComplaints  = [];
+let curFilter      = 'all';
+let curATab        = 'pending';
+let reportType     = 'lost';
+let deferredPWA    = null;
+let pendingImgData = null;
+let confirmCb      = null;
+let curReviewStar  = 0;
+let curPromptStar  = 0;
+let pendingAdminClaimId  = null;
+let pendingReviewItemId  = null;
+let unsubItems     = null;
+let unsubUsers     = null;
+let unsubReviews   = null;
+let unsubReunited  = null;
 let unsubComplaints = null;
 
-function bootApp(user){
-  me = user;
-  document.getElementById('authScreen').classList.remove('active');
-  document.getElementById('appScreen').classList.add('active');
-  
-  setText('userUname', user.first + ' ' + user.last);
-  document.getElementById('userAva').textContent = user.first[0].toUpperCase();
-  setText('homeWelcome', 'Welcome back, ' + user.first + '! 👋');
-  
-  if(user.role === 'admin'){
-    document.getElementById('adminNavSection').style.display = 'block';
-    document.getElementById('storageSection').style.display = 'block';
-  } else {
-    document.getElementById('adminNavSection').style.display = 'none';
-    document.getElementById('storageSection').style.display = 'none';
+/* SEED DEFAULT DATA */
+function seedIfEmpty(){
+  const users = DB.getDocs('users');
+  if(!users.length){
+    DB.setDoc('users','admin_vu',{
+      first:'Admin',last:'User',email:'admin@vu.ac.ug',
+      phone:'0700000000',pass:'admin123',role:'admin',
+      createdAt: new Date().toISOString()
+    });
+    const items=[
+      {type:'lost',name:'Black Samsung Galaxy S23',cat:'📱 Mobile Phone',date:'2026-05-08',loc:'Main Library, 2nd Floor',desc:'Black Samsung with cracked screen protector',phone:'0708731300',status:'pending',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
+      {type:'found',name:'Blue Jansport Backpack',cat:'🎒 Bag / Backpack',date:'2026-05-07',loc:'Canteen Area',desc:'Blue and grey Jansport with notebooks inside',phone:'0702255986',status:'pending',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
+      {type:'found',name:'Black Leather Wallet',cat:'💰 Wallet / Money',date:'2026-05-09',loc:'Security Desk, Gate A',desc:'Found near gate A, contains cash and bank cards',phone:'0700000000',storage:'Security Desk Gate A',status:'pending',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
+    ];
+    items.forEach(item => DB.addDoc('items', item));
+    const reviews=[
+      {userId:'demo',name:'Waligo Salim',rating:5,text:'I recovered my Samsung phone within 2 days of reporting it lost. VU Find is an amazing system!',at:new Date().toISOString()},
+      {userId:'demo',name:'Namatovu Hope',rating:5,text:'Found my Student ID card thanks to VU Find. Total lifesaver for campus life!',at:new Date().toISOString()},
+    ];
+    reviews.forEach(r => DB.addDoc('reviews', r));
   }
-  
-  toast('Welcome back ' + user.first + '! Signed in successfully.','ok');
-  requestNotificationPermission();
-  startListeners();
-  nav('home');
 }
 
+/* LIVE LISTENERS */
 function startListeners(){
-  if(!window.DB) return;
-  stopListeners();
-
+  let _itemsInitialized = false;
+  if(unsubItems) unsubItems();
   unsubItems = DB.onSnapshot('items', docs => {
+    const prev = allItems;
     allItems = docs.sort((a,b)=>new Date(b.at)-new Date(a.at));
-    
-    // Auto-update counter totals dynamically
-    setText('hs-lost', allItems.filter(i=>i.type==='lost'&&i.status==='pending').length);
-    setText('hs-found', allItems.filter(i=>i.type==='found'&&i.status==='pending').length);
-    
-    renderHomeItems();
+    updateStats();
+    renderRecent();
+    renderCarousel();
     renderBrowse();
-    renderMyItems();
-    if(me?.role === 'admin' && (curATab === 'pending' || curATab === 'all') && document.getElementById('pg-admin').classList.contains('show')) {
+    if(me?.role==='admin' && document.getElementById('pg-admin').classList.contains('show'))
       renderAdmin();
+
+    // Detect brand-new items (after initial load) and notify when app is open
+    if(_itemsInitialized){
+      const prevIds = new Set(prev.map(i=>i.id));
+      docs.filter(d=>!prevIds.has(d.id) && d.byId !== me?.id && d.status==='pending').forEach(item=>{
+        // In-app: check lost matches
+        if(item.type==='found') checkLostMatchForFound(item);
+        // System notification when app is open but SW may not have fired yet
+        if(Notification && Notification.permission==='granted'){
+          const isLost = item.type==='lost';
+          new Notification(isLost ? '🔴 New Lost Item Report' : '🟢 New Found Item Report', {
+            body: item.name + (item.loc ? ' — ' + item.loc : ''),
+            icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='36' fill='%231a3580'/><rect x='20' y='20' width='152' height='152' rx='24' fill='%23cc1414'/><text x='96' y='130' font-family='Arial' font-weight='900' font-size='90' fill='white' text-anchor='middle'>VU</text></svg>",
+            tag: 'vufind-item-' + item.id
+          });
+        }
+      });
     }
+    _itemsInitialized = true;
   });
 
+  if(unsubUsers) unsubUsers();
   unsubUsers = DB.onSnapshot('users', docs => {
-    allUsers = docs.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
-    if(me?.role==='admin' && curATab==='users' && document.getElementById('pg-admin').classList.contains('show')) renderAdmin();
+    allUsers = docs;
+    if(me?.role==='admin' && document.getElementById('pg-admin').classList.contains('show'))
+      renderAdmin();
   });
 
+  if(unsubComplaints) unsubComplaints();
+  unsubComplaints = DB.onSnapshot('complaints', docs => {
+    allComplaints = docs.sort((a,b)=>new Date(b.at)-new Date(a.at));
+    // Update tab badge with open complaint count
+    const openCount = allComplaints.filter(c=>c.status==='open').length;
+    const badge = document.getElementById('complaintsTabBadge');
+    if(badge){
+      badge.textContent = openCount;
+      badge.style.display = openCount ? 'inline' : 'none';
+    }
+    if(me?.role==='admin' && document.getElementById('pg-admin').classList.contains('show'))
+      renderAdmin();
+  });
+
+  if(unsubReviews) unsubReviews();
   unsubReviews = DB.onSnapshot('reviews', docs => {
     allReviews = docs.sort((a,b)=>new Date(b.at)-new Date(a.at));
     renderReviews();
     renderHomeReviewsCarousel();
-    if(me?.role==='admin' && curATab==='reviews' && document.getElementById('pg-admin').classList.contains('show')) renderAdmin();
+    if(me?.role==='admin' && curATab==='reviews' &&
+       document.getElementById('pg-admin').classList.contains('show'))
+      renderAdmin();
   });
 
-  if (DB.onSnapshotReunited) {
-    unsubReunited = DB.onSnapshotReunited(count => {
-      setText('hs-reunited', count);
-      const el = document.getElementById('admin-reunited-val');
-      if(el) el.textContent = count;
-    });
-  }
+  if(unsubReunited) unsubReunited();
+  unsubReunited = DB.onSnapshotReunited(count => {
+    setText('hs-reunited', count);
+    const el = document.getElementById('admin-reunited-val');
+    if(el) el.textContent = count;
+  });
 }
 
 function stopListeners(){
@@ -1041,12 +1320,12 @@ function stopListeners(){
   if(unsubComplaints){unsubComplaints();unsubComplaints=null;}
 }
 
-/* AUTHENTICATION LIBRARIES */
+/* AUTH */
 window.authTab = function(t){
   document.getElementById('loginPanel').style.display = t==='login'?'block':'none';
-  document.getElementById('regPanel').style.display = t==='reg' ?'block':'none';
+  document.getElementById('regPanel').style.display   = t==='reg'  ?'block':'none';
   document.getElementById('tab-login').classList.toggle('on', t==='login');
-  document.getElementById('tab-reg').classList.toggle('on', t==='reg');
+  document.getElementById('tab-reg').classList.toggle('on',   t==='reg');
 };
 
 window.doLogin = async function(){
@@ -1066,46 +1345,103 @@ window.doLogin = async function(){
 };
 
 window.doRegister = async function(){
-  const f = v('rFirst'), l = v('rLast'), e = v('rEmail'), p = v('rPhone'), ps = v('rPass'), cf = v('rConf');
-  if(!f||!l||!e||!ps){toast('Fill in all required fields','er');return;}
-  if(!e.endsWith('.ac.ug')){toast('Must use a university email (.ac.ug)','er');return;}
-  if(ps!==cf){toast('Passwords do not match','er');return;}
-  setBtn('regBtn',true,'Creating Account…');
+  const first=v('rFirst'),last=v('rLast'),phone=v('rPhone'),
+        email=v('rEmail'),pass=v('rPass'),conf=v('rConf');
+  if(!first||!last||!phone||!email||!pass){toast('Please fill all required fields','er');return;}
+  if(!/^\S+@\S+\.\S+$/.test(email)){toast('Enter a valid email address','er');return;}
+  if(pass.length<6){toast('Password must be at least 6 characters','er');return;}
+  if(pass!==conf){toast('Passwords do not match','er');return;}
+  setBtn('regBtn',true,'Creating account…');
   try{
-    const users = await DB.getDocs('users', u=>u.email===e);
-    if(users.length){toast('Email already registered','er');setBtn('regBtn',false,'Create Account →');return;}
-    const uid = DB.genId();
-    const newUser = { id:uid, first:f, last:l, email:e, phone:p, pass:ps, role:'student', createdAt:new Date().toISOString() };
-    await DB.setDoc('users', uid, newUser);
-    bootApp(newUser);
-  } catch(err){
-    toast('Register failed: '+err.message,'er');
+    const existing = await DB.getDocs('users', u=>u.email===email);
+    if(existing.length){toast('Email already registered','er');setBtn('regBtn',false,'Create Account →');return;}
+    const newUser = {first,last,email,phone,pass,role:'student',createdAt:new Date().toISOString()};
+    const id = await DB.addDoc('users', newUser);
+    bootApp({id, ...newUser});
+    toast('Account created! Welcome 🎉','ok');
+  } catch(e){
+    toast('Registration failed: '+e.message,'er');
     setBtn('regBtn',false,'Create Account →');
   }
 };
 
+function clearAuthForms(){
+  ['lEmail','lPass'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['rFirst','rLast','rPhone','rEmail','rPass','rConf'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  setBtn('loginBtn',false,'Sign In →');
+  setBtn('regBtn',false,'Create Account →');
+  authTab('login');
+}
+
+function bootApp(u){
+  me = u;
+  _reviewShownThisSession = false;
+  clearTimeout(_inactivityTimer);
+  clearAuthForms();
+  document.getElementById('authScreen').classList.remove('active');
+  document.getElementById('appScreen').classList.add('active');
+  const ini = (u.first[0]+(u.last[0]||'')).toUpperCase();
+  document.getElementById('hAva').textContent  = ini;
+  document.getElementById('hName').textContent = u.first+' '+u.last;
+  const isAdmin = u.role==='admin';
+  document.getElementById('adminGate').style.display  = isAdmin?'none':'block';
+  document.getElementById('adminPanel').style.display = isAdmin?'block':'none';
+  const bnAdmin = document.getElementById('bn-admin');
+  if(bnAdmin) bnAdmin.style.display = isAdmin ? 'flex' : 'none';
+  startListeners();
+  _resetInactivityTimer();
+  toast(`Welcome back, ${u.first}!`,'ok');
+  // Ask for push notification permission
+  requestNotificationPermission();
+  // Run auto-archive check
+  setTimeout(autoArchiveOldItems, 3000);
+  // Tell the service worker who just logged in so it can push background notifications
+  if('serviceWorker' in navigator && navigator.serviceWorker.controller){
+    navigator.serviceWorker.controller.postMessage({
+      type: 'USER_LOGIN',
+      userId: u.id,
+      seenAt: new Date().toISOString()
+    });
+  } else if('serviceWorker' in navigator){
+    // SW not yet controlling — wait for it
+    navigator.serviceWorker.ready.then(reg=>{
+      if(reg.active) reg.active.postMessage({
+        type: 'USER_LOGIN',
+        userId: u.id,
+        seenAt: new Date().toISOString()
+      });
+    });
+  }
+}
+
 window.doLogout = function(){
-  stopListeners();
   me = null;
+  _reviewShownThisSession = false;
+  clearTimeout(_inactivityTimer);
+  stopListeners();
+  allItems=[]; allUsers=[]; allReviews=[]; allComplaints=[];
   document.getElementById('appScreen').classList.remove('active');
   document.getElementById('authScreen').classList.add('active');
-  toast('Signed out successfully','nf');
+  clearAuthForms();
+  nav('home');
+  // Tell the service worker to stop sending notifications
+  if('serviceWorker' in navigator && navigator.serviceWorker.controller){
+    navigator.serviceWorker.controller.postMessage({ type: 'USER_LOGOUT' });
+  }
 };
 
-window.togglePw = function(id, btn){
-  const input = document.getElementById(id);
-  if(!input) return;
-  const isPw = input.type === 'password';
-  input.type = isPw ? 'text' : 'password';
-  btn.innerHTML = isPw ? 
-    `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>` : 
-    `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
-};
+/* NAVIGATION */
+const pageTitles={home:'Home',browse:'Browse Items',report:'Report Item',admin:'Admin Panel',reviews:'Reviews'};
 
-/* REVIEW GATE */
+/* ── REVIEW GATE ── 
+   Show review panel only after:
+   1. User submits a report (lost/found), OR
+   2. 10 minutes of inactivity on any page
+   Never show again in the same session until next login or next report.
+*/
 let _reviewShownThisSession = false;
 let _inactivityTimer = null;
-const INACTIVITY_MS = 10 * 60 * 1000;
+const INACTIVITY_MS = 10 * 60 * 1000; // 10 minutes
 
 function _resetInactivityTimer(){
   clearTimeout(_inactivityTimer);
@@ -1119,6 +1455,7 @@ function _resetInactivityTimer(){
 }
 
 function showReviewPanel(){
+  // Show the modal review prompt (reuse existing review prompt UI but with different title)
   curPromptStar = 0;
   const txt = document.getElementById('promptReviewText');
   if(txt) txt.value = '';
@@ -1132,375 +1469,415 @@ function showReviewPanel(){
   document.addEventListener(ev, _resetInactivityTimer, {passive:true});
 });
 
-/* CORE ROUTING ENGINE */
+
+
 window.nav = function(pg){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('show'));
   document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('on'));
-  
   const page = document.getElementById('pg-'+pg);
-  const btn = document.getElementById('n-'+pg);
+  const btn  = document.getElementById('n-'+pg);
   const bbtn = document.getElementById('bn-'+pg);
-  
   if(page) page.classList.add('show');
-  if(btn) btn.classList.add('on');
+  if(btn)  btn.classList.add('on');
   if(bbtn) bbtn.classList.add('on');
-  
-  // Close hamburger menu overlay for mobile views
-  const sidebar = document.querySelector('.sidebar');
-  if(sidebar) sidebar.classList.remove('open');
-  
-  const titleMap = { home:'Dashboard', browse:'Browse Items', report:'Publish Report', myitems:'My Reports', reviews:'Student Reviews', admin:'Control Panel' };
-  setText('topbarTitle', titleMap[pg] || 'VU Find');
-  
-  if(pg === 'admin') renderAdmin();
+  const tt = document.getElementById('topbarTitle');
+  if(tt) tt.textContent = pageTitles[pg]||'';
+  if(pg==='browse')  renderBrowse();
+  if(pg==='admin' && me?.role==='admin') renderAdmin();
+  if(pg==='reviews') renderReviews();
+  closeSidebar();
 };
 
-window.toggleReportDropdown = function(){
-  document.getElementById('sidebarReportDropdown').classList.toggle('open');
-};
-
-window.openReportSheet = function(){
-  document.getElementById('mobileReportSheetOverlay').classList.add('open');
-};
-window.closeReportSheet = function(){
-  document.getElementById('mobileReportSheetOverlay').classList.remove('open');
-};
-
-/* IMAGES EXTENSION DATA */
-window.previewImg = function(e){
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = function(evt){
-    curActiveFileBase64 = evt.target.result;
-    document.getElementById('fPreview').src = curActiveFileBase64;
-    document.getElementById('fPreviewWrap').classList.add('show');
-  };
-  reader.readAsDataURL(file);
-};
-
-window.clearPreviewImg = function(){
-  curActiveFileBase64 = null;
-  document.getElementById('fFile').value = '';
-  document.getElementById('fPreviewWrap').classList.remove('show');
-};
-
-/* FORM DATA HANDLERS */
 window.goReport = function(type){
-  curFormType = type;
-  window.nav('report');
-  
-  const icon = document.getElementById('formIcon');
-  const title = document.getElementById('formTitle');
-  const desc = document.getElementById('formDesc');
-  const header = document.getElementById('formHeader');
-  
-  if(type === 'lost'){
-    if(icon) icon.textContent = '🔴';
-    if(title) title.textContent = 'Report Lost Item';
-    if(desc) desc.textContent = 'Describe what you lost so others can help';
-    if(header) { header.className = 'form-header'; header.style.borderTop = 'none'; }
-  } else {
-    if(icon) icon.textContent = '🟢';
-    if(title) title.textContent = 'Report Found Item';
-    if(desc) desc.textContent = 'Catalog a turned-in item to reunite it with its owner';
-    if(header) { header.className = 'form-header'; }
-  }
-  
-  // Wipe old input elements
-  ['fName','fCat','fDate','fLoc','fDesc','fStorage','fPhone'].forEach(id=>{
-    const el = document.getElementById(id); if(el) el.value = '';
-  });
-  clearPreviewImg();
+  if(!me){toast('Please sign in to report an item','er');return;}
+  reportType = type;
+  const isFound = type==='found';
+  document.getElementById('formIcon').className = 'form-header-icon '+(isFound?'found':'lost');
+  document.getElementById('formIcon').textContent = isFound?'🟢':'🔴';
+  document.getElementById('formTitle').textContent = isFound?'Report Found Item':'Report Lost Item';
+  document.getElementById('formDesc').textContent  = isFound?'Help return this item to its owner':'Describe what you lost so others can help';
+  document.getElementById('storageSection').style.display = isFound?'block':'none';
+  document.getElementById('submitBtn').className = 'btn '+(isFound?'btn-success':'btn-red');
+  document.getElementById('submitBtn').style.maxWidth = '300px';
+  document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
+  nav('report');
 };
 
-window.submitForm = async function(){
-  const name = v('fName'), cat = v('fCat'), date = v('fDate'), loc = v('fLoc'), desc = v('fDesc'), phone = v('fPhone'), storage = v('fStorage');
-  if(!name||!cat||!date||!loc||!desc||!phone){toast('Please fill all required fields *','er');return;}
-  
-  setBtn('submitFormBtn', true, 'Publishing report...');
-  const itemPayload = {
-    type: curFormType, name, cat, date, loc, desc, phone,
-    storage: me.role==='admin' ? storage : '',
-    status: 'pending', img: curActiveFileBase64,
-    byId: me.id, byName: me.first + ' ' + me.last,
-    at: new Date().toISOString()
-  };
-
-  try{
-    await DB.addDoc('items', itemPayload);
-    toast('Item published successfully to database registry','ok');
-    
-    // Trigger prompt context loop
-    _reviewShownThisSession = true; 
-    setTimeout(showReviewPanel, 800);
-    window.nav('myitems');
-  } catch(e){
-    toast('Submission error: '+e.message,'er');
-  } finally {
-    setBtn('submitFormBtn', false, 'Publish Report');
-  }
+/* MOBILE REPORT SHEET */
+window.openReportSheet = function(){
+  if(!me){toast('Please sign in to report an item','er');return;}
+  document.getElementById('reportSheetOverlay').classList.add('open');
+};
+window.closeReportSheet = function(e){
+  if(!e||e.target===document.getElementById('reportSheetOverlay'))
+    document.getElementById('reportSheetOverlay').classList.remove('open');
+};
+window.closeReportSheetDirect = function(){
+  document.getElementById('reportSheetOverlay').classList.remove('open');
 };
 
-/* RENDERING MODULES */
-function renderHomeItems(){
-  const list = document.getElementById('homeRecentList');
-  if(!list) return;
-  const recent = allItems.filter(i=>i.status==='pending').slice(0, 3);
-  if(!recent.length){
-    list.innerHTML = '<div class="empty"><div class="empty-ico">📭</div><h3>No items yet</h3><p>Be the first to report a lost or found item.</p></div>';
-    return;
-  }
-  list.innerHTML = recent.map(i=>makeItemCard(i)).join('');
+/* SIDEBAR */
+window.toggleSidebar = function(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('show');
+};
+window.closeSidebar = function(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mobileOverlay').classList.remove('show');
+};
+
+/* STATS */
+function updateStats(){
+  setText('hs-lost',   allItems.filter(i=>i.type==='lost').length);
+  setText('hs-found',  allItems.filter(i=>i.type==='found').length);
+  setText('hs-claimed',allItems.filter(i=>i.status==='claimed').length);
+  setText('hs-pending',allItems.filter(i=>i.status==='pending').length);
+}
+
+/* RENDER HELPERS */
+function catEmoji(c){
+  if(!c)return'📦';
+  if(c.includes('Phone'))return'📱';if(c.includes('Laptop'))return'💻';
+  if(c.includes('Bag'))return'🎒';if(c.includes('Book'))return'📚';
+  if(c.includes('ID'))return'🪪';if(c.includes('Cloth'))return'👗';
+  if(c.includes('Key'))return'🔑';if(c.includes('Wallet'))return'💰';
+  if(c.includes('Ear')||c.includes('Audio'))return'🎧';return'📦';
+}
+function pillHTML(i){
+  if(i.status==='claimed')return'<span class="pill pill-claimed">⭐ Claimed</span>';
+  return i.type==='lost'?'<span class="pill pill-lost">🔴 Lost</span>':'<span class="pill pill-found">🟢 Found</span>';
+}
+function thumbHTML(i){
+  if(i.img)return`<div class="item-thumb"><img src="${i.img}" alt="${esc(i.name)}"/></div>`;
+  const cls=i.status==='claimed'?'t-claimed':(i.type==='lost'?'t-lost':'t-found');
+  return`<div class="item-thumb ${cls}">${catEmoji(i.cat)}</div>`;
+}
+function cardHTML(i){
+  return`<div class="item-card" onclick="openSheet('${i.id}')">${thumbHTML(i)}<div class="item-info"><div class="item-name">${esc(i.name)}</div><div class="item-meta"><span>📍 ${esc(i.loc)}</span><span>📅 ${i.date}</span></div></div>${pillHTML(i)}</div>`;
+}
+
+function renderRecent(){
+  const c = document.getElementById('recentList');
+  if(!c) return;
+  const items = [...allItems].sort((a,b)=>new Date(b.at)-new Date(a.at)).slice(0,5);
+  c.innerHTML = items.length
+    ? items.map(cardHTML).join('')
+    : '<div class="empty"><div class="empty-ico">📭</div><h3>No items yet</h3><p>Be the first to report a lost or found item.</p></div>';
 }
 
 function renderBrowse(){
   const c = document.getElementById('browseList');
   if(!c) return;
   const q = (v('searchQ')||'').toLowerCase();
-  
   let items = allItems;
-  if(curFilter === 'claimed') items = items.filter(i=>i.status==='claimed');
-  else if(curFilter === 'pending') items = items.filter(i=>i.status==='pending');
-  else if(curFilter === 'archived') items = items.filter(i=>i.status==='archived');
-  else if(curFilter !== 'all') items = items.filter(i=>i.type===curFilter && i.status!=='claimed' && i.status!=='archived');
-  
-  if(q){
-    items = items.filter(i=>
-      (i.name||'').toLowerCase().includes(q) ||
-      (i.loc||'').toLowerCase().includes(q) ||
-      (i.cat||'').toLowerCase().includes(q)
-    );
-  }
-  
-  if(!items.length){
-    c.innerHTML = '<div class="empty"><div class="empty-ico">🔍</div><h3>No results found</h3><p>Try refining your filters or terms.</p></div>';
-    return;
-  }
-  c.innerHTML = items.map(i=>makeItemCard(i)).join('');
+  if(curFilter==='claimed')      items = items.filter(i=>i.status==='claimed');
+  else if(curFilter==='pending') items = items.filter(i=>i.status==='pending');
+  else if(curFilter==='archived') items = items.filter(i=>i.status==='archived');
+  else if(curFilter!=='all')     items = items.filter(i=>i.type===curFilter&&i.status!=='claimed'&&i.status!=='archived');
+  if(q) items = items.filter(i=>
+    (i.name||'').toLowerCase().includes(q)||(i.loc||'').toLowerCase().includes(q)||
+    (i.desc||'').toLowerCase().includes(q)||(i.cat||'').toLowerCase().includes(q)
+  );
+  items = [...items].sort((a,b)=>new Date(b.at)-new Date(a.at));
+  c.innerHTML = items.length
+    ? items.map(cardHTML).join('')
+    : '<div class="empty"><div class="empty-ico">🔍</div><h3>No results</h3><p>Try a different search or filter.</p></div>';
 }
 
-function renderMyItems(){
-  const c = document.getElementById('myItemsList');
-  if(!c) return;
-  const mine = allItems.filter(i=>i.byId===me.id);
-  if(!mine.length){
-    c.innerHTML = '<div class="empty"><div class="empty-ico">📋</div><h3>No logs active</h3><p>Items you report will appear here.</p></div>';
-    return;
-  }
-  c.innerHTML = mine.map(i=>makeItemCard(i)).join('');
-}
-
-function makeItemCard(i){
-  const badgeClass = i.status==='claimed' ? 'pill-claimed' : (i.type==='lost'?'pill-lost':'pill-found');
-  const badgeText = i.status==='claimed' ? '⭐ Claimed' : (i.type==='lost'?'🔴 Lost':'🟢 Found');
-  const thumbContent = i.img ? `<img src="${i.img}" alt="Item"/>` : (i.type==='lost'?'🔍':'📦');
-  const dStr = new Date(i.date).toLocaleDateString('en-UG',{day:'numeric',month:'short'});
-  
-  return `
-    <div class="item-card" onclick="openDetail('${i.id}')">
-      <div class="item-thumb t-${i.status==='claimed'?'claimed':i.type}">${thumbContent}</div>
-      <div class="item-info">
-        <div class="item-name">${esc(i.name)}</div>
-        <div class="item-meta">
-          <span>📍 ${esc(i.loc)}</span>
-          <span>• 📅 ${dStr}</span>
-        </div>
-      </div>
-      <div class="pill ${badgeClass}">${badgeText}</div>
-    </div>
-  `;
-}
-
-window.setFilter = function(btn, filter){
-  curFilter = filter;
-  document.querySelectorAll('.chip').forEach(b=>b.classList.remove('on'));
+window.doSearch  = function(){ renderBrowse(); };
+window.setFilter = function(btn,f){
+  curFilter = f;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
   btn.classList.add('on');
   renderBrowse();
 };
 
-window.doSearch = function(){ renderBrowse(); };
-
-/* OVERLAY DETAIL MODALS MANAGEMENT */
-let activeItemDetailId = null;
-window.openDetail = function(id){
-  activeItemDetailId = id;
-  const i = allItems.find(item=>item.id===id);
+/* ITEM DETAIL SHEET */
+window.openSheet = function(id){
+  const i = allItems.find(x=>x.id===id);
   if(!i) return;
-  
-  const imgBox = document.getElementById('dImgBox');
-  if(i.img) imgBox.innerHTML = `<img src="${i.img}" alt="Item"/>`;
-  else imgBox.innerHTML = `<div class="detail-img-placeholder">${i.type==='lost'?'🔍':'📦'}</div>`;
-  
-  document.getElementById('dBadgeRow').innerHTML = `<span class="pill ${i.status==='claimed'?'pill-claimed':(i.type==='lost'?'pill-lost':'pill-found')}">${i.status==='claimed'?'Claimed':i.type.toUpperCase()}</span>`;
-  setText('dName', i.name);
-  setText('dLoc', i.loc);
-  setText('dCat', i.cat);
-  setText('dDate', new Date(i.date).toLocaleDateString('en-UG',{day:'numeric',month:'short',year:'numeric'}));
-  setText('dDesc', i.desc);
-  
-  const sBox = document.getElementById('dStorageBox');
-  if(me.role==='admin' && i.storage){
-    sBox.style.display='block'; setText('dStorage', i.storage);
-  } else { sBox.style.display='none'; }
-  
-  const actionBar = document.getElementById('dActionBar');
-  actionBar.innerHTML = '';
-  
-  // Dynamic action buttons generation base on current scopes
-  if(i.status==='pending'){
-    if(me.role==='admin' || i.byId===me.id){
-      actionBar.innerHTML += `<button class="btn btn-success btn-sm" onclick="promptClaimItem('${i.id}')">⚡ Mark as Claimed / Reunited</button>`;
-    } else {
-      actionBar.innerHTML += `<a class="btn btn-blue btn-sm" href="tel:${i.phone}">📞 Contact Reporter</a>`;
-    }
+  let html = '';
+  if(i.img) html += `<img src="${i.img}" class="sheet-img" alt="${esc(i.name)}"/>`;
+  html += `<div class="modal-title">${esc(i.name)}</div>${pillHTML(i)}<div style="margin-top:16px">
+    <div class="drow"><span>Category</span><span>${i.cat||'—'}</span></div>
+    <div class="drow"><span>Date</span><span>${i.date}</span></div>
+    <div class="drow"><span>Location</span><span>${esc(i.loc)}</span></div>
+    ${i.desc?`<div class="drow"><span>Description</span><span>${esc(i.desc)}</span></div>`:''}
+    ${i.storage?`<div class="drow"><span>Currently at</span><span>${esc(i.storage)}</span></div>`:''}
+    ${(me?.role==='admin'&&i.phone)?`<div class="drow"><span>Reporter Contact</span><span><a href="tel:${i.phone}" style="color:var(--vu-red);font-weight:600">${i.phone}</a></span></div>`:''}
+    <div class="drow"><span>Reported by</span><span>${i.byName||'Unknown'}</span></div>
+  </div>
+  <div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:11px 14px;margin-top:14px;font-size:12px;color:var(--text-mid)">
+    📞 <strong>Admin Contact:</strong> <a href="tel:0700000000" style="color:var(--vu-red);font-weight:600">0700000000</a> &nbsp;·&nbsp;
+    📧 <a href="mailto:admin@vu.ac.ug" style="color:var(--vu-blue3);font-weight:500">admin@vu.ac.ug</a>
+  </div>`;
+
+  if(i.status!=='claimed'){
+    const claimBtn = me
+      ? `<button class="btn btn-success btn-sm" style="flex:1" id="claimBtn_${id}" onclick="claimItem('${id}')">Mark as Claimed ⭐</button>`
+      : `<button class="btn btn-ghost btn-sm" style="flex:1;cursor:not-allowed;opacity:.6" onclick="toast('Please log in to claim an item','er')">🔒 Login to Claim</button>`;
+    const transferBtn = (me&&me.id===i.byId&&i.type==='found')
+      ? `<button class="btn btn-ghost btn-sm" style="flex:1" onclick="transferToSecurity('${id}')">📍 Hand to Security</button>`
+      : '';
+    html += `<div style="display:flex;gap:9px;margin-top:20px;flex-wrap:wrap">${claimBtn}${transferBtn}<button class="btn btn-ghost btn-sm" onclick="closeSheet()">Close</button></div>`;
   } else {
-    actionBar.innerHTML += `<div style="font-size:12px;color:var(--text-muted);font-weight:600">✨ Completed item archive log</div>`;
+    if(me?.role==='admin'){
+      const snap = i.claimantSnapshot||{};
+      html += `<div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:13px;margin-top:16px;font-size:12px;">
+        <div style="font-weight:700;color:var(--success);margin-bottom:8px;">✅ Claimed — Claimant Details (Admin)</div>
+        <div><span style="color:var(--text-muted)">Name: </span><strong>${esc(snap.name||'—')}</strong></div>
+        <div style="margin-top:4px"><span style="color:var(--text-muted)">Email: </span><a href="mailto:${esc(snap.email||'')}" style="color:var(--vu-blue3)">${esc(snap.email||'—')}</a></div>
+        <div style="margin-top:4px"><span style="color:var(--text-muted)">Phone: </span><a href="tel:${esc(snap.phone||'')}" style="color:var(--vu-red);font-weight:600">${esc(snap.phone||'—')}</a></div>
+      </div>`;
+    }
+
+    /* ── CLAIM COMPLAINT SECTION (shown to all, right below claimed status) ── */
+    const alreadyComplained = me ? false : false; // evaluated at submit time
+    html += `
+    <div class="complaint-box" id="complaintBox_${id}">
+      <div class="complaint-box-title">⚠️ Think this item is yours?</div>
+      <div class="complaint-box-desc">If this item was incorrectly claimed and actually belongs to you, raise a complaint below. Admin will review and contact both parties.</div>
+      <div class="complaint-submitted" id="complaintDone_${id}">✅ Complaint submitted! Admin will review it shortly.</div>
+      <button class="btn btn-sm" style="background:#fef3c7;border:1.5px solid #fde68a;color:#92400e;width:100%" onclick="toggleComplaintForm('${id}')">⚠️ Raise a Claim Complaint</button>
+      <div class="complaint-form" id="complaintForm_${id}">
+        <div class="fgroup" style="margin-bottom:10px">
+          <div class="flabel">Your Full Name *</div>
+          <input type="text" class="finput" id="cmpName_${id}" placeholder="e.g. Nakato Sarah" style="font-size:13px" value="${me ? esc(me.first+' '+me.last) : ''}"/>
+        </div>
+        <div class="fgroup" style="margin-bottom:10px">
+          <div class="flabel">Your Contact (Phone or Email) *</div>
+          <input type="text" class="finput" id="cmpContact_${id}" placeholder="07XXXXXXXX or you@email.com" style="font-size:13px" value="${me ? esc(me.phone||me.email||'') : ''}"/>
+        </div>
+        <div class="fgroup" style="margin-bottom:10px">
+          <div class="flabel">Why do you believe this item belongs to you? *</div>
+          <textarea class="finput" id="cmpReason_${id}" placeholder="Describe identifying features, proof of ownership, or circumstances..." style="min-height:72px;font-size:13px"></textarea>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm" style="background:#b45309;color:#fff;flex:1" onclick="submitComplaint('${id}','${esc(i.name)}')">Submit Complaint</button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleComplaintForm('${id}')">Cancel</button>
+        </div>
+      </div>
+    </div>`;
+
+    html += `<div style="margin-top:14px"><button class="btn btn-ghost btn-sm" onclick="closeSheet()" style="width:100%">Close</button></div>`;
   }
-  
-  if(me.role==='admin'){
-    actionBar.innerHTML += `<button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="promptDeleteItem('${i.id}')">🗑 Delete</button>`;
-  }
-  
+  document.getElementById('sheetContent').innerHTML = html;
   document.getElementById('detailOverlay').classList.add('open');
 };
 
-window.closeDetail = function(){ document.getElementById('detailOverlay').classList.remove('open'); };
-
-/* PROMPT DIALOGS ACTIONS LIBRARY */
-let globalConfirmAction = null;
-function openPromptConfirm(title, msg, yesCb){
-  setText('confirmTitle', title);
-  setText('confirmMsg', msg);
-  document.getElementById('confirmOverlay').classList.add('open');
-  globalConfirmAction = yesCb;
-}
-window.closePromptConfirm = function(){ document.getElementById('confirmOverlay').classList.remove('open'); };
-
-document.getElementById('confirmYesBtn').onclick = function(){
-  if(globalConfirmAction) globalConfirmAction();
-  closePromptConfirm();
+window.closeSheet = function(e){
+  if(!e||e.target===document.getElementById('detailOverlay'))
+    document.getElementById('detailOverlay').classList.remove('open');
 };
 
-window.promptClaimItem = function(id){
-  openPromptConfirm('Confirm Claim Reification','Mark item as successfully resolved and close public listing visibility?', async ()=>{
-    try{
-      await DB.updateDoc('items', id, {status:'claimed', claimedAt: new Date().toISOString()});
-      if(DB.incrementReunited) await DB.incrementReunited();
-      toast('Listing updated successfully to claimed status!','ok');
-      closeDetail();
-    } catch(e){ toast('Error: '+e.message,'er'); }
-  });
-};
-
-window.promptDeleteItem = function(id){
-  openPromptConfirm('Confirm Total Removals','Are you sure you want to permanently delete this document entry from registry index?', async ()=>{
-    try{
-      await DB.deleteDoc('items', id);
-      toast('Item database entry deleted successfully','nf');
-      closeDetail();
-    } catch(e){ toast('Error: '+e.message,'er'); }
-  });
-};
-
-/* SYSTEM REVIEWS AND USER RATING CHANNELS */
-window.toggleReviewForm = function(){
-  const s = document.getElementById('reviewFormSection');
-  if(s) s.style.display = s.style.display==='none'?'block':'none';
-};
-
-window.setReviewStar = function(n){
-  curReviewStar = n;
-  document.querySelectorAll('#starRow .star-btn').forEach((b,i)=>{ b.classList.toggle('lit',i<n); });
-};
-
-window.submitReview = async function(){
-  if(!me){toast('You must be logged in to submit a review','er');return;}
-  if(!curReviewStar){toast('Please select a star rating','er');return;}
-  const txt = v('reviewText');
-  if(!txt||txt.length<10){toast('Please write at least 10 characters','er');return;}
-  
+let _claimingInProgress = false;
+window.claimItem = async function(id){
+  if(!me){toast('You must be logged in to claim an item','er');return;}
+  if(_claimingInProgress) return;
+  _claimingInProgress = true;
+  const btn = document.getElementById('claimBtn_'+id);
+  if(btn){ btn.disabled=true; btn.textContent='Claiming…'; }
   try{
-    await DB.addDoc('reviews',{userId:me.id,name:me.first+' '+me.last,rating:curReviewStar,text:txt,at:new Date().toISOString()});
-    document.getElementById('reviewText').value='';
-    curReviewStar=0; setReviewStar(0); toggleReviewForm();
-    toast('Review submitted! Thank you ⭐','ok');
-  } catch(e){ toast('Failed: '+e.message,'er'); }
-};
-
-function renderReviews(){
-  const list = document.getElementById('reviewsList');
-  const count = document.getElementById('reviewCount');
-  if(!list) return;
-  if(count) count.textContent = `All Reviews (${allReviews.length})`;
-  if(!allReviews.length){
-    list.innerHTML = '<div class="empty"><div class="empty-ico">💬</div><h3>No feedback yet</h3><p>Be the first to rate your experience.</p></div>';
-    return;
+    await DB.updateDoc('items', id, {
+      status: 'claimed',
+      claimedById: me.id,
+      claimedAt: new Date().toISOString(),
+      claimantSnapshot: {name:me.first+' '+me.last,email:me.email,phone:me.phone||'—'}
+    });
+    await DB.incrementReunited();
+    closeSheet();
+    toast('Item marked as claimed ⭐','ok');
+    // Push notification for claim approved
+    if(Notification&&Notification.permission==='granted'){
+      new Notification('VU Find — Item Claimed!',{
+        body:`You've successfully claimed "${allItems.find(x=>x.id===id)?.name||'an item'}". Admin has been notified.`,
+        icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="%231a3580"/><text x="32" y="44" font-size="30" text-anchor="middle" fill="white">VU</text></svg>'
+      });
+    }
+    pendingReviewItemId = id;
+    if(!_reviewShownThisSession){
+      _reviewShownThisSession = true;
+      clearTimeout(_inactivityTimer);
+      setTimeout(()=>showReviewPrompt(), 700);
+    }
+  } catch(e){
+    toast('Failed to claim item: '+e.message,'er');
+    if(btn){ btn.disabled=false; btn.textContent='Mark as Claimed ⭐'; }
+  } finally{
+    _claimingInProgress = false;
   }
-  list.innerHTML = allReviews.map(r=>{
-    const stars = '⭐'.repeat(r.rating);
-    const dStr = new Date(r.at).toLocaleDateString('en-UG',{day:'numeric',month:'short',year:'numeric'});
-    return `
-      <div class="review-item-card">
-        <div class="review-item-header">
-          <div class="review-item-name">${esc(r.name)}</div>
-          <div class="review-item-stars">${stars}</div>
-        </div>
-        <div class="review-item-text">${esc(r.text)}</div>
-        <div class="review-item-date">${dStr}</div>
-      </div>
-    `;
-  }).join('');
-}
-
-function renderHomeReviewsCarousel(){
-  const track = document.getElementById('homeReviewsTrack');
-  if(!track) return;
-  const reviews = allReviews.length ? allReviews : [{name:'Be the first!',rating:5,text:'Share your experience using VU Find to recover your belongings on campus.'}];
-  const all = [...reviews,...reviews]; // Duplicate for infinite continuous sliding effect
-  track.innerHTML = all.map(r=>{
-    const stars = Array.from({length:5},(_,i)=>`<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="13" height="13"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" style="fill:${i<r.rating?'#f59e0b':'none'};stroke:${i<r.rating?'#f59e0b':'rgba(255,255,255,0.4)'};stroke-width:1.5"/></svg>`).join('');
-    return `
-      <div class="review-slide">
-        <div class="review-slide-stars">${stars}</div>
-        <div class="review-slide-text">${esc(r.text)}</div>
-        <div class="review-slide-name">— ${esc(r.name)}</div>
-      </div>
-    `;
-  }).join('');
-}
-
-/* POPUP PROMPT INLINE CONTEXT REVIEWS */
-window.setPromptReviewStar = function(n){
-  curPromptStar = n;
-  document.querySelectorAll('#promptStarRow .review-prompt-star').forEach((b,i)=>{ b.classList.toggle('lit',i<n); });
 };
-window.closeReviewPrompt = function(){ document.getElementById('reviewPromptOverlay').classList.remove('open'); };
-window.submitPromptReview = async function(){
-  const txt = v('promptReviewText');
-  if(!curPromptStar || !txt){toast('Please fill rating and text feedback','er');return;}
+
+/* CLAIM COMPLAINTS */
+window.toggleComplaintForm = function(id){
+  const form = document.getElementById('complaintForm_'+id);
+  if(form) form.classList.toggle('open');
+};
+
+window.submitComplaint = async function(itemId, itemName){
+  const name    = (document.getElementById('cmpName_'+itemId)?.value||'').trim();
+  const contact = (document.getElementById('cmpContact_'+itemId)?.value||'').trim();
+  const reason  = (document.getElementById('cmpReason_'+itemId)?.value||'').trim();
+  if(!name||!contact||!reason){ toast('Please fill all complaint fields','er'); return; }
   try{
-    await DB.addDoc('reviews',{userId:me.id,name:me.first+' '+me.last,rating:curPromptStar,text:txt,at:new Date().toISOString()});
-    closeReviewPrompt();
-    toast('Story shared to feedback walls successfully!','ok');
+    await DB.addDoc('complaints',{
+      itemId,
+      itemName,
+      name,
+      contact,
+      reason,
+      submittedById: me?.id||null,
+      status: 'open',
+      at: new Date().toISOString()
+    });
+    const form = document.getElementById('complaintForm_'+itemId);
+    const done = document.getElementById('complaintDone_'+itemId);
+    if(form) form.classList.remove('open');
+    if(done) done.classList.add('show');
+    toast('Complaint submitted — admin will review it','ok');
+  } catch(e){
+    toast('Failed to submit complaint: '+e.message,'er');
+  }
+};
+
+window.adminResolveComplaint = async function(id){
+  try{
+    await DB.updateDoc('complaints', id, { status:'resolved', resolvedAt: new Date().toISOString() });
+    toast('Complaint marked as resolved ✓','ok');
   } catch(e){ toast('Error: '+e.message,'er'); }
 };
 
-/* TOAST CONTROLLER INTERFACES */
-let toastTimeout = null;
-window.toast = function(msg, type='ok'){
-  clearTimeout(toastTimeout);
-  const el = document.getElementById('toast');
-  const txt = document.getElementById('toastMsg');
-  if(!el || !txt) return;
-  
-  txt.textContent = msg;
-  el.className = 'show ' + type;
-  toastTimeout = setTimeout(()=>{ el.classList.remove('show'); }, 3800);
+window.adminDelComplaint = async function(id){
+  showConfirm('Delete Complaint','Delete this complaint permanently?','🗑️', async ()=>{
+    await DB.deleteDoc('complaints', id);
+    toast('Complaint deleted','ok');
+  });
 };
 
-/* ADMIN PANEL EXTENSIONS LOGICS */
+/* REPORT ITEM */
+window.submitReport = async function(){
+  if(!me){toast('You must be logged in','er');return;}
+  const name=v('fName'),cat=v('fCat'),date=v('fDate'),loc=v('fLoc');
+  if(!name||!cat||!date||!loc){toast('Fill all required fields','er');return;}
+  setBtn('submitBtn',true,'Submitting…');
+  try{
+    const newId = await DB.addDoc('items',{
+      type: reportType, name, cat, date, loc,
+      desc: v('fDesc'), storage: v('fStorage'), phone: v('fPhone'),
+      status: 'pending',
+      img: pendingImgData||null,
+      byId: me.id,
+      byName: me.first+' '+me.last,
+      at: new Date().toISOString()
+    });
+    // If a found item was just posted, check if it matches any user's lost reports
+    if(reportType==='found'){
+      const fakeItem={type:'found',name,cat,loc,desc:v('fDesc')};
+      checkLostMatchForFound(fakeItem);
+    }
+    ['fName','fCat','fDesc','fStorage','fPhone'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.value='';
+    });
+    clearPhoto();
+    toast(reportType==='lost'?'Lost item reported! 🔴':'Found item reported! 🟢','ok');
+    setBtn('submitBtn',false,'Submit Report →');
+    nav('browse');
+    // Trigger review prompt after successful report (if not already shown this session)
+    if(!_reviewShownThisSession){
+      _reviewShownThisSession = true;
+      clearTimeout(_inactivityTimer);
+      setTimeout(()=>showReviewPanel(), 1200);
+    }
+  } catch(e){
+    toast('Submit failed: '+e.message,'er');
+    setBtn('submitBtn',false,'Submit Report →');
+  }
+};
+
+/* ── "I LOST SOMETHING SIMILAR" MATCHING ──
+   When a found item is posted, check existing lost reports for keyword matches
+   and toast-notify the current user if their lost item matches.
+*/
+function checkLostMatchForFound(foundItem){
+  if(!me || !allItems) return;
+  const keywords = [foundItem.name, foundItem.cat, foundItem.loc, foundItem.desc]
+    .filter(Boolean).join(' ').toLowerCase().split(/\s+/).filter(w=>w.length>3);
+  const myLost = allItems.filter(i=>i.type==='lost'&&i.status==='pending'&&i.byId===me.id);
+  for(const lost of myLost){
+    const lostText = [lost.name,lost.cat,lost.loc,lost.desc].filter(Boolean).join(' ').toLowerCase();
+    const match = keywords.some(kw=>lostText.includes(kw));
+    if(match){
+      toast(`🔔 A found item may match your lost "${lost.name}" — check Browse!`,'ok');
+      // Browser push notification (if permission granted)
+      if(Notification&&Notification.permission==='granted'){
+        new Notification('VU Find — Possible Match!',{
+          body:`A found item may match your lost "${lost.name}". Open VU Find to check.`,
+          icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="%231a3580"/><text x="32" y="44" font-size="30" text-anchor="middle" fill="white">VU</text></svg>'
+        });
+      }
+      break;
+    }
+  }
+}
+
+/* ── ITEM TRANSFER (hand off to security) ──
+   Found-item reporters can transfer their held item to security desk.
+*/
+window.transferToSecurity = async function(id){
+  const location = prompt('Enter security location (e.g. "Security Desk Gate A"):');
+  if(!location) return;
+  try{
+    await DB.updateDoc('items', id, { storage: location, transferredAt: new Date().toISOString() });
+    closeSheet();
+    toast('Item transferred to security ✓','ok');
+  } catch(e){ toast('Transfer failed: '+e.message,'er'); }
+};
+
+/* ── AUTO-ARCHIVE (30-day expiry) ──
+   Unclaimed found items automatically move to "archived" status after 30 days.
+*/
+async function autoArchiveOldItems(){
+  if(!DB||!me) return;
+  const thirtyDaysAgo = Date.now() - 30*24*60*60*1000;
+  const toArchive = allItems.filter(i=>
+    i.type==='found' && i.status==='pending' &&
+    new Date(i.at).getTime() < thirtyDaysAgo
+  );
+  for(const item of toArchive){
+    try{
+      await DB.updateDoc('items', item.id, { status:'archived', archivedAt: new Date().toISOString() });
+    } catch(e){ console.warn('Auto-archive failed for',item.id,e); }
+  }
+  if(toArchive.length) toast(`📦 ${toArchive.length} old item(s) auto-archived after 30 days`,'nf');
+}
+
+/* ── MY ITEMS PAGE ── */
+
+/* Ask for notification permission shortly after login */
+function requestNotificationPermission(){
+  if(typeof Notification === 'undefined') return;
+  if(Notification.permission === 'granted') return;
+  if(Notification.permission === 'denied') return;
+  // Show after a short delay so it doesn't collide with the login toast
+  setTimeout(()=>{
+    Notification.requestPermission().then(perm=>{
+      if(perm === 'granted'){
+        toast('Notifications enabled — you\'ll be alerted about new items 🔔','ok');
+        // Re-send login info to SW now that permission is granted
+        if(me && 'serviceWorker' in navigator && navigator.serviceWorker.controller){
+          navigator.serviceWorker.controller.postMessage({
+            type: 'USER_LOGIN',
+            userId: me.id,
+            seenAt: new Date().toISOString()
+          });
+        }
+      }
+    }).catch(()=>{});
+  }, 2000);
+}
+
+/* ADMIN PANEL */
 window.aTab = function(btn,t){
   curATab = t;
   document.querySelectorAll('.atab').forEach(b=>b.classList.remove('on'));
@@ -1511,200 +1888,767 @@ window.aTab = function(btn,t){
 function renderAdmin(){
   const c = document.getElementById('adminContent');
   if(!c) return;
-  
-  if(curATab === 'users'){
-    c.innerHTML = `
-      <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:10px">Registered Members (${allUsers.length})</div>
-      ${allUsers.map(u=>`
-        <div class="admin-card">
-          <div class="ava">${u.first[0]}</div>
+
+  if(curATab==='complaints'){
+    const complaints = allComplaints;
+    if(!complaints.length){
+      c.innerHTML='<div class="empty"><div class="empty-ico">⚠️</div><h3>No complaints yet</h3><p>Claim complaints from users will appear here.</p></div>';
+    } else {
+      c.innerHTML = complaints.map(cp=>{
+        const dateStr = new Date(cp.at).toLocaleDateString('en-UG',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+        const isResolved = cp.status==='resolved';
+        return`<div class="admin-card" style="${isResolved?'opacity:.6':''}">
+          <div style="font-size:24px;flex-shrink:0">${isResolved?'✅':'⚠️'}</div>
           <div class="admin-info">
-            <div class="admin-name">${esc(u.first)} ${esc(u.last)} ${u.role==='admin'?'<span class="badge-admin">Admin</span>':''}</div>
-            <div class="admin-meta">📧 ${esc(u.email)} | 📞 ${esc(u.phone||'No phone')}</div>
+            <div class="admin-name">${esc(cp.name)} <span style="font-size:10px;color:var(--text-muted);font-weight:400">re: <em>${esc(cp.itemName||cp.itemId)}</em></span>
+              ${isResolved?'<span style="background:#f0fdf4;color:#16a34a;font-size:9px;font-weight:700;padding:2px 7px;border-radius:100px;margin-left:5px">Resolved</span>':'<span style="background:#fef3c7;color:#b45309;font-size:9px;font-weight:700;padding:2px 7px;border-radius:100px;margin-left:5px">Open</span>'}
+            </div>
+            <div class="admin-meta">📞 ${esc(cp.contact)}</div>
+            <div class="admin-meta" style="margin-top:4px;line-height:1.5;color:var(--text-dark)">${esc(cp.reason)}</div>
+            <div class="admin-meta" style="margin-top:3px">📅 ${dateStr}</div>
           </div>
-          ${u.id !== me.id ? `<div class="admin-actions"><button class="btn btn-danger btn-sm" onclick="adminDeleteUser('${u.id}')">Remove User</button></div>`:''}
-        </div>
-      `).join('')}
-    `;
-    return;
-  }
-  
-  if(curATab === 'reviews'){
-    c.innerHTML = `
-      <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:10px">Review Stream Moderation (${allReviews.length})</div>
-      ${allReviews.map(r=>`
-        <div class="admin-card">
-          <div class="admin-info">
-            <div class="admin-name">${esc(r.name)} — ${'⭐'.repeat(r.rating)}</div>
-            <div class="admin-meta" style="color:var(--text-mid);margin:4px 0;font-size:12px">${esc(r.text)}</div>
-            <div class="admin-meta">${new Date(r.at).toLocaleDateString('en-UG')}</div>
+          <div class="admin-actions" style="flex-direction:column;gap:5px">
+            ${!isResolved?`<button class="btn btn-success btn-sm" onclick="adminResolveComplaint('${cp.id}')">✓ Resolve</button>`:''}
+            <button class="btn btn-danger btn-sm" onclick="adminDelComplaint('${cp.id}')">🗑</button>
           </div>
-          <div class="admin-actions"><button class="btn btn-danger btn-sm" onclick="adminDeleteReview('${r.id}')">Moderate</button></div>
-        </div>
-      `).join('')}
-    `;
+        </div>`;
+      }).join('');
+    }
     return;
   }
-  
-  if(curATab === 'complaints'){
-    c.innerHTML = '<div class="empty"><div class="empty-ico">⚠️</div><h3>No complaints yet</h3><p>Claim complaints from users will appear here.</p></div>';
-    return;
-  }
-  
-  let items = curATab==='pending' ? allItems.filter(i=>i.status==='pending') : allItems;
-  if(!items.length){
-    c.innerHTML = '<div class="empty"><div class="empty-ico">✅</div><h3>All clear!</h3><p>No items found inside this collection category.</p></div>';
-    return;
-  }
-  
-  c.innerHTML = `
-    <div class="stat-card" style="width:100%;margin-bottom:12px;flex-direction:row;justify-content:space-between;align-items:center">
-      <span class="stat-lbl">Independent Metric Reunited Counter:</span>
-      <span class="stat-val b" id="admin-reunited-val">0</span>
-    </div>
-    ${items.map(i=>`
-      <div class="admin-card">
-        <div class="admin-info" onclick="openDetail('${i.id}')" style="cursor:pointer">
-          <div class="admin-name" style="color:var(--vu-blue)">${esc(i.name)} [${i.type.toUpperCase()}]</div>
-          <div class="admin-meta">By: ${esc(i.byName)} | Status: <strong>${i.status}</strong></div>
-          ${i.storage ? `<div class="admin-meta" style="color:var(--success)">Locker Safe Assignment: ${esc(i.storage)}</div>`:''}
+
+  if(curATab==='reviews'){
+    if(!allReviews.length){
+      c.innerHTML='<div class="empty"><div class="empty-ico">💬</div><h3>No reviews yet</h3></div>';
+      return;
+    }
+    c.innerHTML = allReviews.map(r=>{
+      const stars='⭐'.repeat(r.rating)+'☆'.repeat(5-r.rating);
+      const dateStr=new Date(r.at).toLocaleDateString('en-UG',{day:'numeric',month:'short',year:'numeric'});
+      return`<div class="admin-card">
+        <div style="font-size:24px;flex-shrink:0">💬</div>
+        <div class="admin-info">
+          <div class="admin-name">${esc(r.name)} <span style="font-size:12px">${stars}</span></div>
+          <div class="admin-meta">${esc(r.text)}</div>
+          <div class="admin-meta" style="margin-top:2px">📅 ${dateStr}</div>
         </div>
         <div class="admin-actions">
-          ${i.status==='pending'?`<button class="btn btn-success btn-sm" onclick="promptClaimItem('${i.id}')">Resolve</button>`:''}
-          <button class="btn btn-danger btn-sm" onclick="promptDeleteItem('${i.id}')">Remove</button>
+          <button class="btn btn-danger btn-sm" onclick="adminDelReview('${r.id}')">🗑</button>
         </div>
+      </div>`;
+    }).join('');
+    return;
+  }
+
+  if(curATab==='users'){
+    if(!allUsers.length){
+      c.innerHTML='<div class="empty"><div class="empty-ico">👥</div><h3>No users yet</h3></div>';
+      return;
+    }
+    c.innerHTML = allUsers.map(u=>`
+      <div class="admin-card">
+        <div class="ava" style="width:38px;height:38px;font-size:14px;flex-shrink:0">${(u.first[0]+(u.last[0]||'')).toUpperCase()}</div>
+        <div class="admin-info">
+          <div class="admin-name">${esc(u.first)} ${esc(u.last)}${u.role==='admin'?'<span class="badge-admin">Admin</span>':''}</div>
+          <div class="admin-meta">${esc(u.email)} · ${u.phone||'—'}</div>
+          <div class="admin-meta" style="margin-top:2px;color:#aaa">Joined: ${u.createdAt?new Date(u.createdAt).toLocaleDateString('en-UG',{day:'numeric',month:'short',year:'numeric'}):'—'}</div>
+        </div>
+        <div class="admin-actions">
+          ${u.role!=='admin'?`<button class="btn btn-danger btn-sm" onclick="adminDelUser('${u.id}')">🗑</button>`:'<span style="font-size:10px;color:var(--text-muted)">Protected</span>'}
+        </div>
+      </div>`).join('');
+    return;
+  }
+
+  if(curATab==='claimed'){
+    const claimed = allItems.filter(i=>i.status==='claimed').sort((a,b)=>new Date(b.claimedAt||b.at)-new Date(a.claimedAt||a.at));
+    if(!claimed.length){
+      c.innerHTML='<div class="admin-claimed-empty"><div style="font-size:44px;margin-bottom:14px;opacity:.4">✅</div><h3 style="font-size:17px;font-weight:600;color:var(--text-dark);margin-bottom:7px">No Claimed Items</h3><p style="color:var(--text-muted);font-size:13px">Items marked as claimed will appear here.</p></div>';
+      return;
+    }
+    c.innerHTML = claimed.map(i=>{
+      const snap = i.claimantSnapshot||{};
+      const thumb = i.img
+        ?`<img class="claimed-card-img" src="${i.img}" alt="${esc(i.name)}"/>`
+        :`<div class="claimed-card-img" style="display:flex;align-items:center;justify-content:center;font-size:28px;background:#f0fdf4">${catEmoji(i.cat)}</div>`;
+      const claimedAtStr = i.claimedAt?new Date(i.claimedAt).toLocaleDateString('en-UG',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
+      return`<div class="claimed-card">
+        <div class="claimed-card-top">
+          ${thumb}
+          <div class="claimed-item-info">
+            <div class="claimed-item-name">${esc(i.name)} <span class="pill pill-claimed">⭐ Claimed</span></div>
+            <div class="claimed-item-meta">📍 ${esc(i.loc)} &nbsp;·&nbsp; 📅 ${i.date}</div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="adminDelItem('${i.id}')" title="Delete">🗑</button>
+        </div>
+        <div class="claimed-divider"></div>
+        <div class="claimed-claimant">
+          <div class="claimed-claimant-label">👤 Claimant Details (Admin Only)</div>
+          ${snap.name?`
+          <div class="claimed-claimant-row"><span>👤 Name</span><span style="font-weight:600;color:var(--vu-blue)">${esc(snap.name)}</span></div>
+          <div class="claimed-claimant-row"><span>📧 Email</span><a href="mailto:${esc(snap.email||'')}" style="color:var(--vu-blue3);font-weight:500;font-size:12px">${esc(snap.email||'—')}</a></div>
+          <div class="claimed-claimant-row"><span>📞 Phone</span><a href="tel:${esc(snap.phone||'')}" style="color:var(--vu-red);font-weight:600;font-size:12px">${esc(snap.phone||'—')}</a></div>
+          `:`<div style="font-size:12px;color:var(--vu-red);padding:8px 0">⚠️ No claimant details available.</div>`}
+          <div class="claimed-at-badge">⏱ Claimed: ${claimedAtStr}</div>
+        </div>
+      </div>`;
+    }).join('');
+    return;
+  }
+
+  let items = curATab==='pending'
+    ? allItems.filter(i=>i.status==='pending')
+    : allItems;
+  items = [...items].sort((a,b)=>new Date(b.at)-new Date(a.at));
+  if(!items.length){
+    c.innerHTML='<div class="empty"><div class="empty-ico">✅</div><h3>All clear!</h3><p>No items to review.</p></div>';
+    return;
+  }
+  c.innerHTML = items.map(i=>{
+    const thumb = i.img
+      ?`<img src="${i.img}" style="width:38px;height:38px;border-radius:8px;object-fit:cover;flex-shrink:0"/>`
+      :`<div style="font-size:24px;flex-shrink:0">${catEmoji(i.cat)}</div>`;
+    return`<div class="admin-card">${thumb}
+      <div class="admin-info">
+        <div class="admin-name">${esc(i.name)} ${pillHTML(i)}</div>
+        <div class="admin-meta">📍 ${esc(i.loc)} · 📅 ${i.date}</div>
+        <div class="admin-meta" style="margin-top:2px">By: ${esc(i.byName||'Unknown')}</div>
       </div>
-    `).join('')}
-  `;
-  
-  if(DB.getReunited){
-    DB.getReunited().then(count=>{
-      const el = document.getElementById('admin-reunited-val');
-      if(el) el.textContent = count;
-    });
-  }
+      <div class="admin-actions">
+        ${i.status!=='claimed'?`<button class="btn btn-success btn-sm" onclick="adminClaim('${i.id}')">✓ Claim</button>`:''}
+        <button class="btn btn-danger btn-sm" onclick="adminDelItem('${i.id}')">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-window.adminDeleteUser = function(id){
-  openPromptConfirm('Remove Account Profile','Delete this member account? This instantly wipes profile data out of university directories.', async ()=>{
-    try{
-      await DB.deleteDoc('users', id);
-      const userItems = allItems.filter(i=>i.byId===id);
-      for(const i of userItems) await DB.deleteDoc('items',i.id);
-      toast('User account deleted','nf');
-    } catch(e){ toast('Delete failed: '+e.message,'er'); }
+window.adminClaim = function(id){
+  pendingAdminClaimId = id;
+  const sel = document.getElementById('claimantSelect');
+  sel.innerHTML = '<option value="">— Not Specified —</option>';
+  allUsers.forEach(u=>{
+    const opt = document.createElement('option');
+    opt.value = u.id;
+    opt.textContent = `${u.first} ${u.last} (${u.email})`;
+    sel.appendChild(opt);
+  });
+  document.getElementById('adminClaimOverlay').classList.add('open');
+};
+window.closeAdminClaimOverlay = function(){
+  document.getElementById('adminClaimOverlay').classList.remove('open');
+  pendingAdminClaimId = null;
+};
+let _adminClaimingInProgress = false;
+window.confirmAdminClaim = async function(){
+  if(!pendingAdminClaimId) return;
+  if(_adminClaimingInProgress) return;
+  _adminClaimingInProgress = true;
+  const confirmBtn = document.querySelector('#adminClaimOverlay .btn-success');
+  if(confirmBtn){ confirmBtn.disabled=true; confirmBtn.textContent='Saving…'; }
+  const sel = document.getElementById('claimantSelect');
+  const uid = sel.value||null;
+  const claimer = uid ? allUsers.find(u=>u.id===uid) : null;
+  try{
+    await DB.updateDoc('items', pendingAdminClaimId, {
+      status:'claimed', claimedById:uid||null,
+      claimedAt:new Date().toISOString(),
+      claimantSnapshot:claimer?{name:claimer.first+' '+claimer.last,email:claimer.email,phone:claimer.phone||'—'}:{}
+    });
+    await DB.incrementReunited();
+    closeAdminClaimOverlay();
+    toast('Marked as claimed ✓','ok');
+  } catch(e){
+    toast('Failed: '+e.message,'er');
+    if(confirmBtn){ confirmBtn.disabled=false; confirmBtn.textContent='Confirm Claimed ✓'; }
+  } finally{
+    _adminClaimingInProgress = false;
+  }
+};
+
+window.adminDelItem = function(id){
+  showConfirm('Delete Item','Permanently delete this item report?','🗑️', async ()=>{
+    try{ await DB.deleteDoc('items', id); toast('Item deleted','nf'); }
+    catch(e){ toast('Delete failed: '+e.message,'er'); }
   });
 };
 
-window.adminDeleteReview = function(id){
-  openPromptConfirm('Moderate System Review','Permanently drop this public comment from students dashboards reviews streams?', async ()=>{
-    try{
-      await DB.deleteDoc('reviews', id);
-      toast('Review entry dropped from servers successfully','nf');
-    } catch(e){ toast('Failed to discard review index data context.','er'); }
+window.adminDelReview = function(id){
+  showConfirm('Delete Review','Permanently delete this review?','🗑️', async ()=>{
+    try{ await DB.deleteDoc('reviews', id); toast('Review deleted','nf'); }
+    catch(e){ toast('Delete failed: '+e.message,'er'); }
   });
 };
 
-window.triggerResetReunited = function(){
-  openPromptConfirm('Reset Reunited Counter','Are you sure you want to reset the decoupled dynamic master metrics counters?', async ()=>{
-    try{
-      if(DB.resetReunited) {
+window.adminResetReunited = function(){
+  showConfirm(
+    'Reset Reunited Counter',
+    'This will reset the "Total Reunited" counter to 0. This action cannot be undone. Are you sure?',
+    '🔄',
+    async ()=>{
+      try{
         await DB.resetReunited();
-        toast('Metrics counters rolled back to initial configurations.','ok');
-      }
-    } catch(e){ toast('Reset failed: '+e.message,'er'); }
-  });
+        toast('Reunited counter has been reset to 0','ok');
+      } catch(e){ toast('Reset failed: '+e.message,'er'); }
+    }
+  );
 };
 
-/* Notification setup wrapper context hooks */
-function requestNotificationPermission(){
-  if(typeof Notification === 'undefined') return;
-  if(Notification.permission === 'granted' || Notification.permission === 'denied') return;
-  setTimeout(()=>{
-    Notification.requestPermission().then(perm=>{
-      if(perm === 'granted'){
-        toast('Notifications enabled — you\'ll be alerted about new items 🔔','ok');
-        if(me && 'serviceWorker' in navigator && navigator.serviceWorker.controller){
-          navigator.serviceWorker.controller.postMessage({ type: 'USER_LOGIN', userId: me.id, seenAt: new Date().toISOString() });
+window.adminDelUser = function(id){
+  const u = allUsers.find(x=>x.id===id);
+  if(!u) return;
+  if(u.role==='admin'){toast('Cannot delete an admin account','er');return;}
+  if(me?.id===id){toast('Cannot delete your own account','er');return;}
+  showConfirm(
+    'Delete User Account',
+    `Permanently delete account for ${u.first} ${u.last}?`,
+    '🔴',
+    async ()=>{
+      try{
+        await DB.deleteDoc('users', id);
+        const userItems = allItems.filter(i=>i.byId===id);
+        for(const i of userItems) await DB.deleteDoc('items',i.id);
+        toast('User account deleted','nf');
+      } catch(e){ toast('Delete failed: '+e.message,'er'); }
+    }
+  );
+};
+
+/* REVIEWS */
+window.toggleReviewForm = function(){
+  const s = document.getElementById('reviewFormSection');
+  if(s) s.style.display = s.style.display==='none'?'block':'none';
+};
+window.setReviewStar = function(n){
+  curReviewStar = n;
+  document.querySelectorAll('#starRow .star-btn').forEach((b,i)=>{
+    b.classList.toggle('lit',i<n);
+  });
+};
+window.submitReview = async function(){
+  if(!me){toast('You must be logged in to submit a review','er');return;}
+  if(!curReviewStar){toast('Please select a star rating','er');return;}
+  const txt = v('reviewText');
+  if(!txt||txt.length<10){toast('Please write at least 10 characters','er');return;}
+  try{
+    await DB.addDoc('reviews',{userId:me.id,name:me.first+' '+me.last,rating:curReviewStar,text:txt,at:new Date().toISOString()});
+    document.getElementById('reviewText').value='';
+    curReviewStar=0; setReviewStar(0);
+    toggleReviewForm();
+    toast('Review submitted! Thank you ⭐','ok');
+  } catch(e){ toast('Failed: '+e.message,'er'); }
+};
+
+function renderReviews(){
+  const list  = document.getElementById('reviewsList');
+  const count = document.getElementById('reviewCount');
+  if(!list) return;
+  if(count) count.textContent = `${allReviews.length} review${allReviews.length!==1?'s':''}`;
+  if(!allReviews.length){
+    list.innerHTML=`<div class="review-empty"><div class="review-empty-ico">💬</div><p style="font-size:14px;color:var(--text-muted)">No reviews yet. Be the first to share your experience!</p></div>`;
+    return;
+  }
+  list.innerHTML = allReviews.map(r=>{
+    const starSVG = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="14" height="14"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" style="stroke-width:1.5"/></svg>`;
+    const stars = Array.from({length:5},(_,i)=>`<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="14" height="14"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" style="fill:${i<r.rating?'#f59e0b':'none'};stroke:${i<r.rating?'#f59e0b':'#d1d5db'};stroke-width:1.5"/></svg>`).join('');
+    const dateStr = new Date(r.at).toLocaleDateString('en-UG',{day:'numeric',month:'short',year:'numeric'});
+    const delBtn = me?.role==='admin'
+      ?`<button class="btn btn-danger btn-sm" onclick="adminDelReview('${r.id}')" style="padding:4px 10px;font-size:11px">🗑</button>`:''
+    return`<div class="review-card">
+      <div class="review-card-top">
+        <div style="display:flex;align-items:center;gap:10px;flex:1">
+          <div class="review-card-name">👤 ${esc(r.name)}</div>
+          <div class="review-card-stars">${stars}</div>
+        </div>
+        ${delBtn}
+      </div>
+      <div class="review-card-text">${esc(r.text)}</div>
+      <div class="review-card-date">📅 ${dateStr}</div>
+    </div>`;
+  }).join('');
+}
+
+/* REVIEW PROMPT */
+function showReviewPrompt(){
+  curPromptStar = 0;
+  document.getElementById('promptReviewText').value='';
+  document.querySelectorAll('#promptStarRow .review-prompt-star').forEach(s=>{s.classList.remove('lit');});
+  document.getElementById('reviewPromptOverlay').classList.add('open');
+}
+window.closeReviewPrompt = function(){
+  document.getElementById('reviewPromptOverlay').classList.remove('open');
+  pendingReviewItemId=null; curPromptStar=0;
+};
+window.setPromptStar = function(n){
+  curPromptStar = n;
+  document.querySelectorAll('#promptStarRow .review-prompt-star').forEach((s,i)=>{
+    s.classList.toggle('lit', i<n);
+  });
+};
+window.submitPromptReview = async function(){
+  if(!me){closeReviewPrompt();return;}
+  const txt = document.getElementById('promptReviewText').value.trim();
+  if(curPromptStar<1){toast('Please tap a star rating first','er');return;}
+  if(!txt||txt.length<5){toast('Please write a short review','er');return;}
+  try{
+    await DB.addDoc('reviews',{userId:me.id,name:me.first+' '+me.last,rating:curPromptStar,text:txt,at:new Date().toISOString()});
+    closeReviewPrompt();
+    toast('Thank you for your review! ⭐','ok');
+  } catch(e){ toast('Failed: '+e.message,'er'); }
+};
+
+/* CAROUSEL */
+function renderCarousel(){
+  const track = document.getElementById('carouselTrack');
+  const wrap  = document.getElementById('carouselWrap');
+  if(!track||!wrap) return;
+  if(!allItems.length){ wrap.style.display='none'; return; }
+  wrap.style.display='';
+  const items = [...allItems].sort((a,b)=>new Date(b.at)-new Date(a.at));
+  const all = [...items,...items];
+  track.innerHTML = all.map(i=>{
+    const thumb = i.img
+      ?`<div class="carousel-item-img"><img src="${i.img}" alt="${esc(i.name)}"/></div>`
+      :`<div class="carousel-item-img" style="font-size:36px">${catEmoji(i.cat)}</div>`;
+    const pillCls = i.status==='claimed'?'found':(i.type==='lost'?'lost':'found');
+    const pillTxt = i.status==='claimed'?'✓ Claimed':(i.type==='lost'?'Lost':'Found');
+    return`<div class="carousel-item" onclick="openSheet('${i.id}')" title="${esc(i.name)}">
+      ${thumb}
+      <div class="carousel-item-label">${esc(i.name)}</div>
+      <div class="carousel-item-pill ${pillCls}">${pillTxt}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderHomeReviewsCarousel(){
+  const track = document.getElementById('homeReviewsTrack');
+  if(!track) return;
+  const reviews = allReviews.length ? allReviews : [
+    {name:'Be the first!',rating:5,text:'Share your experience using VU Find to recover your belongings on campus.'}
+  ];
+  const all = [...reviews,...reviews];
+  track.innerHTML = all.map(r=>{
+    const stars = Array.from({length:5},(_,i)=>`<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="13" height="13"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" style="fill:${i<r.rating?'#f59e0b':'none'};stroke:${i<r.rating?'#f59e0b':'rgba(255,255,255,0.4)'};stroke-width:1.5"/></svg>`).join('');
+    return`<div class="review-slide">
+      <div class="review-slide-stars">${stars}</div>
+      <div class="review-slide-text">${esc(r.text)}</div>
+      <div class="review-slide-name">— ${esc(r.name)}</div>
+    </div>`;
+  }).join('');
+}
+
+/* REPORT DROPDOWN (desktop sidebar) */
+window.toggleReportDropdown = function(e){
+  e.stopPropagation();
+  const d = document.getElementById('reportDropdown');
+  d.classList.toggle('open');
+  document.getElementById('n-report').classList.toggle('on', d.classList.contains('open'));
+};
+window.closeReportDropdown = function(){
+  const d = document.getElementById('reportDropdown');
+  if(d) d.classList.remove('open');
+  const nb = document.getElementById('n-report');
+  if(nb) nb.classList.remove('on');
+};
+document.addEventListener('click', e=>{
+  const d = document.getElementById('reportDropdown');
+  if(d&&!d.contains(e.target)) closeReportDropdown();
+});
+
+/* IMAGE UPLOAD */
+
+window.clearPhoto = function(){
+  pendingImgData=null;
+  const fp = document.getElementById('fPhoto'); if(fp) fp.value='';
+  document.getElementById('imgResizeWrap').classList.remove('show');
+  document.getElementById('uploadZone').style.display='';
+};
+window.onPhoto = function(input){
+  if(!input.files||!input.files[0]) return;
+  const file = input.files[0];
+  const SIZE = 600; // output square px — good quality, reasonable file size
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const img = new Image();
+    img.onload = ()=>{
+      // Centre-crop to square then scale to SIZE×SIZE
+      const canvas  = document.createElement('canvas');
+      canvas.width  = SIZE;
+      canvas.height = SIZE;
+      const ctx = canvas.getContext('2d');
+      const src = Math.min(img.width, img.height); // side of the square crop
+      const sx  = (img.width  - src) / 2;
+      const sy  = (img.height - src) / 2;
+      ctx.drawImage(img, sx, sy, src, src, 0, 0, SIZE, SIZE);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+      pendingImgData = dataUrl;
+      document.getElementById('fPreview').src = dataUrl;
+      // Show friendly meta
+      const kb = Math.round(dataUrl.length * 0.75 / 1024);
+      const meta = document.getElementById('fPreviewMeta');
+      if(meta) meta.textContent = `${SIZE}×${SIZE}px · ~${kb} KB`;
+      document.getElementById('imgResizeWrap').classList.add('show');
+      document.getElementById('uploadZone').style.display='none';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+};
+
+/* CONFIRM DIALOG */
+function showConfirm(title,msg,icon,cb){
+  document.getElementById('cTitle').textContent = title;
+  document.getElementById('cMsg').textContent   = msg;
+  document.getElementById('cIcon').textContent  = icon||'⚠️';
+  confirmCb = cb;
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+window.closeConfirm = function(){
+  document.getElementById('confirmOverlay').classList.remove('open');
+  confirmCb=null;
+};
+document.getElementById('cBtn').onclick = function(){
+  if(confirmCb) confirmCb();
+  closeConfirm();
+};
+
+/* UTILS */
+function v(id){ const el=document.getElementById(id); return el?(el.value||'').trim():''; }
+
+/* PASSWORD VISIBILITY TOGGLE */
+function togglePw(inputId, btn){
+  const inp = document.getElementById(inputId);
+  if(!inp) return;
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  btn.innerHTML = show
+    ? `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+    : `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+}
+function setText(id,val){ const el=document.getElementById(id); if(el) el.textContent=val; }
+function esc(s){ if(!s)return''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function setBtn(id,loading,text){ const el=document.getElementById(id); if(!el) return; el.disabled=loading; el.textContent=text; }
+function toast(msg,type='nf'){
+  const c=document.getElementById('toasts');
+  const icons={ok:'✅',er:'❌',nf:'ℹ️'};
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<span>${icons[type]}</span><span>${esc(msg)}</span>`;
+  c.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(30px)';t.style.transition='all .3s';setTimeout(()=>t.remove(),300);},3500);
+}
+window.toast = toast;
+
+/* PWA */
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault(); deferredPWA=e;
+  document.getElementById('installBar').classList.add('show');
+});
+window.installPWA = function(){
+  if(deferredPWA){
+    deferredPWA.prompt();
+    deferredPWA.userChoice.then(()=>{deferredPWA=null;document.getElementById('installBar').classList.remove('show');});
+  }
+};
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    const swCode = `
+importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js');
+
+const CACHE = 'vufind-v2';
+const ASSETS = [
+  '/',
+  '/index.html',
+  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
+];
+
+const VU_ICON = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='36' fill='%231a3580'/><rect x='20' y='20' width='152' height='152' rx='24' fill='%23cc1414'/><text x='96' y='130' font-family='Arial' font-weight='900' font-size='90' fill='white' text-anchor='middle'>VU</text></svg>";
+
+/* ── CACHE ── */
+self.addEventListener('install', e=>{
+  e.waitUntil(
+    caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())
+  );
+});
+self.addEventListener('activate', e=>{
+  e.waitUntil(
+    caches.keys().then(keys=>Promise.all(
+      keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))
+    )).then(()=>self.clients.claim())
+  );
+});
+self.addEventListener('fetch', e=>{
+  if(e.request.url.includes('firebase') || e.request.url.includes('googleapis.com')){
+    e.respondWith(fetch(e.request));
+    return;
+  }
+  e.respondWith(
+    caches.match(e.request).then(cached=>{
+      if(cached) return cached;
+      return fetch(e.request).then(res=>{
+        if(res && res.status===200 && res.type==='basic'){
+          const clone = res.clone();
+          caches.open(CACHE).then(c=>c.put(e.request, clone));
         }
+        return res;
+      }).catch(()=>caches.match('/index.html'));
+    })
+  );
+});
+
+/* ── NOTIFICATION CLICK ── */
+self.addEventListener('notificationclick', e=>{
+  e.notification.close();
+  e.waitUntil(
+    clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>{
+      for(const c of list){
+        if(c.url && c.focus) return c.focus();
       }
-    }).catch(()=>{});
-  }, 2000);
+      return clients.openWindow('/');
+    })
+  );
+});
+
+/* ── FIREBASE FIRESTORE LISTENER (runs in SW — survives app close) ── */
+let db = null;
+let unsubItems = null;
+let swUserId = null;
+let lastSeenAt = null;
+
+function initFirebaseInSW(){
+  if(db) return;
+  try{
+    if(!firebase.apps.length){
+      firebase.initializeApp({
+        apiKey: "AIzaSyB_hIRIfUfI0uivKKkRk8xno9TQwt0T4jM",
+        authDomain: "lost-and-found-app-9d5d4.firebaseapp.com",
+        projectId: "lost-and-found-app-9d5d4",
+        storageBucket: "lost-and-found-app-9d5d4.firebasestorage.app",
+        messagingSenderId: "334727118690",
+        appId: "1:334727118690:web:6430baaf5ac60522cfb63b"
+      });
+    }
+    db = firebase.firestore();
+  } catch(e){ console.warn('[SW] Firebase init failed:', e); }
 }
 
-/* ── INTERACTIVE BACKUP EVENTS INITIALIZER BLOCK ── */
-function initAuthListeners() {
-  // Login Tab Toggle Button
-  const tabLogin = document.getElementById('tab-login');
-  if (tabLogin) {
-    tabLogin.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.authTab('login');
-    });
-  }
+function startItemListener(){
+  if(!db || unsubItems) return;
+  // lastSeenAt defaults to now so we only notify about items posted AFTER login
+  if(!lastSeenAt) lastSeenAt = new Date().toISOString();
 
-  // Register Tab Toggle Button
-  const tabReg = document.getElementById('tab-reg');
-  if (tabReg) {
-    tabReg.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.authTab('reg');
-    });
-  }
+  unsubItems = db.collection('items').onSnapshot(snap=>{
+    snap.docChanges().forEach(change=>{
+      if(change.type !== 'added') return;
+      const item = { id: change.doc.id, ...change.doc.data() };
 
-  // Primary Sign In Submission Button
-  const loginBtn = document.getElementById('loginBtn');
-  if (loginBtn) {
-    loginBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.doLogin();
-    });
-  }
+      // Skip items that were already there when we started listening
+      if(!item.at || item.at <= lastSeenAt) return;
+      // Skip items posted by this user (don't notify yourself)
+      if(swUserId && item.byId === swUserId) return;
+      // Only notify about lost/found pending items
+      if(item.status !== 'pending') return;
 
-  // Primary Create Account Button
-  const regBtn = document.getElementById('regBtn');
-  if (regBtn) {
-    regBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.doRegister();
-    });
-  }
+      const isLost  = item.type === 'lost';
+      const title   = isLost ? '🔴 New Lost Item Report' : '🟢 New Found Item Report';
+      const body    = item.name + (item.loc ? ' — ' + item.loc : '');
 
-  // Handle "Enter" submission tracking inside inputs
-  const passField = document.getElementById('lPass');
-  if (passField) {
-    passField.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        window.doLogin();
-      }
+      self.registration.showNotification(title, {
+        body,
+        icon: VU_ICON,
+        badge: VU_ICON,
+        tag: 'vufind-item-' + item.id,
+        renotify: true,
+        data: { itemId: item.id }
+      });
+
+      // Advance the cursor so we don't re-notify
+      if(item.at > lastSeenAt) lastSeenAt = item.at;
     });
-  }
+  }, err=>{ console.warn('[SW] Firestore listen error:', err); });
 }
 
-// Bind listeners instantly across system compilation contexts
-window.addEventListener('DOMContentLoaded', initAuthListeners);
-window.addEventListener('load', () => {
-  initAuthListeners();
-  
-  // Decoupled Splash sequence framework controller
-  if(window._firebaseReady) {
-    if(window._firebaseSeedIfEmpty) window._firebaseSeedIfEmpty();
-    setTimeout(() => { 
-      const splash = document.getElementById('splash');
-      if (splash) splash.classList.add('gone'); 
-    }, 1400);
-  } else {
-    document.addEventListener('firebaseReady', () => {
-      if(window._firebaseSeedIfEmpty) window._firebaseSeedIfEmpty();
-      setTimeout(() => { 
-        const splash = document.getElementById('splash');
-        if (splash) splash.classList.add('gone'); 
-      }, 1400);
-    });
+function stopItemListener(){
+  if(unsubItems){ unsubItems(); unsubItems = null; }
+}
+
+/* ── RECEIVE MESSAGES FROM MAIN THREAD ── */
+self.addEventListener('message', e=>{
+  const { type, userId, seenAt } = e.data || {};
+
+  if(type === 'USER_LOGIN'){
+    swUserId   = userId  || null;
+    lastSeenAt = seenAt  || new Date().toISOString();
+    initFirebaseInSW();
+    stopItemListener();
+    startItemListener();
+  }
+
+  if(type === 'USER_LOGOUT'){
+    swUserId   = null;
+    lastSeenAt = null;
+    stopItemListener();
   }
 });
-</script>
+`;
+    const blob = new Blob([swCode],{type:'application/javascript'});
+    const swUrl = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swUrl,{scope:'/'}).catch(()=>{});
+  });
+}
 
+/* ── JS-DRIVEN CAROUSEL ENGINE ──
+   Completely replaces CSS animation. Uses requestAnimationFrame so we
+   always know exactly where each track is — drag in any direction works.
+*/
+function makeCarouselSwipeable(trackId, pxPerSec){
+  const track = document.getElementById(trackId);
+  if(!track) return;
+
+  let pos       = 0;        // current translateX in px (always negative, loops)
+  let halfW     = 0;        // half of scrollWidth — the loop boundary
+  let dragging  = false;
+  let lastTouch = 0;        // last clientX during drag
+  let rafId     = null;
+  let lastTime  = null;
+  let speed     = pxPerSec; // auto-scroll speed (px/s), positive = scrolls left
+
+  function loop(ts){
+    if(lastTime === null) lastTime = ts;
+    const dt = (ts - lastTime) / 1000;
+    lastTime = ts;
+
+    halfW = track.scrollWidth / 2;
+    if(halfW <= 0){ rafId = requestAnimationFrame(loop); return; }
+
+    if(!dragging){
+      pos -= speed * dt;          // auto-scroll left
+    }
+
+    // Wrap: keep pos in [-halfW, 0)
+    pos = ((pos % halfW) - halfW) % halfW;   // always in range [-halfW, 0)
+
+    track.style.transform = `translateX(${pos}px)`;
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function startLoop(){ if(!rafId) rafId = requestAnimationFrame(loop); }
+  function stopLoop(){  if(rafId){ cancelAnimationFrame(rafId); rafId=null; lastTime=null; } }
+
+  function onDragStart(clientX){
+    dragging  = true;
+    lastTouch = clientX;
+  }
+  function onDragMove(clientX){
+    if(!dragging) return;
+    const delta = clientX - lastTouch;   // positive = finger moved right = scroll right
+    lastTouch   = clientX;
+    pos        += delta;                  // add directly — works both directions
+    halfW = track.scrollWidth / 2;
+    if(halfW > 0) pos = ((pos % halfW) - halfW) % halfW;
+    track.style.transform = `translateX(${pos}px)`;
+  }
+  function onDragEnd(){ dragging = false; }
+
+  // Touch
+  track.addEventListener('touchstart',  e=>{ onDragStart(e.touches[0].clientX); }, {passive:true});
+  track.addEventListener('touchmove',   e=>{ onDragMove(e.touches[0].clientX);  }, {passive:true});
+  track.addEventListener('touchend',    onDragEnd);
+  track.addEventListener('touchcancel', onDragEnd);
+
+  // Mouse
+  track.addEventListener('mousedown', e=>{ onDragStart(e.clientX); e.preventDefault(); });
+  document.addEventListener('mousemove', e=>{ if(dragging) onDragMove(e.clientX); });
+  document.addEventListener('mouseup',   ()=>{ if(dragging) onDragEnd(); });
+
+  // Prevent click firing after a drag
+  track.addEventListener('click', e=>{ if(Math.abs(e.clientX - lastTouch) > 5) e.stopPropagation(); }, true);
+
+  startLoop();
+  return { stop: stopLoop, start: startLoop };
+}
+
+function initCarouselSwipe(){
+  makeCarouselSwipeable('carouselTrack',      55);   // items carousel: 55 px/s
+  makeCarouselSwipeable('homeReviewsTrack',   45);   // reviews carousel: 45 px/s
+}
+document.addEventListener('DOMContentLoaded', ()=>{ setTimeout(initCarouselSwipe, 2500); });
+
+/* ── ADMIN ONLINE / OFFLINE STATUS BADGE ── */
+function updateAdminNetBadge(){
+  const badge = document.getElementById('adminNetBadge');
+  if(!badge) return;
+  if(navigator.onLine){
+    badge.className = 'live-badge';
+    badge.innerHTML = '<div class="live-dot"></div> Live';
+  } else {
+    badge.className = 'offline-badge';
+    badge.innerHTML = '<div class="offline-badge-dot"></div> Offline';
+  }
+}
+window.addEventListener('online',  updateAdminNetBadge);
+window.addEventListener('offline', updateAdminNetBadge);
+// Also update whenever admin panel is rendered
+const _origRenderAdmin = window.renderAdmin;
+// Patch: call updateAdminNetBadge after the admin page is shown
+const _origNavFn = window.nav;
+window.nav = function(pg){
+  _origNavFn(pg);
+  if(pg==='admin') setTimeout(updateAdminNetBadge, 50);
+};
+
+
+(function(){
+  const manifest = {
+    name: "VU Find — Smart Lost & Found",
+    short_name: "VU Find",
+    description: "Smart Campus Lost & Found System for Victoria University",
+    start_url: "/index.html",
+    display: "standalone",
+    orientation: "portrait",
+    background_color: "#ffffff",
+    theme_color: "#1a3580",
+    icons: [
+      {
+        src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='36' fill='%231a3580'/><rect x='20' y='20' width='152' height='152' rx='24' fill='%23cc1414'/><text x='96' y='130' font-family='Arial' font-weight='900' font-size='90' fill='white' text-anchor='middle'>VU</text></svg>",
+        sizes: "192x192",
+        type: "image/svg+xml",
+        purpose: "any maskable"
+      },
+      {
+        src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='96' fill='%231a3580'/><rect x='52' y='52' width='408' height='408' rx='64' fill='%23cc1414'/><text x='256' y='350' font-family='Arial' font-weight='900' font-size='240' fill='white' text-anchor='middle'>VU</text></svg>",
+        sizes: "512x512",
+        type: "image/svg+xml",
+        purpose: "any maskable"
+      }
+    ],
+    categories: ["education", "utilities"],
+    lang: "en"
+  };
+  const blob = new Blob([JSON.stringify(manifest)],{type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const link = document.createElement('link');
+  link.rel='manifest'; link.href=url;
+  document.head.appendChild(link);
+})();
+window.addEventListener('online',  ()=>document.getElementById('offlineBar').classList.remove('on'));
+window.addEventListener('offline', ()=>document.getElementById('offlineBar').classList.add('on'));
+if(!navigator.onLine) document.getElementById('offlineBar').classList.add('on');
+
+/* INIT */
+window.addEventListener('load', ()=>{
+  setTimeout(()=>{ document.getElementById('splash').classList.add('gone'); }, 1400);
+});
+/* Wait for Firebase module to set window.DB before seeding */
+function _onFirebaseReady(){
+  if(window._firebaseSeedIfEmpty){
+    window._firebaseSeedIfEmpty().catch(e=>console.warn('Seed skipped:',e));
+  }
+}
+if(window._firebaseReady){ _onFirebaseReady(); }
+else { document.addEventListener('firebaseReady', _onFirebaseReady, {once:true}); }
+
+</script>
 </body>
 </html>
