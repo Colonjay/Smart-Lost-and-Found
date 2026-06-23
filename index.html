@@ -29,6 +29,9 @@
     onSnapshot, query, orderBy, serverTimestamp, getDocs as fsGetDocs,
     getDoc, increment as fsIncrement
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import {
+    getMessaging, getToken, onMessage, deleteToken
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyB_hIRIfUfI0uivKKkRk8xno9TQwt0T4jM",
@@ -40,8 +43,66 @@
     measurementId: "G-B26ZNCVY33"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db  = getFirestore(app);
+  const app       = initializeApp(firebaseConfig);
+  const db        = getFirestore(app);
+  const messaging = getMessaging(app);
+
+  const FCM_VAPID = 'BLLoM6IbJHMYCZ6QnDG998-rL5_0GyO-Fijhglq7bUv9Al_LGCrTWYvD8VJlyrFcVxKBZefHYkuOzjI9-YOn_JE';
+
+  /* ── FCM: register SW, get token, save to Firestore ── */
+  window.setupFCM = async function(userId) {
+    if (!('serviceWorker' in navigator)) return;
+    try {
+      // Register the real FCM service worker file (must be a real path, not blob)
+      const swReg = await navigator.serviceWorker.register('/Smart-Lost-and-Found/firebase-messaging-sw.js');
+
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') return;
+
+      const token = await getToken(messaging, {
+        vapidKey: FCM_VAPID,
+        serviceWorkerRegistration: swReg
+      });
+
+      if (token && userId) {
+        // Save token to Firestore so admin/server can target this user
+        await setDoc(doc(db, 'fcm_tokens', userId), {
+          token,
+          userId,
+          updatedAt: new Date().toISOString(),
+          userAgent: navigator.userAgent
+        });
+        console.log('[FCM] Token saved for user:', userId);
+      }
+
+      // Handle foreground messages (app is open)
+      onMessage(messaging, (payload) => {
+        console.log('[FCM] Foreground message:', payload);
+        const title = payload.notification?.title || '🔔 VU Find';
+        const body  = payload.notification?.body  || '';
+        // Show as in-app toast
+        if (window.toast) window.toast(title + (body ? ' — ' + body : ''), 'nf');
+        // Also show as browser notification if app is in background tab
+        if (document.hidden && Notification.permission === 'granted') {
+          new Notification(title, { body, icon: '/favicon.ico' });
+        }
+      });
+
+    } catch (err) {
+      console.warn('[FCM] Setup failed:', err);
+    }
+  };
+
+  /* ── FCM: remove token on logout ── */
+  window.removeFCMToken = async function(userId) {
+    try {
+      await deleteToken(messaging);
+      if (userId) {
+        const { deleteDoc: fsDeleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+        await deleteDoc(doc(db, 'fcm_tokens', userId));
+      }
+    } catch(e) { /* silent */ }
+  };
 
   /* ── Firestore-backed DB (same API as the old localStorage DB) ── */
   window.DB = {
@@ -1391,8 +1452,10 @@ function bootApp(u){
   startListeners();
   _resetInactivityTimer();
   toast(`Welcome back, ${u.first}!`,'ok');
-  // Ask for push notification permission
+  // Ask for push notification permission (legacy blob-SW notifications)
   requestNotificationPermission();
+  // Setup Firebase Cloud Messaging (true push — works when app is closed)
+  if (window.setupFCM) window.setupFCM(u.id);
   // Run auto-archive check
   setTimeout(autoArchiveOldItems, 3000);
   // Tell the service worker who just logged in so it can push background notifications
@@ -1415,6 +1478,7 @@ function bootApp(u){
 }
 
 window.doLogout = function(){
+  const loggedOutId = me?.id || null;
   me = null;
   _reviewShownThisSession = false;
   clearTimeout(_inactivityTimer);
@@ -1424,10 +1488,12 @@ window.doLogout = function(){
   document.getElementById('authScreen').classList.add('active');
   clearAuthForms();
   nav('home');
-  // Tell the service worker to stop sending notifications
+  // Tell the blob service worker to stop sending notifications
   if('serviceWorker' in navigator && navigator.serviceWorker.controller){
     navigator.serviceWorker.controller.postMessage({ type: 'USER_LOGOUT' });
   }
+  // Remove FCM token from Firestore so no more push notifications
+  if (window.removeFCMToken) window.removeFCMToken(loggedOutId);
 };
 
 /* NAVIGATION */
@@ -2358,8 +2424,8 @@ importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-com
 
 const CACHE = 'vufind-v2';
 const ASSETS = [
-  '/',
-  '/index.html',
+  '/Smart-Lost-and-Found/',
+  '/Smart-Lost-and-Found/index.html',
   'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
 ];
 
@@ -2405,7 +2471,7 @@ self.addEventListener('notificationclick', e=>{
       for(const c of list){
         if(c.url && c.focus) return c.focus();
       }
-      return clients.openWindow('/');
+      return clients.openWindow('/Smart-Lost-and-Found/');
     })
   );
 });
@@ -2604,7 +2670,7 @@ window.nav = function(pg){
     name: "VU Find — Smart Lost & Found",
     short_name: "VU Find",
     description: "Smart Campus Lost & Found System for Victoria University",
-    start_url: "/index.html",
+    start_url: "/Smart-Lost-and-Found/index.html",
     display: "standalone",
     orientation: "portrait",
     background_color: "#ffffff",
