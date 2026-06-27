@@ -362,10 +362,10 @@ textarea.finput{resize:vertical;min-height:76px}
 .item-info{flex:1;min-width:0}
 .item-name{font-size:14px;font-weight:600;color:var(--text-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
 .item-meta{font-size:11px;color:var(--text-muted);display:flex;flex-wrap:wrap;gap:8px}
-.pill{font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px;flex-shrink:0;align-self:flex-start}
-.pill-lost{background:#fef2f2;color:var(--vu-red);border:1px solid #fecaca}
-.pill-found{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
-.pill-claimed{background:#fffbeb;color:var(--warn);border:1px solid #fde68a}
+.pill{font-size:10px;font-weight:700;padding:3px 10px;border-radius:100px;flex-shrink:0;align-self:flex-start;text-shadow:0 1px 3px rgba(0,0,0,0.18);}
+.pill-lost{background:#fef2f2;color:var(--vu-red);border:1px solid #fecaca;box-shadow:0 1px 4px rgba(204,20,20,0.13);}
+.pill-found{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;box-shadow:0 1px 4px rgba(22,163,74,0.13);}
+.pill-claimed{background:#fffbeb;color:var(--warn);border:1px solid #fde68a;box-shadow:0 1px 4px rgba(217,119,6,0.13);}
 
 /* BROWSE */
 .browse-header{background:var(--card-bg);border:1.5px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:18px;box-shadow:var(--shadow)}
@@ -435,6 +435,19 @@ textarea.finput{resize:vertical;min-height:76px}
 .sheet-close{position:absolute;top:16px;right:16px;background:#f1f5f9;border:none;border-radius:7px;width:30px;height:30px;cursor:pointer;color:var(--text-muted);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .sheet-close:hover{background:#e2e8f0;color:var(--text-dark)}
 .sheet-img{width:100%;border-radius:12px;max-height:200px;object-fit:cover;margin-bottom:16px}
+
+/* SHEET HERO IMAGE — edge-to-edge image at top of sheet */
+.sheet-hero{position:relative;margin:-28px -28px 20px -28px;border-radius:20px 20px 0 0;overflow:hidden;height:240px;cursor:zoom-in;flex-shrink:0;}
+.sheet-hero img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease;}
+.sheet-hero:hover img{transform:scale(1.03)}
+.sheet-hero:active img{transform:scale(0.98)}
+.sheet-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 55%);pointer-events:none;}
+.sheet-hero-title{position:absolute;bottom:0;left:0;right:0;padding:18px 20px 14px;color:#fff;}
+.sheet-hero-title h2{font-size:19px;font-weight:700;margin-bottom:6px;line-height:1.3;text-shadow:0 1px 4px rgba(0,0,0,0.4)}
+.sheet-hero-tap-hint{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.42);color:rgba(255,255,255,0.9);font-size:10px;font-weight:600;padding:4px 9px;border-radius:20px;letter-spacing:.3px;backdrop-filter:blur(4px);pointer-events:none;}
+@media(max-width:768px){
+  .sheet-hero{margin:-20px -16px 16px -16px;height:200px;border-radius:16px 16px 0 0;}
+}
 .drow{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1.5px solid var(--border);font-size:13px}
 .drow:last-of-type{border-bottom:none}
 .drow span:first-child{color:var(--text-muted)}
@@ -493,9 +506,14 @@ textarea.finput{resize:vertical;min-height:76px}
 .carousel-item-img{width:100%;height:100%;background:#eef2ff;display:flex;align-items:center;justify-content:center;font-size:36px;}
 .carousel-item-img img{width:100%;height:100%;object-fit:cover}
 .carousel-item-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,0.72) 0%,rgba(0,0,0,0) 100%);color:#fff;font-size:10px;font-weight:600;padding:18px 7px 6px;line-height:1.3;pointer-events:none;}
-.carousel-item-pill{position:absolute;top:6px;right:6px;font-size:9px;font-weight:700;padding:2px 6px;border-radius:100px;}
-.carousel-item-pill.lost{background:rgba(204,20,20,0.85);color:#fff}
-.carousel-item-pill.found{background:rgba(22,163,74,0.85);color:#fff}
+.carousel-item-pill{position:absolute;top:6px;right:6px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:100px;text-shadow:0 1px 2px rgba(0,0,0,0.25);}
+.carousel-item-pill.lost{background:rgba(204,20,20,0.82);color:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+.carousel-item-pill.found{background:rgba(22,163,74,0.82);color:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+.carousel-item-pill.claimed{background:rgba(217,119,6,0.88);color:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+.carousel-zoom-btn{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0);transition:background .22s;pointer-events:none;}
+.carousel-item:hover .carousel-zoom-btn{background:rgba(0,0,0,0.28);pointer-events:auto;}
+.carousel-zoom-icon{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.92);display:flex;align-items:center;justify-content:center;font-size:17px;opacity:0;transform:scale(0.7);transition:opacity .22s,transform .22s;box-shadow:0 2px 8px rgba(0,0,0,0.25);}
+.carousel-item:hover .carousel-zoom-icon{opacity:1;transform:scale(1);}
 .carousel-fade-left{position:absolute;left:0;top:0;bottom:0;width:50px;background:linear-gradient(to right,var(--card-bg) 0%,transparent 100%);pointer-events:none;z-index:2;}
 .carousel-fade-right{position:absolute;right:0;top:0;bottom:0;width:50px;background:linear-gradient(to left,var(--card-bg) 0%,transparent 100%);pointer-events:none;z-index:2;}
 
@@ -669,6 +687,14 @@ textarea.finput{resize:vertical;min-height:76px}
 @media(min-width:1400px){
   :root{--sidebar-w:240px}
 }
+
+/* LIGHTBOX */
+@keyframes fadeInLB{from{opacity:0}to{opacity:1}}
+@keyframes zoomInLB{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+#imgLightbox{display:none}
+#imgLightbox.open{display:flex!important}
+.zoomable-img{cursor:zoom-in;transition:transform .15s,box-shadow .15s;}
+.zoomable-img:hover{transform:scale(1.03);box-shadow:0 4px 20px rgba(26,53,128,0.2)}
 </style>
 </head>
 <body>
@@ -709,6 +735,12 @@ textarea.finput{resize:vertical;min-height:76px}
       <button class="btn btn-danger btn-sm" style="flex:1" id="cBtn">Confirm</button>
     </div>
   </div>
+</div>
+
+<!-- IMAGE LIGHTBOX -->
+<div id="imgLightbox" onclick="closeLightbox()" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.92);backdrop-filter:blur(8px);align-items:center;justify-content:center;cursor:zoom-out;animation:fadeInLB .2s ease;">
+  <button onclick="closeLightbox()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:22px;width:42px;height:42px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1">✕</button>
+  <img id="imgLightboxImg" src="" alt="" style="max-width:95vw;max-height:90vh;object-fit:contain;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,0.5);animation:zoomInLB .25s cubic-bezier(.22,1,.36,1);" onclick="event.stopPropagation()"/>
 </div>
 
 <!-- REVIEW PROMPT MODAL -->
@@ -903,8 +935,10 @@ textarea.finput{resize:vertical;min-height:76px}
         <button class="nav-dropdown-item" onclick="goReport('found');closeReportDropdown()"><span>Found Item</span><span class="dot-green"></span></button>
       </div>
     </div>
-    <div class="nav-section-label" style="margin-top:6px">Administration</div>
-    <button class="navbtn" id="n-admin" onclick="nav('admin')"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span class="nav-label">Admin Panel</span></button>
+    <div id="adminNavSection" style="display:none">
+      <div class="nav-section-label" style="margin-top:6px">Administration</div>
+      <button class="navbtn" id="n-admin" onclick="nav('admin')"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span class="nav-label">Admin Panel</span></button>
+    </div>
     <div class="sidebar-footer">
       <button class="logout-btn" onclick="doLogout()"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>Logout</span></button>
     </div>
@@ -1063,7 +1097,6 @@ textarea.finput{resize:vertical;min-height:76px}
           <button class="chip" onclick="setFilter(this,'found')">🟢 Found</button>
           <button class="chip" onclick="setFilter(this,'claimed')">⭐ Claimed</button>
           <button class="chip" onclick="setFilter(this,'pending')">⏳ Pending</button>
-          <button class="chip" onclick="setFilter(this,'archived')">📦 Archived</button>
         </div>
         <div class="item-list" id="browseList"></div>
       </div>
@@ -1449,6 +1482,8 @@ function bootApp(u){
   document.getElementById('adminPanel').style.display = isAdmin?'block':'none';
   const bnAdmin = document.getElementById('bn-admin');
   if(bnAdmin) bnAdmin.style.display = isAdmin ? 'flex' : 'none';
+  const adminNavSection = document.getElementById('adminNavSection');
+  if(adminNavSection) adminNavSection.style.display = isAdmin ? 'block' : 'none';
   startListeners();
   _resetInactivityTimer();
   toast(`Welcome back, ${u.first}!`,'ok');
@@ -1456,8 +1491,6 @@ function bootApp(u){
   requestNotificationPermission();
   // Setup Firebase Cloud Messaging (true push — works when app is closed)
   if (window.setupFCM) window.setupFCM(u.id);
-  // Run auto-archive check
-  setTimeout(autoArchiveOldItems, 3000);
   // Tell the service worker who just logged in so it can push background notifications
   if('serviceWorker' in navigator && navigator.serviceWorker.controller){
     navigator.serviceWorker.controller.postMessage({
@@ -1502,12 +1535,12 @@ const pageTitles={home:'Home',browse:'Browse Items',report:'Report Item',admin:'
 /* ── REVIEW GATE ── 
    Show review panel only after:
    1. User submits a report (lost/found), OR
-   2. 10 minutes of inactivity on any page
+   2. 30 seconds of inactivity on any page
    Never show again in the same session until next login or next report.
 */
 let _reviewShownThisSession = false;
 let _inactivityTimer = null;
-const INACTIVITY_MS = 10 * 60 * 1000; // 10 minutes
+const INACTIVITY_MS = 30 * 1000; // 30 seconds
 
 function _resetInactivityTimer(){
   clearTimeout(_inactivityTimer);
@@ -1595,8 +1628,8 @@ window.closeSidebar = function(){
 
 /* STATS */
 function updateStats(){
-  setText('hs-lost',   allItems.filter(i=>i.type==='lost').length);
-  setText('hs-found',  allItems.filter(i=>i.type==='found').length);
+  setText('hs-lost',   allItems.filter(i=>i.type==='lost'&&i.status==='pending').length);
+  setText('hs-found',  allItems.filter(i=>i.type==='found'&&i.status==='pending').length);
   setText('hs-claimed',allItems.filter(i=>i.status==='claimed').length);
   setText('hs-pending',allItems.filter(i=>i.status==='pending').length);
 }
@@ -1614,13 +1647,18 @@ function pillHTML(i){
   if(i.status==='claimed')return'<span class="pill pill-claimed">⭐ Claimed</span>';
   return i.type==='lost'?'<span class="pill pill-lost">🔴 Lost</span>':'<span class="pill pill-found">🟢 Found</span>';
 }
+function adminStatusText(i){
+  if(i.status==='claimed') return '<span style="font-size:12px;font-weight:600;color:var(--warn)">— Claimed</span>';
+  if(i.type==='lost')      return '<span style="font-size:12px;font-weight:600;color:var(--vu-red)">— Lost</span>';
+  return '<span style="font-size:12px;font-weight:600;color:var(--success)">— Found</span>';
+}
 function thumbHTML(i){
-  if(i.img)return`<div class="item-thumb"><img src="${i.img}" alt="${esc(i.name)}"/></div>`;
+  if(i.img)return`<div class="item-thumb"><img src="${i.img}" alt="${esc(i.name)}" class="zoomable-img" onclick="event.stopPropagation();openLightbox('${i.img}')"/></div>`;
   const cls=i.status==='claimed'?'t-claimed':(i.type==='lost'?'t-lost':'t-found');
   return`<div class="item-thumb ${cls}">${catEmoji(i.cat)}</div>`;
 }
 function cardHTML(i){
-  return`<div class="item-card" onclick="openSheet('${i.id}')">${thumbHTML(i)}<div class="item-info"><div class="item-name">${esc(i.name)}</div><div class="item-meta"><span>📍 ${esc(i.loc)}</span><span>📅 ${i.date}</span></div></div>${pillHTML(i)}</div>`;
+  return`<div class="item-card" onclick="openSheet('${i.id}')">${thumbHTML(i)}<div class="item-info"><div class="item-name">${esc(i.name)}</div><div class="item-meta"><span>${esc(i.loc)}</span><span>${i.date}</span></div></div>${pillHTML(i)}</div>`;
 }
 
 function renderRecent(){
@@ -1636,11 +1674,10 @@ function renderBrowse(){
   const c = document.getElementById('browseList');
   if(!c) return;
   const q = (v('searchQ')||'').toLowerCase();
-  let items = allItems;
+  let items = [...allItems];
   if(curFilter==='claimed')      items = items.filter(i=>i.status==='claimed');
   else if(curFilter==='pending') items = items.filter(i=>i.status==='pending');
-  else if(curFilter==='archived') items = items.filter(i=>i.status==='archived');
-  else if(curFilter!=='all')     items = items.filter(i=>i.type===curFilter&&i.status!=='claimed'&&i.status!=='archived');
+  else if(curFilter!=='all')     items = items.filter(i=>i.type===curFilter&&i.status!=='claimed');
   if(q) items = items.filter(i=>
     (i.name||'').toLowerCase().includes(q)||(i.loc||'').toLowerCase().includes(q)||
     (i.desc||'').toLowerCase().includes(q)||(i.cat||'').toLowerCase().includes(q)
@@ -1664,8 +1701,22 @@ window.openSheet = function(id){
   const i = allItems.find(x=>x.id===id);
   if(!i) return;
   let html = '';
-  if(i.img) html += `<img src="${i.img}" class="sheet-img" alt="${esc(i.name)}"/>`;
-  html += `<div class="modal-title">${esc(i.name)}</div>${pillHTML(i)}<div style="margin-top:16px">
+  if(i.img){
+    html += `
+    <div class="sheet-hero" onclick="openLightbox('${i.img}')">
+      <img src="${i.img}" alt="${esc(i.name)}"/>
+      <div class="sheet-hero-overlay"></div>
+      <div class="sheet-hero-tap-hint">Tap to enlarge</div>
+      <div class="sheet-hero-title">
+        <h2>${esc(i.name)}</h2>
+        <div class="sheet-hero-pill">${pillHTML(i)}</div>
+      </div>
+    </div>`;
+    html += `<div style="margin-top:0">`;
+  } else {
+    html += `<div class="modal-title">${esc(i.name)}</div>${pillHTML(i)}<div style="margin-top:16px">`;
+  }
+  html += `
     <div class="drow"><span>Category</span><span>${i.cat||'—'}</span></div>
     <div class="drow"><span>Date</span><span>${i.date}</span></div>
     <div class="drow"><span>Location</span><span>${esc(i.loc)}</span></div>
@@ -1674,6 +1725,7 @@ window.openSheet = function(id){
     ${(me?.role==='admin'&&i.phone)?`<div class="drow"><span>Reporter Contact</span><span><a href="tel:${i.phone}" style="color:var(--vu-red);font-weight:600">${i.phone}</a></span></div>`:''}
     <div class="drow"><span>Reported by</span><span>${i.byName||'Unknown'}</span></div>
   </div>
+  ${!i.img?`<div class="modal-title" style="display:none"></div>`:''}
   <div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:11px 14px;margin-top:14px;font-size:12px;color:var(--text-mid)">
     📞 <strong>Admin Contact:</strong> <a href="tel:0700000000" style="color:var(--vu-red);font-weight:600">0700000000</a> &nbsp;·&nbsp;
     📧 <a href="mailto:admin@vu.ac.ug" style="color:var(--vu-blue3);font-weight:500">admin@vu.ac.ug</a>
@@ -1765,7 +1817,7 @@ window.claimItem = async function(id){
     if(!_reviewShownThisSession){
       _reviewShownThisSession = true;
       clearTimeout(_inactivityTimer);
-      setTimeout(()=>showReviewPrompt(), 700);
+      setTimeout(()=>showReviewPrompt(), 20 * 1000); // 20 seconds after claiming
     }
   } catch(e){
     toast('Failed to claim item: '+e.message,'er');
@@ -1900,23 +1952,6 @@ window.transferToSecurity = async function(id){
   } catch(e){ toast('Transfer failed: '+e.message,'er'); }
 };
 
-/* ── AUTO-ARCHIVE (30-day expiry) ──
-   Unclaimed found items automatically move to "archived" status after 30 days.
-*/
-async function autoArchiveOldItems(){
-  if(!DB||!me) return;
-  const thirtyDaysAgo = Date.now() - 30*24*60*60*1000;
-  const toArchive = allItems.filter(i=>
-    i.type==='found' && i.status==='pending' &&
-    new Date(i.at).getTime() < thirtyDaysAgo
-  );
-  for(const item of toArchive){
-    try{
-      await DB.updateDoc('items', item.id, { status:'archived', archivedAt: new Date().toISOString() });
-    } catch(e){ console.warn('Auto-archive failed for',item.id,e); }
-  }
-  if(toArchive.length) toast(`📦 ${toArchive.length} old item(s) auto-archived after 30 days`,'nf');
-}
 
 /* ── MY ITEMS PAGE ── */
 
@@ -1971,7 +2006,7 @@ function renderAdmin(){
             </div>
             <div class="admin-meta">📞 ${esc(cp.contact)}</div>
             <div class="admin-meta" style="margin-top:4px;line-height:1.5;color:var(--text-dark)">${esc(cp.reason)}</div>
-            <div class="admin-meta" style="margin-top:3px">📅 ${dateStr}</div>
+            <div class="admin-meta" style="margin-top:3px">${dateStr}</div>
           </div>
           <div class="admin-actions" style="flex-direction:column;gap:5px">
             ${!isResolved?`<button class="btn btn-success btn-sm" onclick="adminResolveComplaint('${cp.id}')">✓ Resolve</button>`:''}
@@ -1996,7 +2031,7 @@ function renderAdmin(){
         <div class="admin-info">
           <div class="admin-name">${esc(r.name)} <span style="font-size:12px">${stars}</span></div>
           <div class="admin-meta">${esc(r.text)}</div>
-          <div class="admin-meta" style="margin-top:2px">📅 ${dateStr}</div>
+          <div class="admin-meta" style="margin-top:2px">${dateStr}</div>
         </div>
         <div class="admin-actions">
           <button class="btn btn-danger btn-sm" onclick="adminDelReview('${r.id}')">🗑</button>
@@ -2011,7 +2046,15 @@ function renderAdmin(){
       c.innerHTML='<div class="empty"><div class="empty-ico">👥</div><h3>No users yet</h3></div>';
       return;
     }
-    c.innerHTML = allUsers.map(u=>`
+    c.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="font-size:13px;color:var(--text-muted)">${allUsers.length} account${allUsers.length!==1?'s':''} registered</div>
+        <button class="btn btn-blue btn-sm" onclick="openAddAccountModal()" style="display:flex;align-items:center;gap:6px">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Account
+        </button>
+      </div>` +
+    allUsers.map(u=>`
       <div class="admin-card">
         <div class="ava" style="width:38px;height:38px;font-size:14px;flex-shrink:0">${(u.first[0]+(u.last[0]||'')).toUpperCase()}</div>
         <div class="admin-info">
@@ -2042,8 +2085,8 @@ function renderAdmin(){
         <div class="claimed-card-top">
           ${thumb}
           <div class="claimed-item-info">
-            <div class="claimed-item-name">${esc(i.name)} <span class="pill pill-claimed">⭐ Claimed</span></div>
-            <div class="claimed-item-meta">📍 ${esc(i.loc)} &nbsp;·&nbsp; 📅 ${i.date}</div>
+            <div class="claimed-item-name">${esc(i.name)} <span style="font-size:12px;font-weight:600;color:var(--warn)">— Claimed</span></div>
+            <div class="claimed-item-meta">${esc(i.loc)} &nbsp;·&nbsp; ${i.date}</div>
           </div>
           <button class="btn btn-danger btn-sm" onclick="adminDelItem('${i.id}')" title="Delete">🗑</button>
         </div>
@@ -2076,8 +2119,8 @@ function renderAdmin(){
       :`<div style="font-size:24px;flex-shrink:0">${catEmoji(i.cat)}</div>`;
     return`<div class="admin-card">${thumb}
       <div class="admin-info">
-        <div class="admin-name">${esc(i.name)} ${pillHTML(i)}</div>
-        <div class="admin-meta">📍 ${esc(i.loc)} · 📅 ${i.date}</div>
+        <div class="admin-name">${esc(i.name)} ${adminStatusText(i)}</div>
+        <div class="admin-meta">${esc(i.loc)} · ${i.date}</div>
         <div class="admin-meta" style="margin-top:2px">By: ${esc(i.byName||'Unknown')}</div>
       </div>
       <div class="admin-actions">
@@ -2228,7 +2271,7 @@ function renderReviews(){
         ${delBtn}
       </div>
       <div class="review-card-text">${esc(r.text)}</div>
-      <div class="review-card-date">📅 ${dateStr}</div>
+      <div class="review-card-date">${dateStr}</div>
     </div>`;
   }).join('');
 }
@@ -2273,10 +2316,12 @@ function renderCarousel(){
   const all = [...items,...items];
   track.innerHTML = all.map(i=>{
     const thumb = i.img
-      ?`<div class="carousel-item-img"><img src="${i.img}" alt="${esc(i.name)}"/></div>`
+      ?`<div class="carousel-item-img">
+          <img src="${i.img}" alt="${esc(i.name)}" style="width:100%;height:100%;object-fit:cover;display:block;"/>
+        </div>`
       :`<div class="carousel-item-img" style="font-size:36px">${catEmoji(i.cat)}</div>`;
-    const pillCls = i.status==='claimed'?'found':(i.type==='lost'?'lost':'found');
-    const pillTxt = i.status==='claimed'?'✓ Claimed':(i.type==='lost'?'Lost':'Found');
+    const pillCls = i.status==='claimed'?'claimed':(i.type==='lost'?'lost':'found');
+    const pillTxt = i.status==='claimed'?'✓ Claimed':(i.type==='lost'?'🔴 Lost':'🟢 Found');
     return`<div class="carousel-item" onclick="openSheet('${i.id}')" title="${esc(i.name)}">
       ${thumb}
       <div class="carousel-item-label">${esc(i.name)}</div>
@@ -2702,9 +2747,25 @@ window.addEventListener('online',  ()=>document.getElementById('offlineBar').cla
 window.addEventListener('offline', ()=>document.getElementById('offlineBar').classList.add('on'));
 if(!navigator.onLine) document.getElementById('offlineBar').classList.add('on');
 
+/* IMAGE LIGHTBOX */
+window.openLightbox = function(src){
+  const lb = document.getElementById('imgLightbox');
+  const img = document.getElementById('imgLightboxImg');
+  if(!lb||!img||!src) return;
+  img.src = src;
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+window.closeLightbox = function(){
+  const lb = document.getElementById('imgLightbox');
+  if(lb) lb.classList.remove('open');
+  document.body.style.overflow = '';
+};
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeLightbox(); });
+
 /* INIT */
 window.addEventListener('load', ()=>{
-  setTimeout(()=>{ document.getElementById('splash').classList.add('gone'); }, 1400);
+  setTimeout(()=>{ document.getElementById('splash').classList.add('gone'); }, 5000);
 });
 /* Wait for Firebase module to set window.DB before seeding */
 function _onFirebaseReady(){
@@ -2716,5 +2777,89 @@ if(window._firebaseReady){ _onFirebaseReady(); }
 else { document.addEventListener('firebaseReady', _onFirebaseReady, {once:true}); }
 
 </script>
+<!-- ADD ACCOUNT MODAL (Admin only) -->
+<div class="confirm-overlay" id="addAccountOverlay" style="z-index:800">
+  <div class="confirm-box" style="max-width:420px;text-align:left;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div style="font-size:17px;font-weight:700;color:var(--text-dark)">👤 Add New Account</div>
+      <button onclick="closeAddAccountModal()" style="background:#f1f5f9;border:none;border-radius:7px;width:28px;height:28px;cursor:pointer;font-size:13px;color:var(--text-muted)">✕</button>
+    </div>
+    <div class="fgroup">
+      <div class="flabel">Account Type</div>
+      <select class="finput" id="newAccRole">
+        <option value="student">Student (User)</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="fgroup">
+        <div class="flabel">First Name *</div>
+        <input type="text" class="finput" id="newAccFirst" placeholder="e.g. Nakato"/>
+      </div>
+      <div class="fgroup">
+        <div class="flabel">Last Name *</div>
+        <input type="text" class="finput" id="newAccLast" placeholder="e.g. Sarah"/>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="flabel">Email Address *</div>
+      <input type="email" class="finput" id="newAccEmail" placeholder="user@vu.ac.ug"/>
+    </div>
+    <div class="fgroup">
+      <div class="flabel">Phone Number</div>
+      <input type="tel" class="finput" id="newAccPhone" placeholder="07XXXXXXXX"/>
+    </div>
+    <div class="fgroup">
+      <div class="flabel">Password *</div>
+      <div class="pw-wrap">
+        <input type="password" class="finput" id="newAccPass" placeholder="Min. 6 characters"/>
+        <button type="button" class="pw-toggle" onclick="togglePw('newAccPass',this)" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+    <div style="display:flex;gap:9px;margin-top:6px">
+      <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeAddAccountModal()">Cancel</button>
+      <button class="btn btn-blue btn-sm" style="flex:1" id="addAccBtn" onclick="adminCreateAccount()">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<script>
+window.openAddAccountModal = function(){
+  ['newAccFirst','newAccLast','newAccEmail','newAccPhone','newAccPass'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  const roleEl = document.getElementById('newAccRole');
+  if(roleEl) roleEl.value='student';
+  document.getElementById('addAccountOverlay').classList.add('open');
+};
+window.closeAddAccountModal = function(){
+  document.getElementById('addAccountOverlay').classList.remove('open');
+};
+window.adminCreateAccount = async function(){
+  const first = (document.getElementById('newAccFirst')?.value||'').trim();
+  const last  = (document.getElementById('newAccLast')?.value||'').trim();
+  const email = (document.getElementById('newAccEmail')?.value||'').trim();
+  const phone = (document.getElementById('newAccPhone')?.value||'').trim();
+  const pass  = (document.getElementById('newAccPass')?.value||'').trim();
+  const role  = document.getElementById('newAccRole')?.value||'student';
+  if(!first||!last||!email||!pass){toast('Please fill all required fields','er');return;}
+  if(!/^\S+@\S+\.\S+$/.test(email)){toast('Enter a valid email address','er');return;}
+  if(pass.length<6){toast('Password must be at least 6 characters','er');return;}
+  setBtn('addAccBtn',true,'Creating…');
+  try{
+    const existing = await DB.getDocs('users', u=>u.email===email);
+    if(existing.length){toast('An account with this email already exists','er');setBtn('addAccBtn',false,'Create Account');return;}
+    await DB.addDoc('users',{first,last,email,phone,pass,role,createdAt:new Date().toISOString()});
+    closeAddAccountModal();
+    toast(`Account created for ${first} ${last} (${role}) ✓`,'ok');
+  } catch(e){
+    toast('Failed to create account: '+e.message,'er');
+    setBtn('addAccBtn',false,'Create Account');
+  }
+};
+</script>
+
 </body>
 </html>
