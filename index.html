@@ -183,9 +183,9 @@
       createdAt: new Date().toISOString()
     });
     const items=[
-      {type:'lost',name:'Black Samsung Galaxy S23',cat:'📱 Mobile Phone',date:'2026-05-08',loc:'Main Library, 2nd Floor',desc:'Black Samsung with cracked screen protector',phone:'0708731300',status:'pending',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
-      {type:'found',name:'Blue Jansport Backpack',cat:'🎒 Bag / Backpack',date:'2026-05-07',loc:'Canteen Area',desc:'Blue and grey Jansport with notebooks inside',phone:'0702255986',status:'pending',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
-      {type:'found',name:'Black Leather Wallet',cat:'💰 Wallet / Money',date:'2026-05-09',loc:'Security Desk, Gate A',desc:'Found near gate A, contains cash and bank cards',phone:'0700000000',storage:'Security Desk Gate A',status:'pending',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
+      {type:'lost',name:'Black Samsung Galaxy S23',cat:'Mobile Phone',date:'2026-05-08',loc:'Main Library, 2nd Floor',desc:'Black Samsung with cracked screen protector',phone:'0708731300',status:'pending',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
+      {type:'found',name:'Blue Jansport Backpack',cat:'Bag / Backpack',date:'2026-05-07',loc:'Canteen Area',desc:'Blue and grey Jansport with notebooks inside',phone:'0702255986',status:'pending',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
+      {type:'found',name:'Black Leather Wallet',cat:'Wallet / Money',date:'2026-05-09',loc:'Security Desk, Gate A',desc:'Found near gate A, contains cash and bank cards',phone:'0700000000',storage:'Security Desk Gate A',status:'pending',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
     ];
     for(const item of items) await addDoc(collection(db,'items'), item);
     const reviews=[
@@ -612,7 +612,8 @@ textarea.finput{resize:vertical;min-height:76px}
 .footer-policy-link{font-size:11px;color:rgba(255,255,255,.4);cursor:pointer;background:none;border:none;font-family:'Inter',sans-serif;transition:color .2s}
 
 /* MOBILE BOTTOM NAV */
-.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:#fff;border-top:1.5px solid var(--border);z-index:150;align-items:stretch;box-shadow:0 -4px 20px rgba(26,53,128,0.10);}
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:#fff;border-top:1.5px solid var(--border);z-index:150;align-items:stretch;box-shadow:0 -4px 20px rgba(26,53,128,0.10);transition:transform .28s cubic-bezier(.22,1,.36,1);will-change:transform;}
+.bottom-nav.bn-hidden{transform:translateY(100%);box-shadow:none;}
 .bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:transparent;cursor:pointer;font-family:'Inter',sans-serif;padding:6px 2px;color:var(--text-muted);transition:color .2s;position:relative;}
 .bnav-btn.on{color:var(--vu-blue)}
 .bnav-btn .bnav-ico{font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center}
@@ -653,7 +654,8 @@ textarea.finput{resize:vertical;min-height:76px}
   :root{--sidebar-w:0px}
   .sidebar{width:260px;transform:translateX(-100%);transition:transform .3s cubic-bezier(.22,1,.36,1);z-index:200;box-shadow:4px 0 24px rgba(0,0,0,0.12);top:58px;}
   .sidebar.open{transform:translateX(0)}
-  .main-content{margin-left:0;height:calc(100vh - 58px - var(--nav-h));}
+  .main-content{margin-left:0;height:calc(100vh - 58px - var(--nav-h));transition:height .28s cubic-bezier(.22,1,.36,1);}
+  .main-content.nav-collapsed{height:calc(100vh - 58px);}
   .menu-toggle{display:none!important}
   .topbar-logo-desktop{display:none!important}
   .topbar-page-title{display:none}
@@ -1118,16 +1120,16 @@ textarea.finput{resize:vertical;min-height:76px}
               <div class="flabel">Category *</div>
               <select class="finput" id="fCat">
                 <option value="">Choose…</option>
-                <option>📱 Mobile Phone</option>
-                <option>💻 Laptop</option>
-                <option>🎒 Bag / Backpack</option>
-                <option>📚 Books / Notes</option>
-                <option>🪪 ID / Documents</option>
-                <option>👗 Clothing</option>
-                <option>🔑 Keys</option>
-                <option>💰 Wallet / Money</option>
-                <option>🎧 Earphones / Headset</option>
-                <option>📦 Other</option>
+                <option>Mobile Phone</option>
+                <option>Laptop</option>
+                <option>Bag / Backpack</option>
+                <option>Books / Notes</option>
+                <option>ID / Documents</option>
+                <option>Clothing</option>
+                <option>Keys</option>
+                <option>Wallet / Money</option>
+                <option>Earphones / Headset</option>
+                <option>Other</option>
               </select>
             </div>
             <div class="fgroup">
@@ -1320,9 +1322,9 @@ function seedIfEmpty(){
       createdAt: new Date().toISOString()
     });
     const items=[
-      {type:'lost',name:'Black Samsung Galaxy S23',cat:'📱 Mobile Phone',date:'2026-05-08',loc:'Main Library, 2nd Floor',desc:'Black Samsung with cracked screen protector',phone:'0708731300',status:'pending',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
-      {type:'found',name:'Blue Jansport Backpack',cat:'🎒 Bag / Backpack',date:'2026-05-07',loc:'Canteen Area',desc:'Blue and grey Jansport with notebooks inside',phone:'0702255986',status:'pending',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
-      {type:'found',name:'Black Leather Wallet',cat:'💰 Wallet / Money',date:'2026-05-09',loc:'Security Desk, Gate A',desc:'Found near gate A, contains cash and bank cards',phone:'0700000000',storage:'Security Desk Gate A',status:'pending',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
+      {type:'lost',name:'Black Samsung Galaxy S23',cat:'Mobile Phone',date:'2026-05-08',loc:'Main Library, 2nd Floor',desc:'Black Samsung with cracked screen protector',phone:'0708731300',status:'pending',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
+      {type:'found',name:'Blue Jansport Backpack',cat:'Bag / Backpack',date:'2026-05-07',loc:'Canteen Area',desc:'Blue and grey Jansport with notebooks inside',phone:'0702255986',status:'pending',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
+      {type:'found',name:'Black Leather Wallet',cat:'Wallet / Money',date:'2026-05-09',loc:'Security Desk, Gate A',desc:'Found near gate A, contains cash and bank cards',phone:'0700000000',storage:'Security Desk Gate A',status:'pending',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
     ];
     items.forEach(item => DB.addDoc('items', item));
     const reviews=[
@@ -1635,13 +1637,43 @@ function updateStats(){
 }
 
 /* RENDER HELPERS */
+/* Line-art (stroke-based) vector icons for item categories.
+   Only categories with a clean, recognizable icon get one — anything
+   that doesn't match a known category renders with no icon at all. */
+const CAT_ICON_PATHS = {
+  phone:    '<rect x="6.5" y="2" width="11" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/>',
+  laptop:   '<rect x="4" y="4" width="16" height="11" rx="1.4"/><path d="M2 19h20l-1.6-3.2H3.6L2 19z"/>',
+  bag:      '<path d="M9 2 6 6v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M6 6h12"/><path d="M15 10a3 3 0 0 1-6 0"/>',
+  book:     '<path d="M5 19.5A2.5 2.5 0 0 1 7.5 17H19"/><path d="M7.5 2H19v20H7.5A2.5 2.5 0 0 1 5 19.5v-15A2.5 2.5 0 0 1 7.5 2z"/>',
+  id:       '<rect x="2.5" y="5" width="19" height="14" rx="2"/><circle cx="9" cy="10.3" r="2"/><path d="M6.3 16c.5-1.8 1.9-2.8 2.7-2.8s2.2 1 2.7 2.8"/><line x1="14.5" y1="9" x2="18.5" y2="9"/><line x1="14.5" y1="12.3" x2="18.5" y2="12.3"/>',
+  key:      '<circle cx="7.5" cy="15.5" r="5"/><path d="m11 12 9.6-9.6"/><path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0L21.3 7.7a1 1 0 0 0 0-1.4L19 4"/>',
+  wallet:   '<path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H19v3.5"/><path d="M3 7.5v11A2.5 2.5 0 0 0 5.5 21H20a1 1 0 0 0 1-1v-4.5"/><path d="M16.5 12h4a1 1 0 0 1 1 1v2.5a1 1 0 0 1-1 1h-4a2.25 2.25 0 0 1 0-4.5z"/>',
+  earphones:'<path d="M4 14.5h2.2a1.6 1.6 0 0 1 1.6 1.6v2.8a1.6 1.6 0 0 1-1.6 1.6H4v-6.5a8 8 0 0 1 16 0V20.5h-2.2a1.6 1.6 0 0 1-1.6-1.6v-2.8a1.6 1.6 0 0 1 1.6-1.6H20"/>'
+};
 function catEmoji(c){
-  if(!c)return'📦';
-  if(c.includes('Phone'))return'📱';if(c.includes('Laptop'))return'💻';
-  if(c.includes('Bag'))return'🎒';if(c.includes('Book'))return'📚';
-  if(c.includes('ID'))return'🪪';if(c.includes('Cloth'))return'👗';
-  if(c.includes('Key'))return'🔑';if(c.includes('Wallet'))return'💰';
-  if(c.includes('Ear')||c.includes('Audio'))return'🎧';return'📦';
+  let key=null;
+  if(c){
+    if(c.includes('Phone'))key='phone';else if(c.includes('Laptop'))key='laptop';
+    else if(c.includes('Bag'))key='bag';else if(c.includes('Book'))key='book';
+    else if(c.includes('ID'))key='id';else if(c.includes('Key'))key='key';
+    else if(c.includes('Wallet'))key='wallet';
+    else if(c.includes('Ear')||c.includes('Audio'))key='earphones';
+  }
+  // No clean vector icon for this category (e.g. "Clothing", "Other",
+  // or anything unrecognized) — render nothing rather than a poor fit.
+  if(!key) return '';
+  return key;
+}
+function catIcon(c,size){
+  const key = catEmoji(c);
+  if(!key) return '';
+  size = size||22;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${CAT_ICON_PATHS[key]}</svg>`;
+}
+function cleanCatLabel(c){
+  if(!c) return '—';
+  // strip a leading emoji (and the space after it) from older stored records
+  return c.replace(/^\p{Extended_Pictographic}\uFE0F?\s*/u,'').trim()||'—';
 }
 function pillHTML(i){
   if(i.status==='claimed')return'<span class="pill pill-claimed">⭐ Claimed</span>';
@@ -1655,7 +1687,7 @@ function adminStatusText(i){
 function thumbHTML(i){
   if(i.img)return`<div class="item-thumb"><img src="${i.img}" alt="${esc(i.name)}" class="zoomable-img" onclick="event.stopPropagation();openLightbox('${i.img}')"/></div>`;
   const cls=i.status==='claimed'?'t-claimed':(i.type==='lost'?'t-lost':'t-found');
-  return`<div class="item-thumb ${cls}">${catEmoji(i.cat)}</div>`;
+  return`<div class="item-thumb ${cls}">${catIcon(i.cat,24)}</div>`;
 }
 function cardHTML(i){
   return`<div class="item-card" onclick="openSheet('${i.id}')">${thumbHTML(i)}<div class="item-info"><div class="item-name">${esc(i.name)}</div><div class="item-meta"><span>${esc(i.loc)}</span><span>${i.date}</span></div></div>${pillHTML(i)}</div>`;
@@ -1717,7 +1749,7 @@ window.openSheet = function(id){
     html += `<div class="modal-title">${esc(i.name)}</div>${pillHTML(i)}<div style="margin-top:16px">`;
   }
   html += `
-    <div class="drow"><span>Category</span><span>${i.cat||'—'}</span></div>
+    <div class="drow"><span>Category</span><span>${cleanCatLabel(i.cat)}</span></div>
     <div class="drow"><span>Date</span><span>${i.date}</span></div>
     <div class="drow"><span>Location</span><span>${esc(i.loc)}</span></div>
     ${i.desc?`<div class="drow"><span>Description</span><span>${esc(i.desc)}</span></div>`:''}
@@ -2079,7 +2111,7 @@ function renderAdmin(){
       const snap = i.claimantSnapshot||{};
       const thumb = i.img
         ?`<img class="claimed-card-img" src="${i.img}" alt="${esc(i.name)}"/>`
-        :`<div class="claimed-card-img" style="display:flex;align-items:center;justify-content:center;font-size:28px;background:#f0fdf4">${catEmoji(i.cat)}</div>`;
+        :`<div class="claimed-card-img" style="display:flex;align-items:center;justify-content:center;color:var(--vu-blue);background:#f0fdf4">${catIcon(i.cat,28)}</div>`;
       const claimedAtStr = i.claimedAt?new Date(i.claimedAt).toLocaleDateString('en-UG',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
       return`<div class="claimed-card">
         <div class="claimed-card-top">
@@ -2116,7 +2148,7 @@ function renderAdmin(){
   c.innerHTML = items.map(i=>{
     const thumb = i.img
       ?`<img src="${i.img}" style="width:38px;height:38px;border-radius:8px;object-fit:cover;flex-shrink:0"/>`
-      :`<div style="font-size:24px;flex-shrink:0">${catEmoji(i.cat)}</div>`;
+      :`<div style="flex-shrink:0;color:var(--vu-blue)">${catIcon(i.cat,24)}</div>`;
     return`<div class="admin-card">${thumb}
       <div class="admin-info">
         <div class="admin-name">${esc(i.name)} ${adminStatusText(i)}</div>
@@ -2319,7 +2351,7 @@ function renderCarousel(){
       ?`<div class="carousel-item-img">
           <img src="${i.img}" alt="${esc(i.name)}" style="width:100%;height:100%;object-fit:cover;display:block;"/>
         </div>`
-      :`<div class="carousel-item-img" style="font-size:36px">${catEmoji(i.cat)}</div>`;
+      :`<div class="carousel-item-img" style="color:var(--vu-blue)">${catIcon(i.cat,36)}</div>`;
     const pillCls = i.status==='claimed'?'claimed':(i.type==='lost'?'lost':'found');
     const pillTxt = i.status==='claimed'?'✓ Claimed':(i.type==='lost'?'🔴 Lost':'🟢 Found');
     return`<div class="carousel-item" onclick="openSheet('${i.id}')" title="${esc(i.name)}">
@@ -2685,6 +2717,104 @@ function initCarouselSwipe(){
   makeCarouselSwipeable('homeReviewsTrack',   45);   // reviews carousel: 45 px/s
 }
 document.addEventListener('DOMContentLoaded', ()=>{ setTimeout(initCarouselSwipe, 2500); });
+
+/* ── BOTTOM NAV: hide on scroll-down, reveal on scroll-up ── */
+(function(){
+  const navEl  = document.getElementById('bottomNav');
+  const mainEl = document.querySelector('.main-content');
+  if(!navEl) return;
+
+  let lastY = 0;
+  let ticking = false;
+  let wantHidden = false;       // desired nav state, updated live
+  let settleTimer = null;
+  let resizeGuardUntil = 0;     // timestamp until which resize-induced scroll noise is ignored
+  const REVEAL_THRESHOLD = 6;   // px of movement before reacting (ignores jitter)
+  const TOP_GUARD = 24;         // always show nav near the very top of a page
+  const SETTLE_DELAY = 140;     // ms of no scroll events before we resize layout
+  const RESIZE_TRANSITION_MS = 280; // must match .main-content height transition duration
+  const RESIZE_GUARD_PAD = 80;  // extra buffer so we never re-engage mid-transition
+
+  // The nav itself only ever gets a transform (position:fixed, doesn't
+  // affect any scroll container's geometry), so it's always safe to
+  // update instantly for a responsive feel.
+  function setNavTransform(hidden){
+    wantHidden = hidden;
+    navEl.classList.toggle('bn-hidden', hidden);
+  }
+
+  // Resizing .main-content changes the scrollable area's own dimensions,
+  // and that resize itself is CSS-animated (height transition). While that
+  // animation plays, the browser keeps re-clamping scrollTop against the
+  // changing clientHeight, which fires its own scroll events. Without a
+  // guard, those synthetic events feed straight back into handleScroll and
+  // re-trigger setNavHidden, which restarts the transition again - an
+  // endless loop on a hard, fast swipe. So we mute scroll-driven reactions
+  // for the lifetime of the resize transition, and resync our position
+  // tracker once it's done so we don't get a false jump afterwards.
+  function syncLayoutToNav(){
+    if (!mainEl) return;
+    resizeGuardUntil = Date.now() + RESIZE_TRANSITION_MS + RESIZE_GUARD_PAD;
+    mainEl.classList.toggle('nav-collapsed', wantHidden);
+  }
+
+  function setNavHidden(hidden){
+    setNavTransform(hidden);
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(syncLayoutToNav, SETTLE_DELAY);
+  }
+
+  function handleScroll(target){
+    const y = target.scrollTop < 0 ? 0 : target.scrollTop;
+
+    // Ignore scroll noise generated by our own in-flight resize transition.
+    // Just keep the baseline current so we don't see a huge fake delta
+    // once the guard lifts.
+    if (Date.now() < resizeGuardUntil){
+      lastY = y;
+      return;
+    }
+
+    const delta = y - lastY;
+
+    if (y <= TOP_GUARD){
+      setNavHidden(false);
+    } else if (delta > REVEAL_THRESHOLD){
+      // swiping up / content scrolling down -> hide nav and reclaim its space
+      setNavHidden(true);
+    } else if (delta < -REVEAL_THRESHOLD){
+      // swiping down / content scrolling up -> bring nav back
+      setNavHidden(false);
+    }
+    lastY = y;
+  }
+
+  // .page elements are the actual scrollable containers (overflow-y:auto),
+  // and the active one is swapped in/out, so listen in the capture phase
+  // on document to catch scroll events from any of them.
+  document.addEventListener('scroll', function(e){
+    const t = e.target;
+    if (!t || !t.classList || !t.classList.contains('page')) return;
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(()=>{ handleScroll(t); ticking = false; });
+  }, true);
+
+  // Always reveal the nav whenever a different page/tab becomes active
+  // (observe class changes instead of patching nav(), since nav() is
+  // redefined later in this file and a patch here would get overwritten).
+  document.querySelectorAll('.page').forEach(p=>{
+    new MutationObserver(()=>{
+      if (p.classList.contains('show')){
+        clearTimeout(settleTimer);
+        setNavTransform(false);
+        syncLayoutToNav();
+        lastY = 0;
+      }
+    }).observe(p, { attributes:true, attributeFilter:['class'] });
+  });
+})();
+
 
 /* ── ADMIN ONLINE / OFFLINE STATUS BADGE ── */
 function updateAdminNetBadge(){
