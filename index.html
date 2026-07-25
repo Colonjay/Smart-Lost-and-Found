@@ -27,7 +27,7 @@
   import {
     getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc,
     onSnapshot, query, orderBy, serverTimestamp, getDocs as fsGetDocs,
-    getDoc, increment as fsIncrement
+    getDoc, increment as fsIncrement, runTransaction
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import {
     getMessaging, getToken, onMessage, deleteToken
@@ -83,8 +83,8 @@
         // Show as in-app toast
         if (window.toast) window.toast(title + (body ? ' — ' + body : ''), 'nf');
         // Also show as browser notification if app is in background tab
-        if (document.hidden && Notification.permission === 'granted') {
-          new Notification(title, { body, icon: '/favicon.ico' });
+        if (document.hidden) {
+          window.notifyUser(title, { body, icon: '/favicon.ico' });
         }
       });
 
@@ -200,6 +200,29 @@
     async resetTrackers(){
       const ref = doc(db,'_meta','tracker_state');
       await setDoc(ref, { used: [] });
+    },
+
+    /* ── Atomic, conflict-safe claim ──
+       Reads the item and checks its status inside a transaction so two
+       people can never successfully claim the same item. If it's already
+       claimed by someone else, we tell the caller instead of overwriting. */
+    async claimItemTransactional(itemId, claimantSnapshot, claimantId){
+      const ref = doc(db, 'items', itemId);
+      return await runTransaction(db, async (tx) => {
+        const snap = await tx.get(ref);
+        if(!snap.exists()) return { ok:false, notFound:true };
+        const data = snap.data();
+        if(data.status === 'claimed' && data.claimedById !== claimantId){
+          return { ok:false, alreadyClaimed:true, claimedById:data.claimedById, itemName:data.name };
+        }
+        tx.update(ref, {
+          status: 'claimed',
+          claimedById: claimantId,
+          claimedAt: new Date().toISOString(),
+          claimantSnapshot
+        });
+        return { ok:true };
+      });
     }
   };
 
@@ -1349,6 +1372,108 @@ let unsubComplaints = null;
 let unsubResolvedLog = null;
 let resolvedLog    = [];
 
+/* ── SAFE NOTIFICATIONS ──
+   Some mobile browsers (notably Chrome on Android once a service worker
+   controls the page) throw "Failed to construct 'Notification': Illegal
+   constructor" if you call `new Notification()` directly. This helper
+   always routes through the service worker registration when one exists,
+   falls back to the plain constructor otherwise, and never throws —
+   so a notification failure can never surface as a scary error toast. */
+window.notifyUser = function(title, options={}){
+  try{
+    if(!('Notification' in window) || Notification.permission !== 'granted') return;
+    if('serviceWorker' in navigator && navigator.serviceWorker.getRegistration){
+      navigator.serviceWorker.getRegistration().then(reg=>{
+        if(reg && reg.showNotification) reg.showNotification(title, options);
+        else try{ new Notification(title, options); }catch(e){ console.warn('[Notify] suppressed:',e); }
+      }).catch(()=>{ try{ new Notification(title, options); }catch(e){ console.warn('[Notify] suppressed:',e); } });
+    } else {
+      new Notification(title, options);
+    }
+  } catch(err){
+    console.warn('[Notify] suppressed:', err);
+  }
+};
+
+/* ── OFFLINE CLAIM QUEUE ──
+   If a user taps "Mark as Claimed" while offline, we don't touch Firestore
+   at all (that call would just hang until reconnected). Instead we queue
+   the intent locally and settle it — atomically, conflict-checked — the
+   moment the connection returns. */
+const PENDING_CLAIMS_KEY = 'vufind_pending_claims';
+function getPendingClaims(){
+  try{ return JSON.parse(localStorage.getItem(PENDING_CLAIMS_KEY)||'[]'); }catch(e){ return []; }
+}
+function setPendingClaims(list){
+  try{ localStorage.setItem(PENDING_CLAIMS_KEY, JSON.stringify(list)); }catch(e){ /* storage unavailable */ }
+}
+function addPendingClaim(entry){
+  const list = getPendingClaims().filter(p=>p.itemId!==entry.itemId);
+  list.push(entry);
+  setPendingClaims(list);
+}
+function removePendingClaim(itemId){
+  setPendingClaims(getPendingClaims().filter(p=>p.itemId!==itemId));
+}
+window.isPendingClaim = function(itemId){
+  return getPendingClaims().some(p=>p.itemId===itemId);
+};
+
+let _processingPendingClaims = false;
+async function processPendingClaims(){
+  if(_processingPendingClaims || !navigator.onLine) return;
+  const queue = getPendingClaims();
+  if(!queue.length) return;
+  _processingPendingClaims = true;
+  let firstConflict = null;
+  let conflictCount = 0;
+  try{
+    for(const p of queue){
+      try{
+        const result = await DB.claimItemTransactional(p.itemId, p.claimantSnapshot, p.claimantId);
+        removePendingClaim(p.itemId);
+        if(result && result.alreadyClaimed){
+          conflictCount++;
+          if(!firstConflict) firstConflict = { itemId:p.itemId, itemName: result.itemName || p.itemName };
+        } else if(result && result.notFound){
+          // item was deleted in the meantime — nothing to do
+        } else if(me && me.id === p.claimantId){
+          await DB.incrementReunited();
+          toast(`Back online — "${p.itemName}" has been claimed ⭐`,'ok');
+          window.notifyUser('VU Find — Item Claimed!', { body:`You've successfully claimed "${p.itemName}". Admin has been notified.` });
+        }
+      } catch(e){
+        // Still can't reach the server (flaky connection) — leave it queued and retry next time
+        console.warn('[Pending claim] retry later:', e);
+      }
+    }
+  } finally {
+    _processingPendingClaims = false;
+  }
+
+  /* If something we tried to claim offline was already taken by someone
+     else, don't file anything automatically — take the user straight to
+     that item's "Raise a Claim Complaint" form so THEY decide whether to
+     submit it. */
+  if(firstConflict && me){
+    window.notifyUser('VU Find — Item Already Claimed', {
+      body:`"${firstConflict.itemName}" was claimed by someone else while you were offline. Tap to raise a complaint.`
+    });
+    toast(`"${firstConflict.itemName}" was already claimed while you were offline — raise a complaint if it's yours`,'er');
+    nav('browse');
+    openSheet(firstConflict.itemId);
+    setTimeout(()=>{
+      const form = document.getElementById('complaintForm_'+firstConflict.itemId);
+      if(form && !form.classList.contains('open')) toggleComplaintForm(firstConflict.itemId);
+    }, 150);
+    if(conflictCount > 1){
+      setTimeout(()=>toast(`${conflictCount-1} more offline claim(s) also lost to another claimant — check Browse`,'nf'), 1200);
+    }
+  }
+}
+window.addEventListener('online', processPendingClaims);
+
+
 /* SEED DEFAULT DATA */
 function seedIfEmpty(){
   const users = DB.getDocs('users');
@@ -1393,14 +1518,12 @@ function startListeners(){
         // In-app: check lost matches
         if(item.type==='found') checkLostMatchForFound(item);
         // System notification when app is open but SW may not have fired yet
-        if(Notification && Notification.permission==='granted'){
-          const isLost = item.type==='lost';
-          new Notification(isLost ? '🔴 New Lost Item Report' : '🟢 New Found Item Report', {
-            body: item.name + (item.loc ? ' — ' + item.loc : ''),
-            icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='36' fill='%231a3580'/><rect x='20' y='20' width='152' height='152' rx='24' fill='%23cc1414'/><text x='96' y='130' font-family='Arial' font-weight='900' font-size='90' fill='white' text-anchor='middle'>VU</text></svg>",
-            tag: 'vufind-item-' + item.id
-          });
-        }
+        const isLost = item.type==='lost';
+        window.notifyUser(isLost ? '🔴 New Lost Item Report' : '🟢 New Found Item Report', {
+          body: item.name + (item.loc ? ' — ' + item.loc : ''),
+          icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='36' fill='%231a3580'/><rect x='20' y='20' width='152' height='152' rx='24' fill='%23cc1414'/><text x='96' y='130' font-family='Arial' font-weight='900' font-size='90' fill='white' text-anchor='middle'>VU</text></svg>",
+          tag: 'vufind-item-' + item.id
+        });
       });
     }
     _itemsInitialized = true;
@@ -1537,6 +1660,8 @@ function bootApp(u, opts){
   _resetInactivityTimer();
   saveSession(u);
   _resetSessionTimer();
+  // Settle any claims that were queued while offline in a previous session
+  if(navigator.onLine) setTimeout(processPendingClaims, 800);
   if(!opts.silent) toast(`Welcome back, ${u.first}!`,'ok');
   // Ask for push notification permission (legacy blob-SW notifications)
   requestNotificationPermission();
@@ -1784,6 +1909,7 @@ function cleanCatLabel(c){
 }
 function pillHTML(i){
   if(i.status==='claimed')return'<span class="pill pill-claimed">⭐ Claimed</span>';
+  if(window.isPendingClaim(i.id))return'<span class="pill" style="background:#fffbeb;color:#92400e;border:1px solid #fde68a">⏳ Pending Sync</span>';
   return i.type==='lost'?'<span class="pill pill-lost">🔴 Lost</span>':'<span class="pill pill-found">🟢 Found</span>';
 }
 function adminStatusText(i){
@@ -1876,11 +2002,14 @@ window.openSheet = function(id){
   </div>`;
 
   if(i.status!=='claimed'){
-    const claimBtn = me
-      ? (me.role==='security'
-          ? `<button class="btn btn-ghost btn-sm" style="flex:1;cursor:not-allowed;opacity:.6" onclick="toast('Security accounts can report items but cannot claim them','er')">🔒 Security — No Claiming</button>`
-          : `<button class="btn btn-success btn-sm" style="flex:1" id="claimBtn_${id}" onclick="claimItem('${id}')">Mark as Claimed ⭐</button>`)
-      : `<button class="btn btn-ghost btn-sm" style="flex:1;cursor:not-allowed;opacity:.6" onclick="toast('Please log in to claim an item','er')">🔒 Login to Claim</button>`;
+    const pending = window.isPendingClaim(id);
+    const claimBtn = pending
+      ? `<button class="btn btn-ghost btn-sm" style="flex:1;cursor:not-allowed;opacity:.75;background:#fffbeb;border:1.5px solid #fde68a;color:#92400e" disabled>⏳ Pending — syncs when online</button>`
+      : me
+        ? (me.role==='security'
+            ? `<button class="btn btn-ghost btn-sm" style="flex:1;cursor:not-allowed;opacity:.6" onclick="toast('Security accounts can report items but cannot claim them','er')">🔒 Security — No Claiming</button>`
+            : `<button class="btn btn-success btn-sm" style="flex:1" id="claimBtn_${id}" onclick="claimItem('${id}')">Mark as Claimed ⭐</button>`)
+        : `<button class="btn btn-ghost btn-sm" style="flex:1;cursor:not-allowed;opacity:.6" onclick="toast('Please log in to claim an item','er')">🔒 Login to Claim</button>`;
     const transferBtn = (me&&me.id===i.byId&&i.type==='found')
       ? `<button class="btn btn-ghost btn-sm" style="flex:1" onclick="transferToSecurity('${id}')">📍 Hand to Security</button>`
       : '';
@@ -1944,23 +2073,37 @@ window.claimItem = async function(id){
   _claimingInProgress = true;
   const btn = document.getElementById('claimBtn_'+id);
   if(btn){ btn.disabled=true; btn.textContent='Claiming…'; }
+
+  const claimantSnapshot = {name:me.first+' '+me.last,email:me.email,phone:me.phone||'—'};
+  const itemName = allItems.find(x=>x.id===id)?.name || 'this item';
+  const claimIcon = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="%231a3580"/><text x="32" y="44" font-size="30" text-anchor="middle" fill="white">VU</text></svg>';
+
+  /* ── OFFLINE: queue it — we settle the real claim once back online ── */
+  if(!navigator.onLine){
+    addPendingClaim({ itemId:id, itemName, claimantSnapshot, claimantId: me.id, queuedAt: new Date().toISOString() });
+    closeSheet();
+    renderBrowse(); renderRecent();
+    toast(`📡 You're offline — "${itemName}" will be claimed once you're back online`,'nf');
+    window.notifyUser('VU Find — Claim Pending', { body:`You're offline. "${itemName}" will be claimed automatically once your connection is back.`, icon: claimIcon });
+    if(btn){ btn.disabled=false; btn.textContent='Mark as Claimed ⭐'; }
+    _claimingInProgress = false;
+    return;
+  }
+
   try{
-    await DB.updateDoc('items', id, {
-      status: 'claimed',
-      claimedById: me.id,
-      claimedAt: new Date().toISOString(),
-      claimantSnapshot: {name:me.first+' '+me.last,email:me.email,phone:me.phone||'—'}
-    });
+    const result = await DB.claimItemTransactional(id, claimantSnapshot, me.id);
+    if(result && result.alreadyClaimed){
+      toast('Sorry — someone already claimed this item','er');
+      if(btn){ btn.disabled=false; btn.textContent='Mark as Claimed ⭐'; }
+      return;
+    }
     await DB.incrementReunited();
     closeSheet();
     toast('Item marked as claimed ⭐','ok');
-    // Push notification for claim approved
-    if(Notification&&Notification.permission==='granted'){
-      new Notification('VU Find — Item Claimed!',{
-        body:`You've successfully claimed "${allItems.find(x=>x.id===id)?.name||'an item'}". Admin has been notified.`,
-        icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="%231a3580"/><text x="32" y="44" font-size="30" text-anchor="middle" fill="white">VU</text></svg>'
-      });
-    }
+    window.notifyUser('VU Find — Item Claimed!',{
+      body:`You've successfully claimed "${itemName}". Admin has been notified.`,
+      icon: claimIcon
+    });
     pendingReviewItemId = id;
     if(!_reviewShownThisSession){
       _reviewShownThisSession = true;
@@ -1968,12 +2111,17 @@ window.claimItem = async function(id){
       setTimeout(()=>showReviewPrompt(), 20 * 1000); // 20 seconds after claiming
     }
   } catch(e){
-    toast('Failed to claim item: '+e.message,'er');
-    if(btn){ btn.disabled=false; btn.textContent='Mark as Claimed ⭐'; }
+    // A network hiccup mid-claim shouldn't show a scary raw error —
+    // just fall back to the same offline queue and retry later.
+    addPendingClaim({ itemId:id, itemName, claimantSnapshot, claimantId: me.id, queuedAt: new Date().toISOString() });
+    closeSheet();
+    toast(`📡 Connection issue — "${itemName}" will be claimed once you're back online`,'nf');
   } finally{
+    if(btn){ btn.disabled=false; btn.textContent='Mark as Claimed ⭐'; }
     _claimingInProgress = false;
   }
 };
+
 
 /* CLAIM COMPLAINTS */
 window.toggleComplaintForm = function(id){
@@ -2078,12 +2226,10 @@ function checkLostMatchForFound(foundItem){
     if(match){
       toast(`🔔 A found item may match your lost "${lost.name}" — check Browse!`,'ok');
       // Browser push notification (if permission granted)
-      if(Notification&&Notification.permission==='granted'){
-        new Notification('VU Find — Possible Match!',{
-          body:`A found item may match your lost "${lost.name}". Open VU Find to check.`,
-          icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="%231a3580"/><text x="32" y="44" font-size="30" text-anchor="middle" fill="white">VU</text></svg>'
-        });
-      }
+      window.notifyUser('VU Find — Possible Match!',{
+        body:`A found item may match your lost "${lost.name}". Open VU Find to check.`,
+        icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="%231a3580"/><text x="32" y="44" font-size="30" text-anchor="middle" fill="white">VU</text></svg>'
+      });
       break;
     }
   }
