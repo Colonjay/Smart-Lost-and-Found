@@ -173,10 +173,13 @@
     },
 
     /* ── Tracker Numbers ──
-       Every reported item gets a unique 5-char mixed code (letters, digits
-       & symbols). Codes are never reused — even after the item they belong
-       to is deleted — because we keep a permanent list of issued codes in
-       a dedicated meta doc. Admin can wipe that list to start fresh. */
+       Every reported item gets a unique code in the form
+       LETTER-DDDD (one random uppercase letter, a dash, then 4 random
+       digits — e.g. "A-1234"). Codes are never reused — even after the
+       item they belong to is deleted — because we keep a permanent list
+       of issued codes in a dedicated meta doc. Admin can wipe that list
+       to start fresh. Truly random each time via Math.random(), re-rolled
+       whenever it collides with an already-issued code. */
     async genTracker(){
       const ref = doc(db,'_meta','tracker_state');
       let used = [];
@@ -184,11 +187,12 @@
         const snap = await getDoc(ref);
         if(snap.exists()) used = snap.data().used || [];
       } catch(e){ used = []; }
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789#@*-%';
+      const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; // no I/O to avoid look-alikes
       let code;
       do{
-        code = '';
-        for(let i=0;i<5;i++) code += chars[Math.floor(Math.random()*chars.length)];
+        const letter = letters[Math.floor(Math.random()*letters.length)];
+        const digits = Math.floor(Math.random()*10000).toString().padStart(4,'0');
+        code = letter + '-' + digits;
       } while(used.includes(code));
       used.push(code);
       try{
@@ -236,7 +240,10 @@
           claimantSnapshot
         };
         if(!data.tracker){
-          patch.tracker = newTracker || ('T' + Math.random().toString(36).slice(2,7).toUpperCase());
+          const fallbackLetters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+          const fallbackLetter = fallbackLetters[Math.floor(Math.random()*fallbackLetters.length)];
+          const fallbackDigits = Math.floor(Math.random()*10000).toString().padStart(4,'0');
+          patch.tracker = newTracker || (fallbackLetter + '-' + fallbackDigits);
         }
         tx.update(ref, patch);
         return { ok:true, tracker: data.tracker || patch.tracker };
@@ -254,9 +261,9 @@
       createdAt: new Date().toISOString()
     });
     const items=[
-      {type:'lost',name:'Black Samsung Galaxy S23',cat:'Mobile Phone',date:'2026-05-08',loc:'Main Library, 2nd Floor',desc:'Black Samsung with cracked screen protector',phone:'0708731300',status:'pending',tracker:'A1B2C',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
-      {type:'found',name:'Blue Jansport Backpack',cat:'Bag / Backpack',date:'2026-05-07',loc:'Canteen Area',desc:'Blue and grey Jansport with notebooks inside',phone:'0702255986',status:'pending',tracker:'D3E4F',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
-      {type:'found',name:'Black Leather Wallet',cat:'Wallet / Money',date:'2026-05-09',loc:'Security Desk, Gate A',desc:'Found near gate A, contains cash and bank cards',phone:'0700000000',storage:'Security Desk Gate A',status:'pending',tracker:'G5H6J',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
+      {type:'lost',name:'Black Samsung Galaxy S23',cat:'Mobile Phone',date:'2026-05-08',loc:'Main Library, 2nd Floor',desc:'Black Samsung with cracked screen protector',phone:'0708731300',status:'pending',tracker:'A-1042',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
+      {type:'found',name:'Blue Jansport Backpack',cat:'Bag / Backpack',date:'2026-05-07',loc:'Canteen Area',desc:'Blue and grey Jansport with notebooks inside',phone:'0702255986',status:'pending',tracker:'D-3871',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
+      {type:'found',name:'Black Leather Wallet',cat:'Wallet / Money',date:'2026-05-09',loc:'Security Desk, Gate A',desc:'Found near gate A, contains cash and bank cards',phone:'0700000000',storage:'Security Desk Gate A',status:'pending',tracker:'G-5629',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
     ];
     for(const item of items) await addDoc(collection(db,'items'), item);
     const reviews=[
