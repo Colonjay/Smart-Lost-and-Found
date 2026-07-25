@@ -481,8 +481,9 @@ textarea.finput{resize:vertical;min-height:76px}
 .admin-hero p{font-size:13px;opacity:.8}
 .admin-hero-meta{display:flex;align-items:center;gap:10px;margin-top:11px;flex-wrap:wrap}
 .admin-tabs{display:flex;background:#f1f5f9;border-radius:10px;padding:4px;margin-bottom:16px;gap:3px;overflow-x:auto;}
-.atab{flex:1;min-width:0;padding:9px 5px;border:none;background:transparent;color:var(--text-muted);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;transition:all .2s;white-space:nowrap;}
+.atab{flex:1;min-width:0;padding:9px 5px;border:none;background:transparent;color:var(--text-muted);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;transition:all .2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .atab.on{background:#fff;color:var(--vu-blue);box-shadow:0 2px 8px rgba(26,53,128,0.12)}
+.atab-short{display:none}
 .admin-card{background:var(--card-bg);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;gap:12px;align-items:center;box-shadow:var(--shadow);}
 .admin-info{flex:1;min-width:0}
 .admin-name{font-weight:600;font-size:13px;margin-bottom:2px;color:var(--text-dark)}
@@ -739,8 +740,10 @@ textarea.finput{resize:vertical;min-height:76px}
   .page{padding:16px;padding-bottom:calc(var(--nav-h) + 48px)}
   .stats-grid{gap:10px}
   .sheet{padding:20px 16px;border-radius:16px}
-  .admin-tabs{gap:2px}
-  .atab{font-size:10px;padding:8px 3px}
+  .admin-tabs{gap:2px;overflow-x:visible;flex-wrap:nowrap}
+  .atab{font-size:10.5px;padding:8px 2px;letter-spacing:.2px}
+  .atab-full{display:none}
+  .atab-short{display:inline}
   .footer-grid{grid-template-columns:1fr;gap:20px}
   .bottom-nav{display:flex}
   #toasts{right:10px;left:10px;top:64px}
@@ -1322,13 +1325,13 @@ textarea.finput{resize:vertical;min-height:76px}
             </div>
           </div>
           <div class="admin-tabs">
-            <button class="atab on" onclick="aTab(this,'pending')">⏳ Pending</button>
-            <button class="atab" onclick="aTab(this,'all')">📋 All Items</button>
-            <button class="atab" onclick="aTab(this,'claimed')">✅ Claimed</button>
-            <button class="atab" onclick="aTab(this,'reviews')">💬 Reviews</button>
-            <button class="atab" onclick="aTab(this,'complaints')">⚠️ Complaints <span id="complaintsTabBadge" style="display:none;background:#cc1414;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:100px;margin-left:3px;vertical-align:middle"></span></button>
-            <button class="atab" onclick="aTab(this,'users')">👥 Users</button>
-            <button class="atab" onclick="aTab(this,'reported')">📁 Reported Items</button>
+            <button class="atab on" onclick="aTab(this,'pending')">⏳ <span class="atab-full">Pending</span><span class="atab-short">Pen</span></button>
+            <button class="atab" onclick="aTab(this,'all')">📋 <span class="atab-full">All Items</span><span class="atab-short">All</span></button>
+            <button class="atab" onclick="aTab(this,'claimed')">✅ <span class="atab-full">Claimed</span><span class="atab-short">Cla</span></button>
+            <button class="atab" onclick="aTab(this,'reviews')">💬 <span class="atab-full">Reviews</span><span class="atab-short">Rev</span></button>
+            <button class="atab" onclick="aTab(this,'complaints')">⚠️ <span class="atab-full">Complaints</span><span class="atab-short">Com</span><span id="complaintsTabBadge" style="display:none;background:#cc1414;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:100px;margin-left:3px;vertical-align:middle"></span></button>
+            <button class="atab" onclick="aTab(this,'users')">👥 <span class="atab-full">Users</span><span class="atab-short">Use</span></button>
+            <button class="atab" onclick="aTab(this,'reported')">📁 <span class="atab-full">Reported Items</span><span class="atab-short">Rep</span></button>
           </div>
           <div id="adminContent"></div>
         </div>
@@ -1552,6 +1555,16 @@ function startListeners(){
     allUsers = docs;
     if(me?.role==='admin' && document.getElementById('pg-admin').classList.contains('show'))
       renderAdmin();
+    // ── Single-device session enforcement ──
+    // If this account's activeSessionId no longer matches the id we
+    // claimed at login, another device has signed in — sign out here.
+    if(me){
+      const updatedMe = docs.find(d=>d.id===me.id);
+      if(updatedMe && mySessionId && updatedMe.activeSessionId && updatedMe.activeSessionId !== mySessionId){
+        toast('You were signed out — this account was signed in on another device','er');
+        doLogout();
+      }
+    }
   });
 
   if(unsubComplaints) unsubComplaints();
@@ -1620,7 +1633,9 @@ window.doLogin = async function(){
     if(!users.length){toast('No account found with that email','er');setBtn('loginBtn',false,'Sign In →');return;}
     const u = users[0];
     if(u.pass !== pass){toast('Incorrect password','er');setBtn('loginBtn',false,'Sign In →');return;}
-    bootApp(u);
+    mySessionId = genSessionId();
+    await DB.updateDoc('users', u.id, { activeSessionId: mySessionId, activeSessionAt: new Date().toISOString() });
+    bootApp({...u, activeSessionId: mySessionId});
   } catch(e){
     toast('Login failed: '+e.message,'er');
     setBtn('loginBtn',false,'Sign In →');
@@ -1638,7 +1653,8 @@ window.doRegister = async function(){
   try{
     const existing = await DB.getDocs('users', u=>u.email===email);
     if(existing.length){toast('Email already registered','er');setBtn('regBtn',false,'Create Account →');return;}
-    const newUser = {first,last,email,phone,pass,role:'student',createdAt:new Date().toISOString()};
+    mySessionId = genSessionId();
+    const newUser = {first,last,email,phone,pass,role:'student',createdAt:new Date().toISOString(), activeSessionId: mySessionId, activeSessionAt: new Date().toISOString()};
     const id = await DB.addDoc('users', newUser);
     bootApp({id, ...newUser});
     toast('Account created! Welcome 🎉','ok');
@@ -1676,7 +1692,7 @@ function bootApp(u, opts){
   if(adminNavSection) adminNavSection.style.display = isAdmin ? 'block' : 'none';
   startListeners();
   _resetInactivityTimer();
-  saveSession(u);
+  saveSession(u, mySessionId);
   _resetSessionTimer();
   // Settle any claims that were queued while offline in a previous session
   if(navigator.onLine) setTimeout(processPendingClaims, 800);
@@ -1707,6 +1723,7 @@ function bootApp(u, opts){
 window.doLogout = function(){
   const loggedOutId = me?.id || null;
   me = null;
+  mySessionId = null;
   _reviewShownThisSession = false;
   clearTimeout(_inactivityTimer);
   clearTimeout(_sessionTimer);
@@ -1766,26 +1783,35 @@ function showReviewPanel(){
 
 /* ── SESSION PERSISTENCE ──
    Keep the user signed in across page refreshes / app restarts. The
-   session is only ever ended by an explicit Logout OR by 10 minutes of
+   session is only ever ended by an explicit Logout, by 10 minutes of
    total inactivity (no clicks, taps, scrolls, key presses, or mouse
-   movement) — never merely by reloading or closing the app briefly.
+   movement), or by signing in to the same account on another device —
+   never merely by reloading or closing the app briefly.
 */
 const SESSION_KEY   = 'vufind_session';
 const SESSION_MS    = 10 * 60 * 1000; // 10 minutes of inactivity
 let _sessionTimer   = null;
 
-function saveSession(u){
-  try{ localStorage.setItem(SESSION_KEY, JSON.stringify({ uid: u.id, ts: Date.now() })); }
+/* ── SINGLE-DEVICE SESSION ──
+   Each successful login/registration mints a fresh random session id and
+   writes it to the user's Firestore doc as `activeSessionId`. Only the
+   device holding the current id is allowed to stay signed in — the
+   real-time 'users' listener (in startListeners) watches for this id
+   changing out from under us and signs this device out the moment
+   another device claims the account. */
+let mySessionId = null;
+function genSessionId(){
+  return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,10);
+}
+
+function saveSession(u, sid){
+  try{ localStorage.setItem(SESSION_KEY, JSON.stringify({ uid: u.id, ts: Date.now(), sid: sid ?? mySessionId })); }
   catch(e){ /* storage unavailable — session just won't persist */ }
 }
 function touchSession(){
   if(!me) return;
-  try{
-    const raw = localStorage.getItem(SESSION_KEY);
-    const s = raw ? JSON.parse(raw) : { uid: me.id };
-    s.ts = Date.now();
-    localStorage.setItem(SESSION_KEY, JSON.stringify(s));
-  } catch(e){ /* ignore */ }
+  try{ localStorage.setItem(SESSION_KEY, JSON.stringify({ uid: me.id, ts: Date.now(), sid: mySessionId })); }
+  catch(e){ /* ignore */ }
 }
 function clearSession(){
   try{ localStorage.removeItem(SESSION_KEY); } catch(e){ /* ignore */ }
@@ -1813,11 +1839,24 @@ async function tryRestoreSession(){
     if(!s || !s.uid || !s.ts || (Date.now() - s.ts) > SESSION_MS){ clearSession(); return; }
     const users = await DB.getDocs('users');
     const u = users.find(x=>x.id===s.uid);
-    if(u) bootApp(u, { silent:true });
-    else clearSession();
+    if(!u){ clearSession(); return; }
+    if(u.activeSessionId && s.sid && u.activeSessionId !== s.sid){
+      // This account was signed in on another device while this one was closed.
+      clearSession();
+      toast('You were signed out — this account was signed in on another device','er');
+      return;
+    }
+    mySessionId = s.sid || null;
+    if(!u.activeSessionId){
+      // Legacy account with no tracked session yet — claim it for this device now.
+      mySessionId = mySessionId || genSessionId();
+      DB.updateDoc('users', u.id, { activeSessionId: mySessionId, activeSessionAt: new Date().toISOString() }).catch(()=>{});
+    }
+    bootApp({...u, activeSessionId: mySessionId}, { silent:true });
   } catch(e){ clearSession(); }
 }
 window._tryRestoreSession = tryRestoreSession;
+
 
 
 
