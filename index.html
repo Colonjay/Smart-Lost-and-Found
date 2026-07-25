@@ -682,11 +682,11 @@ textarea.finput{resize:vertical;min-height:76px}
 
 @media(max-width:768px){
   :root{--sidebar-w:0px}
-  .sidebar{width:260px;transform:translateX(-100%);transition:transform .3s cubic-bezier(.22,1,.36,1);z-index:200;box-shadow:4px 0 24px rgba(0,0,0,0.12);top:58px;}
-  .sidebar.open{transform:translateX(0)}
+  .sidebar{display:none!important}
+  .mobile-overlay{display:none!important}
   .main-content{margin-left:0;height:calc(100vh - 58px - var(--nav-h));transition:height .28s cubic-bezier(.22,1,.36,1);}
   .main-content.nav-collapsed{height:calc(100vh - 58px);}
-  .menu-toggle{display:flex!important}
+  .menu-toggle{display:none!important}
   .topbar-logo-desktop{display:none!important}
   .topbar-page-title{display:none}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
