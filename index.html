@@ -205,9 +205,23 @@
     /* ── Atomic, conflict-safe claim ──
        Reads the item and checks its status inside a transaction so two
        people can never successfully claim the same item. If it's already
-       claimed by someone else, we tell the caller instead of overwriting. */
+       claimed by someone else, we tell the caller instead of overwriting.
+       Also guarantees a tracker number: if the item somehow doesn't have
+       one yet (legacy data, edge cases), one is generated and attached
+       right here so no claimed item is ever left without one. */
     async claimItemTransactional(itemId, claimantSnapshot, claimantId){
       const ref = doc(db, 'items', itemId);
+
+      // Generate a tracker ahead of time if this item doesn't have one —
+      // done outside the transaction since it touches a separate meta doc.
+      let newTracker = null;
+      try{
+        const preSnap = await getDoc(ref);
+        if(preSnap.exists() && !preSnap.data().tracker){
+          newTracker = await this.genTracker();
+        }
+      } catch(e){ /* non-fatal — falls back to inline generation below */ }
+
       return await runTransaction(db, async (tx) => {
         const snap = await tx.get(ref);
         if(!snap.exists()) return { ok:false, notFound:true };
@@ -215,13 +229,17 @@
         if(data.status === 'claimed' && data.claimedById !== claimantId){
           return { ok:false, alreadyClaimed:true, claimedById:data.claimedById, itemName:data.name };
         }
-        tx.update(ref, {
+        const patch = {
           status: 'claimed',
           claimedById: claimantId,
           claimedAt: new Date().toISOString(),
           claimantSnapshot
-        });
-        return { ok:true };
+        };
+        if(!data.tracker){
+          patch.tracker = newTracker || ('T' + Math.random().toString(36).slice(2,7).toUpperCase());
+        }
+        tx.update(ref, patch);
+        return { ok:true, tracker: data.tracker || patch.tracker };
       });
     }
   };
@@ -2488,11 +2506,16 @@ window.confirmAdminClaim = async function(){
   const uid = sel.value||null;
   const claimer = uid ? allUsers.find(u=>u.id===uid) : null;
   try{
-    await DB.updateDoc('items', pendingAdminClaimId, {
+    const item = allItems.find(x=>x.id===pendingAdminClaimId);
+    const patch = {
       status:'claimed', claimedById:uid||null,
       claimedAt:new Date().toISOString(),
       claimantSnapshot:claimer?{name:claimer.first+' '+claimer.last,email:claimer.email,phone:claimer.phone||'—'}:{}
-    });
+    };
+    if(item && !item.tracker){
+      patch.tracker = await DB.genTracker();
+    }
+    await DB.updateDoc('items', pendingAdminClaimId, patch);
     await DB.incrementReunited();
     closeAdminClaimOverlay();
     toast('Marked as claimed ✓','ok');
