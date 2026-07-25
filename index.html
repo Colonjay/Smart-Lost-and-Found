@@ -170,6 +170,36 @@
       return onSnapshot(ref, snap=>{
         cb(snap.exists() ? (snap.data().count||0) : 0);
       }, ()=>cb(0));
+    },
+
+    /* ── Tracker Numbers ──
+       Every reported item gets a unique 5-char mixed code (letters, digits
+       & symbols). Codes are never reused — even after the item they belong
+       to is deleted — because we keep a permanent list of issued codes in
+       a dedicated meta doc. Admin can wipe that list to start fresh. */
+    async genTracker(){
+      const ref = doc(db,'_meta','tracker_state');
+      let used = [];
+      try{
+        const snap = await getDoc(ref);
+        if(snap.exists()) used = snap.data().used || [];
+      } catch(e){ used = []; }
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789#@*-%';
+      let code;
+      do{
+        code = '';
+        for(let i=0;i<5;i++) code += chars[Math.floor(Math.random()*chars.length)];
+      } while(used.includes(code));
+      used.push(code);
+      try{
+        await setDoc(ref, { used }, { merge:true });
+      } catch(e){ /* non-fatal — code still returned/used locally */ }
+      return code;
+    },
+
+    async resetTrackers(){
+      const ref = doc(db,'_meta','tracker_state');
+      await setDoc(ref, { used: [] });
     }
   };
 
@@ -183,9 +213,9 @@
       createdAt: new Date().toISOString()
     });
     const items=[
-      {type:'lost',name:'Black Samsung Galaxy S23',cat:'Mobile Phone',date:'2026-05-08',loc:'Main Library, 2nd Floor',desc:'Black Samsung with cracked screen protector',phone:'0708731300',status:'pending',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
-      {type:'found',name:'Blue Jansport Backpack',cat:'Bag / Backpack',date:'2026-05-07',loc:'Canteen Area',desc:'Blue and grey Jansport with notebooks inside',phone:'0702255986',status:'pending',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
-      {type:'found',name:'Black Leather Wallet',cat:'Wallet / Money',date:'2026-05-09',loc:'Security Desk, Gate A',desc:'Found near gate A, contains cash and bank cards',phone:'0700000000',storage:'Security Desk Gate A',status:'pending',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
+      {type:'lost',name:'Black Samsung Galaxy S23',cat:'Mobile Phone',date:'2026-05-08',loc:'Main Library, 2nd Floor',desc:'Black Samsung with cracked screen protector',phone:'0708731300',status:'pending',tracker:'A1B2C',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
+      {type:'found',name:'Blue Jansport Backpack',cat:'Bag / Backpack',date:'2026-05-07',loc:'Canteen Area',desc:'Blue and grey Jansport with notebooks inside',phone:'0702255986',status:'pending',tracker:'D3E4F',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
+      {type:'found',name:'Black Leather Wallet',cat:'Wallet / Money',date:'2026-05-09',loc:'Security Desk, Gate A',desc:'Found near gate A, contains cash and bank cards',phone:'0700000000',storage:'Security Desk Gate A',status:'pending',tracker:'G5H6J',img:null,byId:'admin_vu',byName:'Admin User',at:new Date().toISOString()},
     ];
     for(const item of items) await addDoc(collection(db,'items'), item);
     const reviews=[
@@ -321,7 +351,7 @@ textarea.finput{resize:vertical;min-height:76px}
 .main-content{display:none;flex-direction:column;overflow:hidden;margin-left:var(--sidebar-w);margin-top:58px;flex:1;height:calc(100vh - 58px);}
 #appScreen.active .main-content{display:flex}
 .pages{flex:1;overflow:hidden;position:relative}
-.page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:24px;display:none;animation:pgIn .28s cubic-bezier(.22,1,.36,1);}
+.page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;touch-action:pan-y;padding:24px;padding-bottom:48px;display:none;animation:pgIn .28s cubic-bezier(.22,1,.36,1);}
 .page::-webkit-scrollbar{width:6px}
 .page::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 .page.show{display:block}
@@ -656,7 +686,7 @@ textarea.finput{resize:vertical;min-height:76px}
   .sidebar.open{transform:translateX(0)}
   .main-content{margin-left:0;height:calc(100vh - 58px - var(--nav-h));transition:height .28s cubic-bezier(.22,1,.36,1);}
   .main-content.nav-collapsed{height:calc(100vh - 58px);}
-  .menu-toggle{display:none!important}
+  .menu-toggle{display:flex!important}
   .topbar-logo-desktop{display:none!important}
   .topbar-page-title{display:none}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
@@ -665,7 +695,7 @@ textarea.finput{resize:vertical;min-height:76px}
   .form-row{grid-template-columns:1fr}
   .home-banner{padding:18px}
   .home-banner h2{font-size:17px}
-  .page{padding:16px}
+  .page{padding:16px;padding-bottom:calc(var(--nav-h) + 48px)}
   .stats-grid{gap:10px}
   .sheet{padding:20px 16px;border-radius:16px}
   .admin-tabs{gap:2px}
@@ -903,6 +933,9 @@ textarea.finput{resize:vertical;min-height:76px}
   <!-- TOP BAR -->
   <div class="topbar" style="padding:0 10px;justify-content:space-between;">
     <div style="display:flex;align-items:center;gap:8px;margin-left:6px">
+      <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Open menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
       <div class="vu-logo-box topbar-logo-desktop">
         <div class="vu-logo-shield">VU</div>
         <div class="vu-logo-text">
@@ -1244,6 +1277,7 @@ textarea.finput{resize:vertical;min-height:76px}
                 </div>
               </div>
               <button class="btn btn-ghost btn-sm" style="background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:#fff;white-space:nowrap" onclick="adminResetReunited()">🔄 Reset Counter</button>
+              <button class="btn btn-ghost btn-sm" style="background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:#fff;white-space:nowrap" onclick="adminResetTrackers()">🏷 Reset Tracker Numbers</button>
             </div>
           </div>
           <div class="admin-tabs">
@@ -1253,6 +1287,7 @@ textarea.finput{resize:vertical;min-height:76px}
             <button class="atab" onclick="aTab(this,'reviews')">💬 Reviews</button>
             <button class="atab" onclick="aTab(this,'complaints')">⚠️ Complaints <span id="complaintsTabBadge" style="display:none;background:#cc1414;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:100px;margin-left:3px;vertical-align:middle"></span></button>
             <button class="atab" onclick="aTab(this,'users')">👥 Users</button>
+            <button class="atab" onclick="aTab(this,'reported')">📁 Reported Items</button>
           </div>
           <div id="adminContent"></div>
         </div>
@@ -1311,6 +1346,8 @@ let unsubUsers     = null;
 let unsubReviews   = null;
 let unsubReunited  = null;
 let unsubComplaints = null;
+let unsubResolvedLog = null;
+let resolvedLog    = [];
 
 /* SEED DEFAULT DATA */
 function seedIfEmpty(){
@@ -1406,6 +1443,14 @@ function startListeners(){
     const el = document.getElementById('admin-reunited-val');
     if(el) el.textContent = count;
   });
+
+  if(unsubResolvedLog) unsubResolvedLog();
+  unsubResolvedLog = DB.onSnapshot('resolved_log', docs => {
+    resolvedLog = docs.sort((a,b)=>new Date(b.resolvedAt||b.at)-new Date(a.resolvedAt||a.at));
+    if(me?.role==='admin' && curATab==='reported' &&
+       document.getElementById('pg-admin').classList.contains('show'))
+      renderAdmin();
+  });
 }
 
 function stopListeners(){
@@ -1414,6 +1459,7 @@ function stopListeners(){
   if(unsubReviews){unsubReviews();unsubReviews=null;}
   if(unsubReunited){unsubReunited();unsubReunited=null;}
   if(unsubComplaints){unsubComplaints();unsubComplaints=null;}
+  if(unsubResolvedLog){unsubResolvedLog();unsubResolvedLog=null;}
 }
 
 /* AUTH */
@@ -1469,7 +1515,8 @@ function clearAuthForms(){
   authTab('login');
 }
 
-function bootApp(u){
+function bootApp(u, opts){
+  opts = opts || {};
   me = u;
   _reviewShownThisSession = false;
   clearTimeout(_inactivityTimer);
@@ -1488,7 +1535,9 @@ function bootApp(u){
   if(adminNavSection) adminNavSection.style.display = isAdmin ? 'block' : 'none';
   startListeners();
   _resetInactivityTimer();
-  toast(`Welcome back, ${u.first}!`,'ok');
+  saveSession(u);
+  _resetSessionTimer();
+  if(!opts.silent) toast(`Welcome back, ${u.first}!`,'ok');
   // Ask for push notification permission (legacy blob-SW notifications)
   requestNotificationPermission();
   // Setup Firebase Cloud Messaging (true push — works when app is closed)
@@ -1517,6 +1566,8 @@ window.doLogout = function(){
   me = null;
   _reviewShownThisSession = false;
   clearTimeout(_inactivityTimer);
+  clearTimeout(_sessionTimer);
+  clearSession();
   stopListeners();
   allItems=[]; allUsers=[]; allReviews=[]; allComplaints=[];
   document.getElementById('appScreen').classList.remove('active');
@@ -1569,6 +1620,62 @@ function showReviewPanel(){
 ['click','touchstart','keydown','scroll','mousemove'].forEach(ev=>{
   document.addEventListener(ev, _resetInactivityTimer, {passive:true});
 });
+
+/* ── SESSION PERSISTENCE ──
+   Keep the user signed in across page refreshes / app restarts. The
+   session is only ever ended by an explicit Logout OR by 10 minutes of
+   total inactivity (no clicks, taps, scrolls, key presses, or mouse
+   movement) — never merely by reloading or closing the app briefly.
+*/
+const SESSION_KEY   = 'vufind_session';
+const SESSION_MS    = 10 * 60 * 1000; // 10 minutes of inactivity
+let _sessionTimer   = null;
+
+function saveSession(u){
+  try{ localStorage.setItem(SESSION_KEY, JSON.stringify({ uid: u.id, ts: Date.now() })); }
+  catch(e){ /* storage unavailable — session just won't persist */ }
+}
+function touchSession(){
+  if(!me) return;
+  try{
+    const raw = localStorage.getItem(SESSION_KEY);
+    const s = raw ? JSON.parse(raw) : { uid: me.id };
+    s.ts = Date.now();
+    localStorage.setItem(SESSION_KEY, JSON.stringify(s));
+  } catch(e){ /* ignore */ }
+}
+function clearSession(){
+  try{ localStorage.removeItem(SESSION_KEY); } catch(e){ /* ignore */ }
+}
+function _resetSessionTimer(){
+  clearTimeout(_sessionTimer);
+  if(!me) return;
+  touchSession();
+  _sessionTimer = setTimeout(()=>{
+    if(me){
+      toast('You were signed out after 10 minutes of inactivity','er');
+      doLogout();
+    }
+  }, SESSION_MS);
+}
+['click','touchstart','keydown','scroll','mousemove'].forEach(ev=>{
+  document.addEventListener(ev, _resetSessionTimer, {passive:true});
+});
+
+/* Attempt to restore a saved session on load (survives refresh) */
+async function tryRestoreSession(){
+  try{
+    const raw = localStorage.getItem(SESSION_KEY);
+    if(!raw) return;
+    const s = JSON.parse(raw);
+    if(!s || !s.uid || !s.ts || (Date.now() - s.ts) > SESSION_MS){ clearSession(); return; }
+    const users = await DB.getDocs('users');
+    const u = users.find(x=>x.id===s.uid);
+    if(u) bootApp(u, { silent:true });
+    else clearSession();
+  } catch(e){ clearSession(); }
+}
+window._tryRestoreSession = tryRestoreSession;
 
 
 
@@ -1696,28 +1803,32 @@ function cardHTML(i){
 function renderRecent(){
   const c = document.getElementById('recentList');
   if(!c) return;
-  const items = [...allItems].sort((a,b)=>new Date(b.at)-new Date(a.at)).slice(0,5);
-  c.innerHTML = items.length
-    ? items.map(cardHTML).join('')
-    : '<div class="empty"><div class="empty-ico">📭</div><h3>No items yet</h3><p>Be the first to report a lost or found item.</p></div>';
+  withScrollPreserved(c, ()=>{
+    const items = [...allItems].sort((a,b)=>new Date(b.at)-new Date(a.at)).slice(0,5);
+    c.innerHTML = items.length
+      ? items.map(cardHTML).join('')
+      : '<div class="empty"><div class="empty-ico">📭</div><h3>No items yet</h3><p>Be the first to report a lost or found item.</p></div>';
+  });
 }
 
 function renderBrowse(){
   const c = document.getElementById('browseList');
   if(!c) return;
-  const q = (v('searchQ')||'').toLowerCase();
-  let items = [...allItems];
-  if(curFilter==='claimed')      items = items.filter(i=>i.status==='claimed');
-  else if(curFilter==='pending') items = items.filter(i=>i.status==='pending');
-  else if(curFilter!=='all')     items = items.filter(i=>i.type===curFilter&&i.status!=='claimed');
-  if(q) items = items.filter(i=>
-    (i.name||'').toLowerCase().includes(q)||(i.loc||'').toLowerCase().includes(q)||
-    (i.desc||'').toLowerCase().includes(q)||(i.cat||'').toLowerCase().includes(q)
-  );
-  items = [...items].sort((a,b)=>new Date(b.at)-new Date(a.at));
-  c.innerHTML = items.length
-    ? items.map(cardHTML).join('')
-    : '<div class="empty"><div class="empty-ico">🔍</div><h3>No results</h3><p>Try a different search or filter.</p></div>';
+  withScrollPreserved(c, ()=>{
+    const q = (v('searchQ')||'').toLowerCase();
+    let items = [...allItems];
+    if(curFilter==='claimed')      items = items.filter(i=>i.status==='claimed');
+    else if(curFilter==='pending') items = items.filter(i=>i.status==='pending');
+    else if(curFilter!=='all')     items = items.filter(i=>i.type===curFilter&&i.status!=='claimed');
+    if(q) items = items.filter(i=>
+      (i.name||'').toLowerCase().includes(q)||(i.loc||'').toLowerCase().includes(q)||
+      (i.desc||'').toLowerCase().includes(q)||(i.cat||'').toLowerCase().includes(q)
+    );
+    items = [...items].sort((a,b)=>new Date(b.at)-new Date(a.at));
+    c.innerHTML = items.length
+      ? items.map(cardHTML).join('')
+      : '<div class="empty"><div class="empty-ico">🔍</div><h3>No results</h3><p>Try a different search or filter.</p></div>';
+  });
 }
 
 window.doSearch  = function(){ renderBrowse(); };
@@ -1756,6 +1867,7 @@ window.openSheet = function(id){
     ${i.storage?`<div class="drow"><span>Currently at</span><span>${esc(i.storage)}</span></div>`:''}
     ${(me?.role==='admin'&&i.phone)?`<div class="drow"><span>Reporter Contact</span><span><a href="tel:${i.phone}" style="color:var(--vu-red);font-weight:600">${i.phone}</a></span></div>`:''}
     <div class="drow"><span>Reported by</span><span>${i.byName||'Unknown'}</span></div>
+    ${(i.tracker && (me?.role==='admin' || (i.status==='claimed' && me?.id===i.claimedById)))?`<div class="drow"><span>Tracker Number</span><span style="font-family:monospace;letter-spacing:1px;color:var(--vu-blue);background:#eef2ff;padding:2px 8px;border-radius:6px">${esc(i.tracker)}</span></div>`:''}
   </div>
   ${!i.img?`<div class="modal-title" style="display:none"></div>`:''}
   <div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:11px 14px;margin-top:14px;font-size:12px;color:var(--text-mid)">
@@ -1765,7 +1877,9 @@ window.openSheet = function(id){
 
   if(i.status!=='claimed'){
     const claimBtn = me
-      ? `<button class="btn btn-success btn-sm" style="flex:1" id="claimBtn_${id}" onclick="claimItem('${id}')">Mark as Claimed ⭐</button>`
+      ? (me.role==='security'
+          ? `<button class="btn btn-ghost btn-sm" style="flex:1;cursor:not-allowed;opacity:.6" onclick="toast('Security accounts can report items but cannot claim them','er')">🔒 Security — No Claiming</button>`
+          : `<button class="btn btn-success btn-sm" style="flex:1" id="claimBtn_${id}" onclick="claimItem('${id}')">Mark as Claimed ⭐</button>`)
       : `<button class="btn btn-ghost btn-sm" style="flex:1;cursor:not-allowed;opacity:.6" onclick="toast('Please log in to claim an item','er')">🔒 Login to Claim</button>`;
     const transferBtn = (me&&me.id===i.byId&&i.type==='found')
       ? `<button class="btn btn-ghost btn-sm" style="flex:1" onclick="transferToSecurity('${id}')">📍 Hand to Security</button>`
@@ -1789,7 +1903,10 @@ window.openSheet = function(id){
       <div class="complaint-box-title">⚠️ Think this item is yours?</div>
       <div class="complaint-box-desc">If this item was incorrectly claimed and actually belongs to you, raise a complaint below. Admin will review and contact both parties.</div>
       <div class="complaint-submitted" id="complaintDone_${id}">✅ Complaint submitted! Admin will review it shortly.</div>
-      <button class="btn btn-sm" style="background:#fef3c7;border:1.5px solid #fde68a;color:#92400e;width:100%" onclick="toggleComplaintForm('${id}')">⚠️ Raise a Claim Complaint</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm" style="background:#fef3c7;border:1.5px solid #fde68a;color:#92400e;flex:1" onclick="toggleComplaintForm('${id}')">⚠️ Raise a Claim Complaint</button>
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeSheet()">Close</button>
+      </div>
       <div class="complaint-form" id="complaintForm_${id}">
         <div class="fgroup" style="margin-bottom:10px">
           <div class="flabel">Your Full Name *</div>
@@ -1809,8 +1926,6 @@ window.openSheet = function(id){
         </div>
       </div>
     </div>`;
-
-    html += `<div style="margin-top:14px"><button class="btn btn-ghost btn-sm" onclick="closeSheet()" style="width:100%">Close</button></div>`;
   }
   document.getElementById('sheetContent').innerHTML = html;
   document.getElementById('detailOverlay').classList.add('open');
@@ -1824,6 +1939,7 @@ window.closeSheet = function(e){
 let _claimingInProgress = false;
 window.claimItem = async function(id){
   if(!me){toast('You must be logged in to claim an item','er');return;}
+  if(me.role==='security'){toast('Security accounts can report items but cannot claim them','er');return;}
   if(_claimingInProgress) return;
   _claimingInProgress = true;
   const btn = document.getElementById('claimBtn_'+id);
@@ -1912,10 +2028,12 @@ window.submitReport = async function(){
   if(!name||!cat||!date||!loc){toast('Fill all required fields','er');return;}
   setBtn('submitBtn',true,'Submitting…');
   try{
+    const tracker = await DB.genTracker();
     const newId = await DB.addDoc('items',{
       type: reportType, name, cat, date, loc,
       desc: v('fDesc'), storage: v('fStorage'), phone: v('fPhone'),
       status: 'pending',
+      tracker,
       img: pendingImgData||null,
       byId: me.id,
       byName: me.first+' '+me.last,
@@ -2021,6 +2139,9 @@ window.aTab = function(btn,t){
 function renderAdmin(){
   const c = document.getElementById('adminContent');
   if(!c) return;
+  const _pageEl = c.closest('.page');
+  const _scrollY = _pageEl ? _pageEl.scrollTop : 0;
+  requestAnimationFrame(()=>{ if(_pageEl) _pageEl.scrollTop = _scrollY; });
 
   if(curATab==='complaints'){
     const complaints = allComplaints;
@@ -2090,13 +2211,39 @@ function renderAdmin(){
       <div class="admin-card">
         <div class="ava" style="width:38px;height:38px;font-size:14px;flex-shrink:0">${(u.first[0]+(u.last[0]||'')).toUpperCase()}</div>
         <div class="admin-info">
-          <div class="admin-name">${esc(u.first)} ${esc(u.last)}${u.role==='admin'?'<span class="badge-admin">Admin</span>':''}</div>
+          <div class="admin-name">${esc(u.first)} ${esc(u.last)}${u.role==='admin'?'<span class="badge-admin">Admin</span>':''}${u.role==='security'?'<span class="badge-admin" style="background:#fff7ed;color:#c2410c;border-color:#fed7aa">Security</span>':''}</div>
           <div class="admin-meta">${esc(u.email)} · ${u.phone||'—'}</div>
           <div class="admin-meta" style="margin-top:2px;color:#aaa">Joined: ${u.createdAt?new Date(u.createdAt).toLocaleDateString('en-UG',{day:'numeric',month:'short',year:'numeric'}):'—'}</div>
         </div>
         <div class="admin-actions">
           ${u.role!=='admin'?`<button class="btn btn-danger btn-sm" onclick="adminDelUser('${u.id}')">🗑</button>`:'<span style="font-size:10px;color:var(--text-muted)">Protected</span>'}
         </div>
+      </div>`).join('');
+    return;
+  }
+
+  if(curATab==='reported'){
+    if(!resolvedLog.length){
+      c.innerHTML='<div class="empty"><div class="empty-ico">📁</div><h3>No resolved reports yet</h3><p>Items appear here once claimed and marked "Resolved" from the Claimed tab. This log is permanent — deleting the live item never removes its record here.</p></div>';
+      return;
+    }
+    c.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+        <div style="font-size:13px;color:var(--text-muted)">${resolvedLog.length} resolved report${resolvedLog.length!==1?'s':''} on file</div>
+        <button class="btn btn-blue btn-sm" onclick="downloadResolvedLogWord()" style="display:flex;align-items:center;gap:6px">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download All (.doc)
+        </button>
+      </div>` +
+    resolvedLog.map(r=>`
+      <div class="admin-card" style="cursor:pointer" onclick="openResolvedDetail('${r.id}')">
+        <div style="font-size:22px;flex-shrink:0">${r.type==='lost'?'🔴':'🟢'}</div>
+        <div class="admin-info">
+          <div class="admin-name">${esc(r.name)}</div>
+          <div class="admin-meta">${esc(r.loc||'—')} · ${r.date||'—'}</div>
+          <div class="admin-meta" style="margin-top:2px"><span style="font-family:monospace;letter-spacing:1px;color:var(--vu-blue);background:#eef2ff;padding:1px 7px;border-radius:6px;font-size:10px">🏷 ${esc(r.tracker||'—')}</span></div>
+        </div>
+        <span style="font-size:11px;color:var(--vu-blue3);font-weight:600">View →</span>
       </div>`).join('');
     return;
   }
@@ -2119,8 +2266,12 @@ function renderAdmin(){
           <div class="claimed-item-info">
             <div class="claimed-item-name">${esc(i.name)} <span style="font-size:12px;font-weight:600;color:var(--warn)">— Claimed</span></div>
             <div class="claimed-item-meta">${esc(i.loc)} &nbsp;·&nbsp; ${i.date}</div>
+            ${i.tracker?`<div style="margin-top:4px"><span style="font-family:monospace;font-size:11px;letter-spacing:1px;color:var(--vu-blue);background:#eef2ff;padding:2px 8px;border-radius:6px">🏷 ${esc(i.tracker)}</span></div>`:''}
           </div>
-          <button class="btn btn-danger btn-sm" onclick="adminDelItem('${i.id}')" title="Delete">🗑</button>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            ${!i.resolved?`<button class="btn btn-blue btn-sm" onclick="adminResolveItem('${i.id}')" title="Archive full details permanently">✅ Resolved</button>`:`<span style="font-size:10px;color:var(--success);font-weight:700;text-align:center">✔ Logged</span>`}
+            <button class="btn btn-danger btn-sm" onclick="adminDelItem('${i.id}')" title="Delete">🗑</button>
+          </div>
         </div>
         <div class="claimed-divider"></div>
         <div class="claimed-claimant">
@@ -2154,6 +2305,7 @@ function renderAdmin(){
         <div class="admin-name">${esc(i.name)} ${adminStatusText(i)}</div>
         <div class="admin-meta">${esc(i.loc)} · ${i.date}</div>
         <div class="admin-meta" style="margin-top:2px">By: ${esc(i.byName||'Unknown')}</div>
+        ${i.tracker?`<div class="admin-meta" style="margin-top:2px"><span style="font-family:monospace;letter-spacing:1px;color:var(--vu-blue);background:#eef2ff;padding:1px 7px;border-radius:6px;font-size:10px">🏷 ${esc(i.tracker)}</span></div>`:''}
       </div>
       <div class="admin-actions">
         ${i.status!=='claimed'?`<button class="btn btn-success btn-sm" onclick="adminClaim('${i.id}')">✓ Claim</button>`:''}
@@ -2213,6 +2365,129 @@ window.adminDelItem = function(id){
   });
 };
 
+/* ── RESOLVE ITEM ──
+   Archives a full, permanent snapshot of a claimed item (tracker, reporter,
+   claimant, contacts, etc.) into the 'resolved_log' collection. This record
+   survives even if the admin later deletes the live item from 'items'. */
+window.adminResolveItem = async function(id){
+  const i = allItems.find(x=>x.id===id);
+  if(!i){ toast('Item not found','er'); return; }
+  if(i.resolved){ toast('This item is already logged','nf'); return; }
+  const snap = i.claimantSnapshot||{};
+  try{
+    await DB.addDoc('resolved_log', {
+      itemId: i.id,
+      tracker: i.tracker||'—',
+      type: i.type,
+      name: i.name,
+      cat: i.cat,
+      date: i.date,
+      loc: i.loc,
+      desc: i.desc||'',
+      storage: i.storage||'',
+      reporterName: i.byName||'Unknown',
+      reporterPhone: i.phone||'—',
+      reporterId: i.byId||'',
+      claimantName: snap.name||'—',
+      claimantEmail: snap.email||'—',
+      claimantPhone: snap.phone||'—',
+      claimedAt: i.claimedAt||'',
+      reportedAt: i.at||'',
+      resolvedAt: new Date().toISOString(),
+      resolvedBy: me?.first ? (me.first+' '+me.last) : 'Admin'
+    });
+    await DB.updateDoc('items', id, { resolved:true });
+    toast('Item resolved & permanently logged ✓','ok');
+  } catch(e){ toast('Failed to resolve: '+e.message,'er'); }
+};
+
+window.openResolvedDetail = function(id){
+  const r = resolvedLog.find(x=>x.id===id);
+  if(!r) return;
+  const dateStr = (d)=> d? new Date(d).toLocaleDateString('en-UG',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+  const html = `
+    <div class="modal-title">${esc(r.name)}</div>
+    <div class="pill ${r.type==='lost'?'pill-lost':'pill-found'}">${r.type==='lost'?'LOST':'FOUND'}</div>
+    <div style="margin-top:16px">
+      <div class="drow"><span>Tracker Number</span><span style="font-family:monospace;letter-spacing:1px;color:var(--vu-blue);background:#eef2ff;padding:2px 8px;border-radius:6px">${esc(r.tracker)}</span></div>
+      <div class="drow"><span>Category</span><span>${cleanCatLabel(r.cat)}</span></div>
+      <div class="drow"><span>Date Reported</span><span>${r.date||'—'}</span></div>
+      <div class="drow"><span>Location</span><span>${esc(r.loc||'—')}</span></div>
+      ${r.desc?`<div class="drow"><span>Description</span><span>${esc(r.desc)}</span></div>`:''}
+      ${r.storage?`<div class="drow"><span>Currently at</span><span>${esc(r.storage)}</span></div>`:''}
+      <div class="drow"><span>Reported by</span><span>${esc(r.reporterName)}</span></div>
+      <div class="drow"><span>Reporter Phone</span><span><a href="tel:${esc(r.reporterPhone)}" style="color:var(--vu-red);font-weight:600">${esc(r.reporterPhone)}</a></span></div>
+      <div class="drow"><span>Claimed by</span><span>${esc(r.claimantName)}</span></div>
+      <div class="drow"><span>Claimant Email</span><span><a href="mailto:${esc(r.claimantEmail)}" style="color:var(--vu-blue3)">${esc(r.claimantEmail)}</a></span></div>
+      <div class="drow"><span>Claimant Phone</span><span><a href="tel:${esc(r.claimantPhone)}" style="color:var(--vu-red);font-weight:600">${esc(r.claimantPhone)}</a></span></div>
+      <div class="drow"><span>Claimed At</span><span>${dateStr(r.claimedAt)}</span></div>
+      <div class="drow"><span>Resolved At</span><span>${dateStr(r.resolvedAt)}</span></div>
+      <div class="drow"><span>Resolved By</span><span>${esc(r.resolvedBy||'Admin')}</span></div>
+    </div>
+    <div style="display:flex;gap:9px;margin-top:20px">
+      <button class="btn btn-danger btn-sm" style="flex:1" onclick="adminDelResolvedLog('${r.id}')">🗑 Delete Record</button>
+      <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeSheet()">Close</button>
+    </div>`;
+  document.getElementById('sheetContent').innerHTML = html;
+  document.getElementById('detailOverlay').classList.add('open');
+};
+
+window.adminDelResolvedLog = function(id){
+  showConfirm('Delete Record','Permanently remove this resolved-item record from the archive?','🗑️', async ()=>{
+    try{ await DB.deleteDoc('resolved_log', id); closeSheet(); toast('Record deleted','nf'); }
+    catch(e){ toast('Delete failed: '+e.message,'er'); }
+  });
+};
+
+/* ── DOWNLOAD ALL RESOLVED RECORDS AS A WORD DOCUMENT (.doc) ──
+   Builds an HTML table that Microsoft Word opens natively as a real,
+   well-formatted table — no external libraries or network calls needed. */
+window.downloadResolvedLogWord = function(){
+  if(!resolvedLog.length){ toast('No resolved records to download yet','er'); return; }
+  const dateStr = (d)=> d? new Date(d).toLocaleDateString('en-UG',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+  const rows = resolvedLog.map(r=>`
+    <tr>
+      <td>${esc(r.tracker)}</td>
+      <td>${r.type==='lost'?'Lost':'Found'}</td>
+      <td>${esc(r.name)}</td>
+      <td>${cleanCatLabel(r.cat)}</td>
+      <td>${esc(r.loc||'—')}</td>
+      <td>${r.date||'—'}</td>
+      <td>${esc(r.reporterName)}</td>
+      <td>${esc(r.reporterPhone)}</td>
+      <td>${esc(r.claimantName)}</td>
+      <td>${esc(r.claimantEmail)}</td>
+      <td>${esc(r.claimantPhone)}</td>
+      <td>${dateStr(r.claimedAt)}</td>
+      <td>${dateStr(r.resolvedAt)}</td>
+    </tr>`).join('');
+  const html = `
+  <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+  <head><meta charset="utf-8"><title>VU Find — Resolved Items Report</title></head>
+  <body style="font-family:Calibri,Arial,sans-serif">
+    <h2 style="color:#1a3580">VU Find — Resolved Lost &amp; Found Items</h2>
+    <p style="font-size:11px;color:#555">Generated ${new Date().toLocaleString('en-UG')} · ${resolvedLog.length} record(s)</p>
+    <table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse;font-size:11px;width:100%">
+      <tr style="background:#1a3580;color:#fff;font-weight:bold">
+        <td>Tracker</td><td>Type</td><td>Item</td><td>Category</td><td>Location</td><td>Date Reported</td>
+        <td>Reporter</td><td>Reporter Phone</td><td>Claimant</td><td>Claimant Email</td><td>Claimant Phone</td>
+        <td>Claimed At</td><td>Resolved At</td>
+      </tr>
+      ${rows}
+    </table>
+  </body></html>`;
+  const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'VU_Find_Resolved_Items_' + new Date().toISOString().slice(0,10) + '.doc';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+  toast('Downloading Word document…','ok');
+};
+
 window.adminDelReview = function(id){
   showConfirm('Delete Review','Permanently delete this review?','🗑️', async ()=>{
     try{ await DB.deleteDoc('reviews', id); toast('Review deleted','nf'); }
@@ -2229,6 +2504,20 @@ window.adminResetReunited = function(){
       try{
         await DB.resetReunited();
         toast('Reunited counter has been reset to 0','ok');
+      } catch(e){ toast('Reset failed: '+e.message,'er'); }
+    }
+  );
+};
+
+window.adminResetTrackers = function(){
+  showConfirm(
+    'Reset Tracker Numbers',
+    'This clears the record of issued tracker numbers so new items can start fresh from scratch. Previously issued tracker numbers may then be reused. Continue?',
+    '🏷',
+    async ()=>{
+      try{
+        await DB.resetTrackers();
+        toast('Tracker numbering has been reset','ok');
       } catch(e){ toast('Reset failed: '+e.message,'er'); }
     }
   );
@@ -2283,6 +2572,9 @@ function renderReviews(){
   const list  = document.getElementById('reviewsList');
   const count = document.getElementById('reviewCount');
   if(!list) return;
+  const _pageEl = list.closest('.page');
+  const _scrollY = _pageEl ? _pageEl.scrollTop : 0;
+  requestAnimationFrame(()=>{ if(_pageEl) _pageEl.scrollTop = _scrollY; });
   if(count) count.textContent = `${allReviews.length} review${allReviews.length!==1?'s':''}`;
   if(!allReviews.length){
     list.innerHTML=`<div class="review-empty"><div class="review-empty-ico">💬</div><p style="font-size:14px;color:var(--text-muted)">No reviews yet. Be the first to share your experience!</p></div>`;
@@ -2471,6 +2763,16 @@ function togglePw(inputId, btn){
 function setText(id,val){ const el=document.getElementById(id); if(el) el.textContent=val; }
 function esc(s){ if(!s)return''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function setBtn(id,loading,text){ const el=document.getElementById(id); if(!el) return; el.disabled=loading; el.textContent=text; }
+
+/* Keeps the enclosing .page's scroll position stable across a real-time
+   list re-render, so incoming Firestore updates never yank the view back
+   up to the top while someone is mid-scroll. */
+function withScrollPreserved(containerEl, renderFn){
+  const pageEl = containerEl ? containerEl.closest('.page') : null;
+  const y = pageEl ? pageEl.scrollTop : 0;
+  renderFn();
+  if(pageEl) requestAnimationFrame(()=>{ pageEl.scrollTop = y; });
+}
 function toast(msg,type='nf'){
   const c=document.getElementById('toasts');
   const icons={ok:'✅',er:'❌',nf:'ℹ️'};
@@ -2834,10 +3136,72 @@ window.addEventListener('offline', updateAdminNetBadge);
 const _origRenderAdmin = window.renderAdmin;
 // Patch: call updateAdminNetBadge after the admin page is shown
 const _origNavFn = window.nav;
-window.nav = function(pg){
+window.nav = function(pg, _fromPopstate){
   _origNavFn(pg);
   if(pg==='admin') setTimeout(updateAdminNetBadge, 50);
+  // Tapping Home in the bottom nav (or navigating to Home) always glides
+  // back to the top of the page, even if the user had scrolled down.
+  if(pg==='home'){
+    const el = document.getElementById('pg-home');
+    if(el) el.scrollTo({ top:0, behavior:'smooth' });
+  }
+  if(!_fromPopstate && window._vuPushNavState) window._vuPushNavState(pg);
 };
+
+/* ── ANDROID / PWA BACK BUTTON ──
+   Intercepts the hardware/gesture back action so it navigates within the
+   app (closing an open sheet/modal, or returning to the previous page)
+   instead of exiting the app entirely. */
+(function(){
+  let navStack = ['home'];
+
+  function topOverlayOpen(){
+    return document.getElementById('detailOverlay')?.classList.contains('open')
+        || document.getElementById('reportSheetOverlay')?.classList.contains('open')
+        || document.getElementById('adminClaimOverlay')?.classList.contains('open')
+        || document.getElementById('addAccountOverlay')?.classList.contains('open')
+        || document.getElementById('confirmOverlay')?.classList.contains('open')
+        || document.getElementById('reviewPromptOverlay')?.classList.contains('open')
+        || document.getElementById('sidebar')?.classList.contains('open');
+  }
+  function closeTopOverlay(){
+    if(document.getElementById('detailOverlay')?.classList.contains('open')) return closeSheet();
+    if(document.getElementById('reportSheetOverlay')?.classList.contains('open')) return closeReportSheetDirect();
+    if(document.getElementById('adminClaimOverlay')?.classList.contains('open')) return closeAdminClaimOverlay();
+    if(document.getElementById('addAccountOverlay')?.classList.contains('open')) return closeAddAccountModal();
+    if(document.getElementById('confirmOverlay')?.classList.contains('open')) document.getElementById('confirmOverlay').classList.remove('open');
+    if(document.getElementById('reviewPromptOverlay')?.classList.contains('open')) document.getElementById('reviewPromptOverlay').classList.remove('open');
+    if(document.getElementById('sidebar')?.classList.contains('open')) return closeSidebar();
+  }
+
+  window._vuPushNavState = function(pg){
+    if(navStack[navStack.length-1] !== pg) navStack.push(pg);
+    history.pushState({ vuPage: pg }, '', '#'+pg);
+  };
+
+  // Establish a base history entry once the app screen becomes active,
+  // so the very first back-press has something in-app to land on.
+  document.addEventListener('DOMContentLoaded', ()=>{
+    history.replaceState({ vuPage:'home' }, '', '#home');
+  });
+
+  window.addEventListener('popstate', (e)=>{
+    // Priority 1: close whatever overlay/sheet/sidebar is open.
+    if(topOverlayOpen()){
+      closeTopOverlay();
+      history.pushState({ vuPage: navStack[navStack.length-1]||'home' }, '', '#'+(navStack[navStack.length-1]||'home'));
+      return;
+    }
+    // Priority 2: go to the previous in-app page rather than exiting.
+    if(navStack.length > 1) navStack.pop();
+    const target = (e.state && e.state.vuPage) || navStack[navStack.length-1] || 'home';
+    navStack[navStack.length-1] = target;
+    nav(target, true);
+    // Always keep at least one history entry so the next back-press
+    // stays inside the app instead of closing it.
+    history.pushState({ vuPage: target }, '', '#'+target);
+  });
+})();
 
 
 (function(){
@@ -2900,7 +3264,11 @@ window.addEventListener('load', ()=>{
 /* Wait for Firebase module to set window.DB before seeding */
 function _onFirebaseReady(){
   if(window._firebaseSeedIfEmpty){
-    window._firebaseSeedIfEmpty().catch(e=>console.warn('Seed skipped:',e));
+    window._firebaseSeedIfEmpty()
+      .catch(e=>console.warn('Seed skipped:',e))
+      .finally(()=>{ if(window._tryRestoreSession) window._tryRestoreSession(); });
+  } else if(window._tryRestoreSession){
+    window._tryRestoreSession();
   }
 }
 if(window._firebaseReady){ _onFirebaseReady(); }
@@ -2918,6 +3286,7 @@ else { document.addEventListener('firebaseReady', _onFirebaseReady, {once:true})
       <div class="flabel">Account Type</div>
       <select class="finput" id="newAccRole">
         <option value="student">Student (User)</option>
+        <option value="security">Security</option>
         <option value="admin">Admin</option>
       </select>
     </div>
