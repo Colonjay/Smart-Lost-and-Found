@@ -1737,6 +1737,10 @@ window.doLogout = function(){
   clearSession();
   stopListeners();
   allItems=[]; allUsers=[]; allReviews=[]; allComplaints=[];
+  // Auto-close the "leave a review" popup if it's open — it should never
+  // stay on screen once the account is signed out (e.g. the 10-minute
+  // inactivity auto-logout firing while the prompt was up).
+  document.getElementById('reviewPromptOverlay')?.classList.remove('open');
   document.getElementById('appScreen').classList.remove('active');
   document.getElementById('authScreen').classList.add('active');
   clearAuthForms();
@@ -1755,12 +1759,15 @@ const pageTitles={home:'Home',browse:'Browse Items',report:'Report Item',admin:'
 /* ── REVIEW GATE ── 
    Show review panel only after:
    1. User submits a report (lost/found), OR
-   2. 30 seconds of inactivity on any page
+   2. 8 minutes of inactivity on any page
    Never show again in the same session until next login or next report.
+   If the user is auto-logged-out (10 minutes of total inactivity — see
+   SESSION_MS below), the review prompt is force-closed at that point too
+   (handled in doLogout).
 */
 let _reviewShownThisSession = false;
 let _inactivityTimer = null;
-const INACTIVITY_MS = 30 * 1000; // 30 seconds
+const INACTIVITY_MS = 8 * 60 * 1000; // 8 minutes
 
 function _resetInactivityTimer(){
   clearTimeout(_inactivityTimer);
