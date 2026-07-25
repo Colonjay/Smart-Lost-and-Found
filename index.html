@@ -1796,7 +1796,6 @@ function _resetSessionTimer(){
   touchSession();
   _sessionTimer = setTimeout(()=>{
     if(me){
-      toast('You were signed out after 10 minutes of inactivity','er');
       doLogout();
     }
   }, SESSION_MS);
