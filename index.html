@@ -850,6 +850,43 @@ textarea.finput{resize:vertical;min-height:76px}
   </div>
 </div>
 
+<!-- 24-HOUR POST-CLAIM HELP-FEEDBACK MODAL -->
+<div class="confirm-overlay" id="helpFeedbackOverlay">
+  <div class="confirm-box" style="max-width:380px;text-align:left;">
+    <div id="helpFeedbackQuestion">
+      <div style="font-size:38px;text-align:center;margin-bottom:8px">🤔</div>
+      <div style="font-size:16px;font-weight:700;text-align:center;color:var(--text-dark);margin-bottom:6px">Did you receive help retrieving your item?</div>
+      <div style="font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5;margin-bottom:18px">
+        It's been over 24 hours since you claimed "<strong id="hfItemName"></strong>". Let us know how it went.
+      </div>
+      <label style="display:flex;align-items:center;gap:9px;margin-bottom:12px;cursor:pointer;font-size:14px;color:var(--text-dark)">
+        <input type="checkbox" id="hfYes" onchange="hfCheck('yes')" style="width:18px;height:18px;accent-color:var(--success,#16a34a)"/> Yes, I received help
+      </label>
+      <label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-size:14px;color:var(--text-dark)">
+        <input type="checkbox" id="hfNo" onchange="hfCheck('no')" style="width:18px;height:18px;accent-color:var(--vu-red)"/> No, I did not receive help
+      </label>
+    </div>
+    <div id="helpFeedbackNo" style="display:none">
+      <div style="font-size:34px;text-align:center;margin-bottom:8px">📞</div>
+      <div style="font-size:13px;color:var(--text-mid);text-align:center;line-height:1.5;margin-bottom:14px">
+        We're sorry to hear that. Please reach out to admin so we can help you retrieve your item:
+      </div>
+      <div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:11px 14px;font-size:12px;color:var(--text-mid);text-align:center">
+        📞 <strong>Admin Contact:</strong> <a href="tel:0700000000" style="color:var(--vu-red);font-weight:600">0700000000</a><br/>
+        📧 <a href="mailto:admin@vu.ac.ug" style="color:var(--vu-blue3);font-weight:500">admin@vu.ac.ug</a>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:16px" onclick="closeHelpFeedback()">Close</button>
+    </div>
+    <div id="helpFeedbackYes" style="display:none">
+      <div style="font-size:34px;text-align:center;margin-bottom:8px">🌟</div>
+      <div style="font-size:13px;color:var(--text-mid);text-align:center;line-height:1.5;margin-bottom:16px">
+        Great! Please take a moment to add a review about your experience.
+      </div>
+      <button class="btn btn-success btn-sm" style="width:100%" onclick="closeHelpFeedbackThenReview()">Add a Review ⭐</button>
+    </div>
+  </div>
+</div>
+
 <!-- ADMIN CLAIM DIALOG -->
 <div class="admin-claim-overlay" id="adminClaimOverlay">
   <div class="admin-claim-box">
@@ -1555,6 +1592,7 @@ function startListeners(){
       });
     }
     _itemsInitialized = true;
+    checkHelpFeedbackDue();
   });
 
   if(unsubUsers) unsubUsers();
@@ -1683,6 +1721,7 @@ function bootApp(u, opts){
   opts = opts || {};
   me = u;
   _reviewShownThisSession = false;
+  _helpFeedbackShownThisSession = false;
   clearTimeout(_inactivityTimer);
   clearAuthForms();
   document.getElementById('authScreen').classList.remove('active');
@@ -1732,6 +1771,8 @@ window.doLogout = function(){
   me = null;
   mySessionId = null;
   _reviewShownThisSession = false;
+  _helpFeedbackShownThisSession = false;
+  hfCurrentItemId = null;
   clearTimeout(_inactivityTimer);
   clearTimeout(_sessionTimer);
   clearSession();
@@ -1741,6 +1782,7 @@ window.doLogout = function(){
   // stay on screen once the account is signed out (e.g. the 10-minute
   // inactivity auto-logout firing while the prompt was up).
   document.getElementById('reviewPromptOverlay')?.classList.remove('open');
+  document.getElementById('helpFeedbackOverlay')?.classList.remove('open');
   document.getElementById('appScreen').classList.remove('active');
   document.getElementById('authScreen').classList.add('active');
   clearAuthForms();
@@ -2095,36 +2137,48 @@ window.openSheet = function(id){
       </div>`;
     }
 
-    /* ── CLAIM COMPLAINT SECTION (shown to all, right below claimed status) ── */
-    const alreadyComplained = me ? false : false; // evaluated at submit time
-    html += `
-    <div class="complaint-box" id="complaintBox_${id}">
-      <div class="complaint-box-title">⚠️ Think this item is yours?</div>
-      <div class="complaint-box-desc">If this item was incorrectly claimed and actually belongs to you, raise a complaint below. Admin will review and contact both parties.</div>
-      <div class="complaint-submitted" id="complaintDone_${id}">✅ Complaint submitted! Admin will review it shortly.</div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-sm" style="background:#fef3c7;border:1.5px solid #fde68a;color:#92400e;flex:1" onclick="toggleComplaintForm('${id}')">⚠️ Raise a Claim Complaint</button>
-        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeSheet()">Close</button>
-      </div>
-      <div class="complaint-form" id="complaintForm_${id}">
-        <div class="fgroup" style="margin-bottom:10px">
-          <div class="flabel">Your Full Name *</div>
-          <input type="text" class="finput" id="cmpName_${id}" placeholder="e.g. Nakato Sarah" style="font-size:13px" value="${me ? esc(me.first+' '+me.last) : ''}"/>
-        </div>
-        <div class="fgroup" style="margin-bottom:10px">
-          <div class="flabel">Your Contact (Phone or Email) *</div>
-          <input type="text" class="finput" id="cmpContact_${id}" placeholder="07XXXXXXXX or you@email.com" style="font-size:13px" value="${me ? esc(me.phone||me.email||'') : ''}"/>
-        </div>
-        <div class="fgroup" style="margin-bottom:10px">
-          <div class="flabel">Why do you believe this item belongs to you? *</div>
-          <textarea class="finput" id="cmpReason_${id}" placeholder="Describe identifying features, proof of ownership, or circumstances..." style="min-height:72px;font-size:13px"></textarea>
-        </div>
+    /* ── CLAIM COMPLAINT SECTION (shown to all, right below claimed status) ──
+       Security accounts cannot raise claim complaints — they see a locked
+       notice instead of the complaint form. */
+    if(me?.role==='security'){
+      html += `
+      <div class="complaint-box" id="complaintBox_${id}">
+        <div class="complaint-box-title">🔒 Security — No Complaints</div>
+        <div class="complaint-box-desc">Security accounts can report and manage items but cannot raise claim complaints.</div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-sm" style="background:#b45309;color:#fff;flex:1" onclick="submitComplaint('${id}','${esc(i.name)}')">Submit Complaint</button>
-          <button class="btn btn-ghost btn-sm" onclick="toggleComplaintForm('${id}')">Cancel</button>
+          <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeSheet()">Close</button>
         </div>
-      </div>
-    </div>`;
+      </div>`;
+    } else {
+      html += `
+      <div class="complaint-box" id="complaintBox_${id}">
+        <div class="complaint-box-title">⚠️ Think this item is yours?</div>
+        <div class="complaint-box-desc">If this item was incorrectly claimed and actually belongs to you, raise a complaint below. Admin will review and contact both parties.</div>
+        <div class="complaint-submitted" id="complaintDone_${id}">✅ Complaint submitted! Admin will review it shortly.</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm" style="background:#fef3c7;border:1.5px solid #fde68a;color:#92400e;flex:1" onclick="toggleComplaintForm('${id}')">⚠️ Raise a Claim Complaint</button>
+          <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeSheet()">Close</button>
+        </div>
+        <div class="complaint-form" id="complaintForm_${id}">
+          <div class="fgroup" style="margin-bottom:10px">
+            <div class="flabel">Your Full Name *</div>
+            <input type="text" class="finput" id="cmpName_${id}" placeholder="e.g. Nakato Sarah" style="font-size:13px" value="${me ? esc(me.first+' '+me.last) : ''}"/>
+          </div>
+          <div class="fgroup" style="margin-bottom:10px">
+            <div class="flabel">Your Contact (Phone or Email) *</div>
+            <input type="text" class="finput" id="cmpContact_${id}" placeholder="07XXXXXXXX or you@email.com" style="font-size:13px" value="${me ? esc(me.phone||me.email||'') : ''}"/>
+          </div>
+          <div class="fgroup" style="margin-bottom:10px">
+            <div class="flabel">Why do you believe this item belongs to you? *</div>
+            <textarea class="finput" id="cmpReason_${id}" placeholder="Describe identifying features, proof of ownership, or circumstances..." style="min-height:72px;font-size:13px"></textarea>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-sm" style="background:#b45309;color:#fff;flex:1" onclick="submitComplaint('${id}','${esc(i.name)}')">Submit Complaint</button>
+            <button class="btn btn-ghost btn-sm" onclick="toggleComplaintForm('${id}')">Cancel</button>
+          </div>
+        </div>
+      </div>`;
+    }
   }
   document.getElementById('sheetContent').innerHTML = html;
   document.getElementById('detailOverlay').classList.add('open');
@@ -2193,6 +2247,83 @@ window.claimItem = async function(id){
 };
 
 
+/* ── 24-HOUR POST-CLAIM HELP-FEEDBACK POPUP ──
+   Once 24 hours have passed since a user claimed an item, they're asked
+   whether they actually received help retrieving it. Answering "No" shows
+   the admin contact/email with a close button; answering "Yes" invites
+   them to leave a review. Shown at most once per item (helpFeedbackAsked
+   is persisted on the item) and at most once per app session. Security
+   accounts never claim items, so this never applies to them. */
+let _helpFeedbackShownThisSession = false;
+let hfCurrentItemId = null;
+
+function checkHelpFeedbackDue(){
+  if(_helpFeedbackShownThisSession || !me || me.role==='security') return;
+  const now = Date.now();
+  const due = allItems.find(i=>
+    i.status==='claimed' &&
+    i.claimedById===me.id &&
+    i.claimedAt &&
+    !i.helpFeedbackAsked &&
+    (now - new Date(i.claimedAt).getTime()) >= 24*60*60*1000
+  );
+  if(!due) return;
+  _helpFeedbackShownThisSession = true;
+  hfCurrentItemId = due.id;
+  const nameEl = document.getElementById('hfItemName');
+  if(nameEl) nameEl.textContent = due.name || 'your item';
+  resetHelpFeedbackModal();
+  document.getElementById('helpFeedbackOverlay').classList.add('open');
+}
+
+function resetHelpFeedbackModal(){
+  const q = document.getElementById('helpFeedbackQuestion');
+  const no = document.getElementById('helpFeedbackNo');
+  const yes = document.getElementById('helpFeedbackYes');
+  if(q) q.style.display='block';
+  if(no) no.style.display='none';
+  if(yes) yes.style.display='none';
+  const hfYes = document.getElementById('hfYes'); if(hfYes) hfYes.checked=false;
+  const hfNo  = document.getElementById('hfNo');  if(hfNo)  hfNo.checked=false;
+}
+
+window.hfCheck = async function(which){
+  const hfYes = document.getElementById('hfYes');
+  const hfNo  = document.getElementById('hfNo');
+  // Keep the two checkboxes mutually exclusive
+  if(which==='yes'){ if(hfNo) hfNo.checked=false; }
+  else { if(hfYes) hfYes.checked=false; }
+
+  document.getElementById('helpFeedbackQuestion').style.display='none';
+  document.getElementById('helpFeedbackNo').style.display  = which==='no'  ? 'block':'none';
+  document.getElementById('helpFeedbackYes').style.display = which==='yes' ? 'block':'none';
+
+  if(hfCurrentItemId){
+    try{
+      await DB.updateDoc('items', hfCurrentItemId, {
+        helpFeedbackAsked: true,
+        helpFeedbackAnswer: which,
+        helpFeedbackAt: new Date().toISOString()
+      });
+    } catch(e){ /* non-critical — don't block the UI on this */ }
+  }
+};
+
+window.closeHelpFeedback = function(){
+  document.getElementById('helpFeedbackOverlay').classList.remove('open');
+  hfCurrentItemId = null;
+  resetHelpFeedbackModal();
+};
+
+window.closeHelpFeedbackThenReview = function(){
+  const itemId = hfCurrentItemId;
+  document.getElementById('helpFeedbackOverlay').classList.remove('open');
+  hfCurrentItemId = null;
+  resetHelpFeedbackModal();
+  if(itemId) pendingReviewItemId = itemId;
+  showReviewPrompt();
+};
+
 /* CLAIM COMPLAINTS */
 window.toggleComplaintForm = function(id){
   const form = document.getElementById('complaintForm_'+id);
@@ -2200,6 +2331,7 @@ window.toggleComplaintForm = function(id){
 };
 
 window.submitComplaint = async function(itemId, itemName){
+  if(me?.role==='security'){toast('Security accounts cannot raise claim complaints','er');return;}
   const name    = (document.getElementById('cmpName_'+itemId)?.value||'').trim();
   const contact = (document.getElementById('cmpContact_'+itemId)?.value||'').trim();
   const reason  = (document.getElementById('cmpReason_'+itemId)?.value||'').trim();
